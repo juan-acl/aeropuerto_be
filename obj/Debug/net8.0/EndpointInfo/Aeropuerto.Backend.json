@@ -1,0 +1,2939 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Aeropuerto.Backend",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/AcompanantesViaje": {
+      "post": {
+        "tags": [
+          "AcompanantesViaje"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AcompanantesViaje/principal/{idPasajeroPrincipal}": {
+      "get": {
+        "tags": [
+          "AcompanantesViaje"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajeroPrincipal",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AcompanantesViaje/{id}": {
+      "put": {
+        "tags": [
+          "AcompanantesViaje"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcompanantesViajeModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AcompanantesViaje/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "AcompanantesViaje"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Aeropuertos": {
+      "post": {
+        "tags": [
+          "Aeropuertos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AeropuertoModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AeropuertoModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AeropuertoModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Aeropuertos"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Aeropuertos/{codigo}": {
+      "put": {
+        "tags": [
+          "Aeropuertos"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "terminales",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "puertas",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "activo",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Aeropuertos"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Facturas": {
+      "post": {
+        "tags": [
+          "Facturas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Facturas/reserva/{idReserva}": {
+      "get": {
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "name": "idReserva",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Facturas/{id}": {
+      "put": {
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FacturasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Facturas/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "Facturas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialComunicaciones": {
+      "post": {
+        "tags": [
+          "HistorialComunicaciones"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialComunicaciones/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "HistorialComunicaciones"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialComunicaciones/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "HistorialComunicaciones"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialComunicaciones/{id}": {
+      "put": {
+        "tags": [
+          "HistorialComunicaciones"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialComunicacionModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialReservas": {
+      "post": {
+        "tags": [
+          "HistorialReservas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialReservas/reserva/{idReserva}": {
+      "get": {
+        "tags": [
+          "HistorialReservas"
+        ],
+        "parameters": [
+          {
+            "name": "idReserva",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialReservas/{id}": {
+      "put": {
+        "tags": [
+          "HistorialReservas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorialReservasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/HistorialReservas/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "HistorialReservas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/MetodosPago": {
+      "post": {
+        "tags": [
+          "MetodosPago"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MetodosPago"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/MetodosPago/{id}": {
+      "put": {
+        "tags": [
+          "MetodosPago"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetodosPagoModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/MetodosPago/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "MetodosPago"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Pasajeros": {
+      "post": {
+        "tags": [
+          "Pasajeros"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pasajeros"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Pasajeros/{id}": {
+      "put": {
+        "tags": [
+          "Pasajeros"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "telefono",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "direccion",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pasajeros"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosDocumentos": {
+      "post": {
+        "tags": [
+          "PasajerosDocumentos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosDocumentosModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosDocumentosModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosDocumentosModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosDocumentos/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PasajerosDocumentos"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosDocumentos/{id}/verificar": {
+      "patch": {
+        "tags": [
+          "PasajerosDocumentos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosDocumentos/{id}": {
+      "delete": {
+        "tags": [
+          "PasajerosDocumentos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosHistorialMedico": {
+      "post": {
+        "tags": [
+          "PasajerosHistorialMedico"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroHistorialMedicoModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroHistorialMedicoModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroHistorialMedicoModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosHistorialMedico/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PasajerosHistorialMedico"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosHistorialMedico/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "PasajerosHistorialMedico"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosPreferencias": {
+      "post": {
+        "tags": [
+          "PasajerosPreferencias"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroPreferenciaModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroPreferenciaModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajeroPreferenciaModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosPreferencias/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PasajerosPreferencias"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosPreferencias/{id}": {
+      "put": {
+        "tags": [
+          "PasajerosPreferencias"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PasajerosPreferencias"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosRedesSociales": {
+      "post": {
+        "tags": [
+          "PasajerosRedesSociales"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosRedesSociales/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PasajerosRedesSociales"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosRedesSociales/{id}": {
+      "put": {
+        "tags": [
+          "PasajerosRedesSociales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasajerosRedesSocialesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PasajerosRedesSociales/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "PasajerosRedesSociales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PerfilesViajero": {
+      "post": {
+        "tags": [
+          "PerfilesViajero"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerfilViajeroModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerfilViajeroModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerfilViajeroModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PerfilesViajero/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PerfilesViajero"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PerfilesViajero/{id}/sumar-puntos": {
+      "patch": {
+        "tags": [
+          "PerfilesViajero"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PerfilesViajero/{id}": {
+      "delete": {
+        "tags": [
+          "PerfilesViajero"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PreferenciasIdiomas": {
+      "post": {
+        "tags": [
+          "PreferenciasIdiomas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PreferenciasIdiomas/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "PreferenciasIdiomas"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PreferenciasIdiomas/{id}": {
+      "put": {
+        "tags": [
+          "PreferenciasIdiomas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferenciaIdiomaModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/PreferenciasIdiomas/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "PreferenciasIdiomas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Promociones": {
+      "post": {
+        "tags": [
+          "Promociones"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Promociones"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Promociones/validar/{codigo}": {
+      "get": {
+        "tags": [
+          "Promociones"
+        ],
+        "parameters": [
+          {
+            "name": "codigo",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Promociones/{id}": {
+      "put": {
+        "tags": [
+          "Promociones"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Promociones/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "Promociones"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Reservas": {
+      "post": {
+        "tags": [
+          "Reservas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Reservas/pasajero/{idPasajero}": {
+      "get": {
+        "tags": [
+          "Reservas"
+        ],
+        "parameters": [
+          {
+            "name": "idPasajero",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Reservas/{id}": {
+      "put": {
+        "tags": [
+          "Reservas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Reservas/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "Reservas"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPagos": {
+      "post": {
+        "tags": [
+          "ReservasPagos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPagosModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPagosModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPagosModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPagos/reserva/{idReserva}": {
+      "get": {
+        "tags": [
+          "ReservasPagos"
+        ],
+        "parameters": [
+          {
+            "name": "idReserva",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPagos/{id}/estado": {
+      "patch": {
+        "tags": [
+          "ReservasPagos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPagos/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "ReservasPagos"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPromociones/aplicar": {
+      "post": {
+        "tags": [
+          "ReservasPromociones"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPromocionesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPromocionesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReservasPromocionesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPromociones/reserva/{idReserva}": {
+      "get": {
+        "tags": [
+          "ReservasPromociones"
+        ],
+        "parameters": [
+          {
+            "name": "idReserva",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/ReservasPromociones/quitar/{idReserva}/{idPromocion}": {
+      "delete": {
+        "tags": [
+          "ReservasPromociones"
+        ],
+        "parameters": [
+          {
+            "name": "idReserva",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "idPromocion",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/TarifasEspeciales": {
+      "post": {
+        "tags": [
+          "TarifasEspeciales"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/TarifasEspeciales/activas": {
+      "get": {
+        "tags": [
+          "TarifasEspeciales"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/TarifasEspeciales/aerolinea/{idAerolinea}": {
+      "get": {
+        "tags": [
+          "TarifasEspeciales"
+        ],
+        "parameters": [
+          {
+            "name": "idAerolinea",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/TarifasEspeciales/{id}": {
+      "put": {
+        "tags": [
+          "TarifasEspeciales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TarifasEspecialesModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/TarifasEspeciales/fisico/{id}": {
+      "delete": {
+        "tags": [
+          "TarifasEspeciales"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/Test": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcompanantesViajeModel": {
+        "type": "object",
+        "properties": {
+          "IdAcompanante": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajeroPrincipal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajeroAcompanante": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Frecuencia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Relacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "UltimoViajeJuntos": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AeropuertoModel": {
+        "type": "object",
+        "properties": {
+          "CodigoAeropuerto": {
+            "type": "string",
+            "nullable": true
+          },
+          "Nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "Ciudad": {
+            "type": "string",
+            "nullable": true
+          },
+          "Pais": {
+            "type": "string",
+            "nullable": true
+          },
+          "Region": {
+            "type": "string",
+            "nullable": true
+          },
+          "Continente": {
+            "type": "string",
+            "nullable": true
+          },
+          "HusoHorario": {
+            "type": "string",
+            "nullable": true
+          },
+          "Latitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Longitud": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "ElevacionMetros": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "Terminales": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "PuertasAbordaje": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Activo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FechaRegistro": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "UsuarioRegistro": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "FacturasModel": {
+        "type": "object",
+        "properties": {
+          "IdFactura": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NumeroFactura": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaEmision": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Subtotal": {
+            "type": "number",
+            "format": "double"
+          },
+          "Impuestos": {
+            "type": "number",
+            "format": "double"
+          },
+          "Total": {
+            "type": "number",
+            "format": "double"
+          },
+          "Moneda": {
+            "type": "string",
+            "nullable": true
+          },
+          "DatosFiscales": {
+            "type": "string",
+            "nullable": true
+          },
+          "PdfFactura": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HistorialComunicacionModel": {
+        "type": "object",
+        "properties": {
+          "IdComunicacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TipoComunicacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaEnvio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Asunto": {
+            "type": "string",
+            "nullable": true
+          },
+          "Contenido": {
+            "type": "string",
+            "nullable": true
+          },
+          "Estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "RespuestaRecibida": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HistorialReservasModel": {
+        "type": "object",
+        "properties": {
+          "IdHistorialReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FechaCambio": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "CampoModificado": {
+            "type": "string",
+            "nullable": true
+          },
+          "ValorAnterior": {
+            "type": "string",
+            "nullable": true
+          },
+          "ValorNuevo": {
+            "type": "string",
+            "nullable": true
+          },
+          "UsuarioModificacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "MotivoCambio": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MetodosPagoModel": {
+        "type": "object",
+        "properties": {
+          "IdMetodoPago": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "TipoPago": {
+            "type": "string",
+            "nullable": true
+          },
+          "Procesador": {
+            "type": "string",
+            "nullable": true
+          },
+          "Activo": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasajeroHistorialMedicoModel": {
+        "type": "object",
+        "properties": {
+          "IdHistorialMedico": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CondicionMedica": {
+            "type": "string",
+            "nullable": true
+          },
+          "RequiereAtencionEspecial": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MedicamentosAutorizados": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContactoEmergenciaNombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContactoEmergenciaTelefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "ContactoEmergenciaRelacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "UltimaActualizacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasajeroModel": {
+        "type": "object",
+        "properties": {
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Nombres": {
+            "type": "string",
+            "nullable": true
+          },
+          "Apellidos": {
+            "type": "string",
+            "nullable": true
+          },
+          "TipoDocumento": {
+            "type": "string",
+            "nullable": true
+          },
+          "NumeroDocumento": {
+            "type": "string",
+            "nullable": true
+          },
+          "Nacionalidad": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaNacimiento": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Genero": {
+            "type": "string",
+            "nullable": true
+          },
+          "Telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "Email": {
+            "type": "string",
+            "nullable": true
+          },
+          "Direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "CiudadResidencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaisResidencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "CodigoPostal": {
+            "type": "string",
+            "nullable": true
+          },
+          "Ocupacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "EstadoCivil": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaRegistro": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "UsuarioRegistro": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasajeroPreferenciaModel": {
+        "type": "object",
+        "properties": {
+          "IdPreferencia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TipoPreferencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "Descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "Activo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FechaActualizacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasajerosDocumentosModel": {
+        "type": "object",
+        "properties": {
+          "IdDocumento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TipoDocumento": {
+            "type": "string",
+            "nullable": true
+          },
+          "NumeroDocumento": {
+            "type": "string",
+            "nullable": true
+          },
+          "PaisEmision": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaEmision": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FechaExpiracion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ImagenDocumento": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "Verificado": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PasajerosRedesSocialesModel": {
+        "type": "object",
+        "properties": {
+          "IdRedSocial": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "RedSocial": {
+            "type": "string",
+            "nullable": true
+          },
+          "Usuario": {
+            "type": "string",
+            "nullable": true
+          },
+          "UrlPerfil": {
+            "type": "string",
+            "nullable": true
+          },
+          "Publico": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PerfilViajeroModel": {
+        "type": "object",
+        "properties": {
+          "IdPerfil": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "TipoPerfil": {
+            "type": "string",
+            "nullable": true
+          },
+          "NumeroPrograma": {
+            "type": "string",
+            "nullable": true
+          },
+          "AerolineaAsociada": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "PuntosAcumulados": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Categoria": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaIngreso": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FechaUltimaActividad": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PreferenciaIdiomaModel": {
+        "type": "object",
+        "properties": {
+          "IdPreferenciaIdioma": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Idioma": {
+            "type": "string",
+            "nullable": true
+          },
+          "Nivel": {
+            "type": "string",
+            "nullable": true
+          },
+          "Preferido": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PromocionesModel": {
+        "type": "object",
+        "properties": {
+          "IdPromocion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CodigoPromocion": {
+            "type": "string",
+            "nullable": true
+          },
+          "NombrePromocion": {
+            "type": "string",
+            "nullable": true
+          },
+          "Descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "TipoDescuento": {
+            "type": "string",
+            "nullable": true
+          },
+          "ValorDescuento": {
+            "type": "number",
+            "format": "double"
+          },
+          "FechaInicio": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "UsoMaximo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "UsosActuales": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Activa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReservasModel": {
+        "type": "object",
+        "properties": {
+          "IdReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdVuelo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPasajero": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CodigoReserva": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaReserva": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FechaModificacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "EstadoReserva": {
+            "type": "string",
+            "nullable": true
+          },
+          "TipoTarifa": {
+            "type": "string",
+            "nullable": true
+          },
+          "PrecioPagado": {
+            "type": "number",
+            "format": "double"
+          },
+          "Moneda": {
+            "type": "string",
+            "nullable": true
+          },
+          "NumeroAsiento": {
+            "type": "string",
+            "nullable": true
+          },
+          "ClaseServicio": {
+            "type": "string",
+            "nullable": true
+          },
+          "EquipajeFacturadoKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "EquipajeManoKg": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "CheckinRealizado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "FechaCheckin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "PuertaEmbarqueAsignada": {
+            "type": "string",
+            "nullable": true
+          },
+          "GrupoEmbarque": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "Observaciones": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReservasPagosModel": {
+        "type": "object",
+        "properties": {
+          "IdPago": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdMetodoPago": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Monto": {
+            "type": "number",
+            "format": "double"
+          },
+          "Moneda": {
+            "type": "string",
+            "nullable": true
+          },
+          "FechaPago": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "CodigoTransaccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "EstadoPago": {
+            "type": "string",
+            "nullable": true
+          },
+          "ComprobantePago": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ReservasPromocionesModel": {
+        "type": "object",
+        "properties": {
+          "IdReserva": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdPromocion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "DescuentoAplicado": {
+            "type": "number",
+            "format": "double"
+          },
+          "FechaAplicacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "TarifasEspecialesModel": {
+        "type": "object",
+        "properties": {
+          "IdTarifa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "IdAerolinea": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "NombreTarifa": {
+            "type": "string",
+            "nullable": true
+          },
+          "Descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "Condiciones": {
+            "type": "string",
+            "nullable": true
+          },
+          "DescuentoPorcentaje": {
+            "type": "number",
+            "format": "double"
+          },
+          "FechaInicio": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FechaFin": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Activa": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

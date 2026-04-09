@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|c:\\users\\gpast\\desktop\\proyecto base_datos_ii\\eropuerto_be\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|c:\\users\\gpast\\desktop\\proyecto base_datos_ii\\eropuerto_be\\data\\dbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|solutionrelative:data\\dbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|c:\\users\\gpast\\desktop\\proyecto base_datos_ii\\eropuerto_be\\services\\reservaspromocionesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|solutionrelative:services\\reservaspromocionesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|c:\\users\\gpast\\desktop\\proyecto base_datos_ii\\eropuerto_be\\interfaces\\ireservaspromocionesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|solutionrelative:interfaces\\ireservaspromocionesservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|c:\\users\\gpast\\desktop\\proyecto base_datos_ii\\eropuerto_be\\models\\reservaspromociones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E9851493-9C5B-4739-8DCE-D7FF1535A096}|Aeropuerto.Backend.csproj|solutionrelative:models\\reservaspromociones.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ReservasPromocionesService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Services\\ReservasPromocionesService.cs",
+              "RelativeDocumentMoniker": "Services\\ReservasPromocionesService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Services\\ReservasPromocionesService.cs*",
+              "RelativeToolTip": "Services\\ReservasPromocionesService.cs*",
+              "ViewState": "AgIAABUAAAAAAAAAAAAswDIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T21:43:39.046Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IReservasPromocionesService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IReservasPromocionesService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IReservasPromocionesService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IReservasPromocionesService.cs*",
+              "RelativeToolTip": "Interfaces\\IReservasPromocionesService.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T21:43:10.454Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ReservasPromociones.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\ReservasPromociones.cs",
+              "RelativeDocumentMoniker": "Models\\ReservasPromociones.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\ReservasPromociones.cs",
+              "RelativeToolTip": "Models\\ReservasPromociones.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T21:42:42.352Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DBContext.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Data\\DBContext.cs",
+              "RelativeDocumentMoniker": "Data\\DBContext.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Data\\DBContext.cs*",
+              "RelativeToolTip": "Data\\DBContext.cs*",
+              "ViewState": "AgIAABcAAAAAAAAAAAAmwCUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T21:15:18.556Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACIAAABWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-03T06:09:27.955Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

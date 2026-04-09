@@ -1,0 +1,288 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Data\\DBContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Data\\DBContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\PerfilViajeroController.cs||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controllers\\PerfilViajeroController.cs||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Services\\PerfilViajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Services\\PerfilViajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPerfilViajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Interfaces\\IPerfilViajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajerosDocumentosService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Interfaces\\IPasajerosDocumentosService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Interfaces\\IPasajeroService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Aeropuerto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\Aeropuerto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Pasajero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\Pasajero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PasajerosDocumentos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\PasajerosDocumentos.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PerfilViajero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Models\\PerfilViajero.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.Development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:appsettings.Development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IAeropuertoService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Interfaces\\IAeropuertoService.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\AeropuertosController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Controllers\\AeropuertosController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Aeropuerto.Backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Aeropuerto.Backend.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PerfilViajeroService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Services\\PerfilViajeroService.cs",
+              "RelativeDocumentMoniker": "Services\\PerfilViajeroService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Services\\PerfilViajeroService.cs",
+              "RelativeToolTip": "Services\\PerfilViajeroService.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAuwDcAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:09:45.125Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "IPasajerosDocumentosService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajerosDocumentosService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IPasajerosDocumentosService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajerosDocumentosService.cs",
+              "RelativeToolTip": "Interfaces\\IPasajerosDocumentosService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:06:50.87Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "IPasajeroService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajeroService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IPasajeroService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPasajeroService.cs",
+              "RelativeToolTip": "Interfaces\\IPasajeroService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:06:47.522Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PerfilViajeroController.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\PerfilViajeroController.cs",
+              "RelativeDocumentMoniker": "Controllers\\PerfilViajeroController.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\PerfilViajeroController.cs",
+              "RelativeToolTip": "Controllers\\PerfilViajeroController.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAuwCsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:03:58.176Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DBContext.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Data\\DBContext.cs",
+              "RelativeDocumentMoniker": "Data\\DBContext.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Data\\DBContext.cs",
+              "RelativeToolTip": "Data\\DBContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:08:26.595Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABQAAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:08:37.398Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Pasajero.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Pasajero.cs",
+              "RelativeDocumentMoniker": "Models\\Pasajero.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Pasajero.cs",
+              "RelativeToolTip": "Models\\Pasajero.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:06:11.827Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "PasajerosDocumentos.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PasajerosDocumentos.cs",
+              "RelativeDocumentMoniker": "Models\\PasajerosDocumentos.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PasajerosDocumentos.cs",
+              "RelativeToolTip": "Models\\PasajerosDocumentos.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:06:09.079Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "PerfilViajero.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PerfilViajero.cs",
+              "RelativeDocumentMoniker": "Models\\PerfilViajero.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\PerfilViajero.cs",
+              "RelativeToolTip": "Models\\PerfilViajero.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:05:05.773Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IPerfilViajeroService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPerfilViajeroService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IPerfilViajeroService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IPerfilViajeroService.cs",
+              "RelativeToolTip": "Interfaces\\IPerfilViajeroService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T16:04:49.653Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Aeropuerto.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Aeropuerto.cs",
+              "RelativeDocumentMoniker": "Models\\Aeropuerto.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Models\\Aeropuerto.cs",
+              "RelativeToolTip": "Models\\Aeropuerto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:06:40.191Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-03-18T23:09:00.97Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "IAeropuertoService.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IAeropuertoService.cs",
+              "RelativeDocumentMoniker": "Interfaces\\IAeropuertoService.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Interfaces\\IAeropuertoService.cs",
+              "RelativeToolTip": "Interfaces\\IAeropuertoService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:07:08.251Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "AeropuertosController.cs",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\AeropuertosController.cs",
+              "RelativeDocumentMoniker": "Controllers\\AeropuertosController.cs",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Controllers\\AeropuertosController.cs",
+              "RelativeToolTip": "Controllers\\AeropuertosController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:06:54.349Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAChAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-03-18T23:05:58.665Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Aeropuerto.Backend.csproj",
+              "DocumentMoniker": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Aeropuerto.Backend.csproj",
+              "RelativeDocumentMoniker": "Aeropuerto.Backend.csproj",
+              "ToolTip": "C:\\Users\\gpast\\Desktop\\Proyecto Base_Datos_II\\eropuerto_be\\Aeropuerto.Backend.csproj",
+              "RelativeToolTip": "Aeropuerto.Backend.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-03-18T23:05:50.806Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

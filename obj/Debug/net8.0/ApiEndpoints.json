@@ -1,0 +1,1239 @@
+[
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AcompanantesViajeController",
+    "Method": "Post",
+    "RelativePath": "api/AcompanantesViaje",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.AcompanantesViajeModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AcompanantesViajeController",
+    "Method": "Put",
+    "RelativePath": "api/AcompanantesViaje/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.AcompanantesViajeModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AcompanantesViajeController",
+    "Method": "Delete",
+    "RelativePath": "api/AcompanantesViaje/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AcompanantesViajeController",
+    "Method": "Get",
+    "RelativePath": "api/AcompanantesViaje/principal/{idPasajeroPrincipal}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajeroPrincipal",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AeropuertosController",
+    "Method": "Crear",
+    "RelativePath": "api/Aeropuertos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.AeropuertoModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AeropuertosController",
+    "Method": "Listar",
+    "RelativePath": "api/Aeropuertos",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AeropuertosController",
+    "Method": "Actualizar",
+    "RelativePath": "api/Aeropuertos/{codigo}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "codigo",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "terminales",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "puertas",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "activo",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.AeropuertosController",
+    "Method": "Eliminar",
+    "RelativePath": "api/Aeropuertos/{codigo}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "codigo",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.FacturasController",
+    "Method": "Post",
+    "RelativePath": "api/Facturas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.FacturasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.FacturasController",
+    "Method": "Put",
+    "RelativePath": "api/Facturas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.FacturasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.FacturasController",
+    "Method": "Delete",
+    "RelativePath": "api/Facturas/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.FacturasController",
+    "Method": "GetByReserva",
+    "RelativePath": "api/Facturas/reserva/{idReserva}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idReserva",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialComunicacionesController",
+    "Method": "Crear",
+    "RelativePath": "api/HistorialComunicaciones",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.HistorialComunicacionModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialComunicacionesController",
+    "Method": "ActualizarHistorialComunicacion",
+    "RelativePath": "api/HistorialComunicaciones/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.HistorialComunicacionModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialComunicacionesController",
+    "Method": "DeleteFisico",
+    "RelativePath": "api/HistorialComunicaciones/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialComunicacionesController",
+    "Method": "GetByPasajero",
+    "RelativePath": "api/HistorialComunicaciones/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialReservasController",
+    "Method": "Post",
+    "RelativePath": "api/HistorialReservas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.HistorialReservasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialReservasController",
+    "Method": "Put",
+    "RelativePath": "api/HistorialReservas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.HistorialReservasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialReservasController",
+    "Method": "Delete",
+    "RelativePath": "api/HistorialReservas/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.HistorialReservasController",
+    "Method": "GetByReserva",
+    "RelativePath": "api/HistorialReservas/reserva/{idReserva}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idReserva",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.MetodosPagoController",
+    "Method": "Post",
+    "RelativePath": "api/MetodosPago",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.MetodosPagoModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.MetodosPagoController",
+    "Method": "GetAll",
+    "RelativePath": "api/MetodosPago",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.MetodosPagoController",
+    "Method": "Put",
+    "RelativePath": "api/MetodosPago/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.MetodosPagoModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.MetodosPagoController",
+    "Method": "Delete",
+    "RelativePath": "api/MetodosPago/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosController",
+    "Method": "Crear",
+    "RelativePath": "api/Pasajeros",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajeroModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosController",
+    "Method": "Listar",
+    "RelativePath": "api/Pasajeros",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosController",
+    "Method": "ActualizarContacto",
+    "RelativePath": "api/Pasajeros/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "telefono",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "direccion",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosController",
+    "Method": "Eliminar",
+    "RelativePath": "api/Pasajeros/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosDocumentosController",
+    "Method": "Post",
+    "RelativePath": "api/PasajerosDocumentos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajerosDocumentosModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosDocumentosController",
+    "Method": "Delete",
+    "RelativePath": "api/PasajerosDocumentos/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosDocumentosController",
+    "Method": "Verificar",
+    "RelativePath": "api/PasajerosDocumentos/{id}/verificar",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "estado",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosDocumentosController",
+    "Method": "GetPorPasajero",
+    "RelativePath": "api/PasajerosDocumentos/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosHistorialMedicoController",
+    "Method": "Crear",
+    "RelativePath": "api/PasajerosHistorialMedico",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajeroHistorialMedicoModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosHistorialMedicoController",
+    "Method": "DeleteFisico",
+    "RelativePath": "api/PasajerosHistorialMedico/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosHistorialMedicoController",
+    "Method": "GetByPasajero",
+    "RelativePath": "api/PasajerosHistorialMedico/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosPreferenciasController",
+    "Method": "Crear",
+    "RelativePath": "api/PasajerosPreferencias",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajeroPreferenciaModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosPreferenciasController",
+    "Method": "Actualizar",
+    "RelativePath": "api/PasajerosPreferencias/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "descripcion",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosPreferenciasController",
+    "Method": "Delete",
+    "RelativePath": "api/PasajerosPreferencias/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosPreferenciasController",
+    "Method": "GetByPasajero",
+    "RelativePath": "api/PasajerosPreferencias/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosRedesSocialesController",
+    "Method": "Post",
+    "RelativePath": "api/PasajerosRedesSociales",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajerosRedesSocialesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosRedesSocialesController",
+    "Method": "Put",
+    "RelativePath": "api/PasajerosRedesSociales/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PasajerosRedesSocialesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosRedesSocialesController",
+    "Method": "Delete",
+    "RelativePath": "api/PasajerosRedesSociales/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PasajerosRedesSocialesController",
+    "Method": "Get",
+    "RelativePath": "api/PasajerosRedesSociales/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PerfilesViajeroController",
+    "Method": "Crear",
+    "RelativePath": "api/PerfilesViajero",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PerfilViajeroModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PerfilesViajeroController",
+    "Method": "Delete",
+    "RelativePath": "api/PerfilesViajero/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PerfilesViajeroController",
+    "Method": "AddPoints",
+    "RelativePath": "api/PerfilesViajero/{id}/sumar-puntos",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "puntos",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PerfilesViajeroController",
+    "Method": "GetByPasajero",
+    "RelativePath": "api/PerfilesViajero/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PreferenciasIdiomasController",
+    "Method": "Post",
+    "RelativePath": "api/PreferenciasIdiomas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PreferenciaIdiomaModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PreferenciasIdiomasController",
+    "Method": "Put",
+    "RelativePath": "api/PreferenciasIdiomas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PreferenciaIdiomaModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PreferenciasIdiomasController",
+    "Method": "Delete",
+    "RelativePath": "api/PreferenciasIdiomas/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PreferenciasIdiomasController",
+    "Method": "Get",
+    "RelativePath": "api/PreferenciasIdiomas/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PromocionesController",
+    "Method": "Post",
+    "RelativePath": "api/Promociones",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PromocionesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PromocionesController",
+    "Method": "GetAll",
+    "RelativePath": "api/Promociones",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PromocionesController",
+    "Method": "Put",
+    "RelativePath": "api/Promociones/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.PromocionesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PromocionesController",
+    "Method": "Delete",
+    "RelativePath": "api/Promociones/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.PromocionesController",
+    "Method": "Validate",
+    "RelativePath": "api/Promociones/validar/{codigo}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "codigo",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasController",
+    "Method": "Post",
+    "RelativePath": "api/Reservas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.ReservasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasController",
+    "Method": "Put",
+    "RelativePath": "api/Reservas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.ReservasModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasController",
+    "Method": "Delete",
+    "RelativePath": "api/Reservas/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasController",
+    "Method": "GetByPasajero",
+    "RelativePath": "api/Reservas/pasajero/{idPasajero}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idPasajero",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPagosController",
+    "Method": "Post",
+    "RelativePath": "api/ReservasPagos",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.ReservasPagosModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPagosController",
+    "Method": "PatchEstado",
+    "RelativePath": "api/ReservasPagos/{id}/estado",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "nuevoEstado",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPagosController",
+    "Method": "Delete",
+    "RelativePath": "api/ReservasPagos/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPagosController",
+    "Method": "Get",
+    "RelativePath": "api/ReservasPagos/reserva/{idReserva}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idReserva",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPromocionesController",
+    "Method": "Aplicar",
+    "RelativePath": "api/ReservasPromociones/aplicar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.ReservasPromocionesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPromocionesController",
+    "Method": "Delete",
+    "RelativePath": "api/ReservasPromociones/quitar/{idReserva}/{idPromocion}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idReserva",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "idPromocion",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.ReservasPromocionesController",
+    "Method": "Get",
+    "RelativePath": "api/ReservasPromociones/reserva/{idReserva}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idReserva",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TarifasEspecialesController",
+    "Method": "Post",
+    "RelativePath": "api/TarifasEspeciales",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.TarifasEspecialesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TarifasEspecialesController",
+    "Method": "Put",
+    "RelativePath": "api/TarifasEspeciales/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "modelo",
+        "Type": "Aeropuerto.Backend.Models.TarifasEspecialesModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TarifasEspecialesController",
+    "Method": "GetActivas",
+    "RelativePath": "api/TarifasEspeciales/activas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TarifasEspecialesController",
+    "Method": "GetByAerolinea",
+    "RelativePath": "api/TarifasEspeciales/aerolinea/{idAerolinea}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idAerolinea",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TarifasEspecialesController",
+    "Method": "Delete",
+    "RelativePath": "api/TarifasEspeciales/fisico/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Aeropuerto.Backend.Controllers.TestController",
+    "Method": "Get",
+    "RelativePath": "api/Test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
