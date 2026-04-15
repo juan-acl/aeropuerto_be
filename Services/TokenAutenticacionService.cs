@@ -1,0 +1,26 @@
+﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Interfaces;
+using Aeropuerto.Backend.Models;
+using Microsoft.EntityFrameworkCore;
+namespace Aeropuerto.Backend.Services
+{
+    public class TokenAutenticacionService : ITokenAutenticacionService
+    {
+        private readonly DBContext _ctx;
+        public TokenAutenticacionService(DBContext ctx) => _ctx = ctx;
+        public async Task<List<TokensAutenticacion>> ListarTodo() => await _ctx.Set<TokensAutenticacion>().ToListAsync();
+        public async Task<TokensAutenticacion?> ObtenerPorId(int id) => await _ctx.Set<TokensAutenticacion>().FindAsync(id);
+        public async Task<bool> Insertar(TokensAutenticacion m) { _ctx.Set<TokensAutenticacion>().Add(m); await _ctx.SaveChangesAsync(); return true; }
+        public async Task<bool> Actualizar(int id, TokensAutenticacion m) {
+            var e = await _ctx.Set<TokensAutenticacion>().FindAsync(id);
+            if (e == null) return false;
+            _ctx.Entry(e).CurrentValues.SetValues(m);
+            await _ctx.SaveChangesAsync(); return true;
+        }
+        public async Task<bool> Eliminar(int id) {
+            var e = await _ctx.Set<TokensAutenticacion>().FindAsync(id);
+            if (e == null) return false;
+            _ctx.Set<TokensAutenticacion>().Remove(e); await _ctx.SaveChangesAsync(); return true;
+        }
+    }
+}

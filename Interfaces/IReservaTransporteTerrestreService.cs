@@ -1,0 +1,25 @@
+﻿using Aeropuerto.Backend.Models;
+
+namespace Aeropuerto.Backend.Interfaces
+{
+    public interface IReservaTransporteTerrestreService
+    {
+        // Inserta un nuevo registro
+        Task<bool> Insertar(ReservasTransporteTerrestre modelo);
+
+        // Actualiza los datos del registro por ID
+        // Nota: Ajusta los parámetros adicionales según los campos de la tabla
+        Task<bool> Actualizar(int id, ReservasTransporteTerrestre modelo);
+
+        // Eliminación por ID
+        Task<bool> Eliminar(int id);
+
+        // Obtiene la lista completa
+        Task<List<ReservasTransporteTerrestre>> ListarTodo();
+
+        // Buscar por ID específico
+        Task<ReservasTransporteTerrestre?> ObtenerPorId(int id);
+    }
+}
+
+
