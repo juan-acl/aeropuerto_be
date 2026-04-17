@@ -3,6 +3,7 @@ using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Services;
 using Aeropuerto.Backend.Services.Seguridad;
+using Aeropuerto.Backend.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -348,6 +349,8 @@ builder.Services.AddScoped<ISegmentoClienteService,                  SegmentoCli
 
 // ═══════════════════════════════════════════════════════════════════════════════
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
