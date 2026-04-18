@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
@@ -26,8 +26,8 @@ namespace Aeropuerto.Backend.Models
         public decimal? PermisoEjecucion { get; set; }
         
         [Key]
-        [Column("PRIMARY")]
-        public decimal Primary { get; set; }
+        [Column("ID_ROL_PERMISO_MODULO")]
+        public int IdRolPermisoModulo { get; set; }
 
     }
 }

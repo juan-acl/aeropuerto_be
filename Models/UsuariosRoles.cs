@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
@@ -23,11 +23,8 @@ namespace Aeropuerto.Backend.Models
         public decimal? Activo { get; set; }
         
         [Key]
-        [Column("PRIMARY")]
-        public decimal Primary { get; set; }
-        
-        [Column("FOREIGN")]
-        public decimal? Foreign { get; set; }
+        [Column("ID_USUARIO_ROL")]
+        public int IdUsuarioRol { get; set; }
   
     }
 }
