@@ -1,6 +1,6 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -10,131 +10,78 @@ namespace Aeropuerto.Backend.Services
     public class EstacionamientoRegistroService : IEstacionamientoRegistroService
     {
         private readonly DBContext _context;
-
         public EstacionamientoRegistroService(DBContext context) => _context = context;
 
-        public async Task<int> RegistrarEntrada(EstacionamientoRegistroModel m)
+        public async Task<List<EstacionamientoRegistroModel>> ListarTodo()
         {
-            using var transaction = await _context.Database.BeginTransactionAsync();
+            try { return await _context.EstacionamientoRegistro.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo EstacionamientoRegistroModel: {ex.Message}"); return new List<EstacionamientoRegistroModel>(); }
+        }
+
+        public async Task<EstacionamientoRegistroModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.EstacionamientoRegistro.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId EstacionamientoRegistroModel: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(EstacionamientoRegistroModel m)
+        {
             try
             {
-                // 1. Registramos la entrada y obtenemos el ID generado para imprimir el ticket
-                var sqlInsert = @"INSERT INTO estacionamiento_registro 
-                            (id_espacio, id_pasajero, id_vuelo, placa_vehiculo, 
-                             fecha_entrada, tarifa_aplicada, estado_pago) 
-                            VALUES (:p_espacio, :p_pas, :p_vuelo, :p_placa, 
-                                    SYSTIMESTAMP, :p_tarifa, 0)
-                            RETURNING id_registro INTO :p_id_out";
-
-                var idOutParam = new OracleParameter("p_id_out", OracleDbType.Int32, ParameterDirection.Output);
-
-                var parametrosInsert = new[] {
-                    new OracleParameter("p_espacio", (object?)m.IdEspacio ?? DBNull.Value),
-                    new OracleParameter("p_pas", (object?)m.IdPasajero ?? DBNull.Value),
-                    new OracleParameter("p_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
-                    new OracleParameter("p_placa", (object?)m.PlacaVehiculo ?? DBNull.Value),
-                    new OracleParameter("p_tarifa", (object?)m.TarifaAplicada ?? DBNull.Value),
-                    idOutParam
+                string sql = "BEGIN pkg_estacionamiento_registro.insert_registro(:p_id_espacio, :p_id_pasajero, :p_id_vuelo, :p_placa_vehiculo, :p_fecha_entrada, :p_fecha_salida, :p_tiempo_total_horas, :p_tarifa_aplicada, :p_total_pagar, :p_estado_pago, :p_metodo_pago); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_espacio", (object?)m.IdEspacio ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+                new OracleParameter("p_placa_vehiculo", (object?)m.PlacaVehiculo ?? DBNull.Value),
+                new OracleParameter("p_fecha_entrada", (object?)m.FechaEntrada ?? DBNull.Value),
+                new OracleParameter("p_fecha_salida", (object?)m.FechaSalida ?? DBNull.Value),
+                new OracleParameter("p_tiempo_total_horas", (object?)m.TiempoTotalHoras ?? DBNull.Value),
+                new OracleParameter("p_tarifa_aplicada", (object?)m.TarifaAplicada ?? DBNull.Value),
+                new OracleParameter("p_total_pagar", (object?)m.TotalPagar ?? DBNull.Value),
+                new OracleParameter("p_estado_pago", m.EstadoPago),
+                new OracleParameter("p_metodo_pago", (object?)m.MetodoPago ?? DBNull.Value)
                 };
-
-                await _context.Database.ExecuteSqlRawAsync(sqlInsert, parametrosInsert);
-                int idGenerado = Convert.ToInt32(idOutParam.Value.ToString());
-
-                // 2. Marcamos el espacio como OCUPADO en la tabla maestra
-                if (m.IdEspacio.HasValue)
-                {
-                    var sqlUpdateEspacio = "UPDATE estacionamiento SET disponible = 0 WHERE id_estacionamiento = :p_esp";
-                    await _context.Database.ExecuteSqlRawAsync(sqlUpdateEspacio, new OracleParameter("p_esp", m.IdEspacio.Value));
-                }
-
-                await transaction.CommitAsync();
-                return idGenerado;
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-        }
-
-        public async Task<EstacionamientoRegistroModel?> CalcularSalida(int idRegistro)
-        {
-            // Buscamos el registro actual
-            var registro = await _context.EstacionamientoRegistro.FindAsync(idRegistro);
-            if (registro == null || registro.FechaSalida != null) return registro;
-
-            // Lógica de negocio: Calcular tiempo y costo
-            registro.FechaSalida = DateTime.Now;
-            var diferencia = registro.FechaSalida.Value - registro.FechaEntrada.Value;
-
-            // Redondeamos hacia arriba para cobrar la fracción como hora completa (clásico de aeropuertos)
-            registro.TiempoTotalHoras = (decimal)Math.Ceiling(diferencia.TotalHours);
-
-            // Cálculo del total
-            registro.TotalPagar = registro.TiempoTotalHoras * (registro.TarifaAplicada ?? 0);
-
-            // Actualizamos el registro en la base de datos
-            var sql = @"UPDATE estacionamiento_registro 
-                        SET fecha_salida = :p_salida, 
-                            tiempo_total_horas = :p_horas, 
-                            total_pagar = :p_total 
-                        WHERE id_registro = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_salida", registro.FechaSalida),
-                new OracleParameter("p_horas", registro.TiempoTotalHoras),
-                new OracleParameter("p_total", registro.TotalPagar),
-                new OracleParameter("p_id", idRegistro));
-
-            return registro;
-        }
-
-        public async Task<bool> ProcesarPago(int idRegistro, string metodoPago)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                // 1. Marcamos el ticket como pagado
-                var sqlPago = @"UPDATE estacionamiento_registro 
-                                SET estado_pago = 1, metodo_pago = :p_metodo 
-                                WHERE id_registro = :p_id";
-
-                await _context.Database.ExecuteSqlRawAsync(sqlPago,
-                    new OracleParameter("p_metodo", metodoPago),
-                    new OracleParameter("p_id", idRegistro));
-
-                // 2. Liberamos el espacio de estacionamiento
-                var registro = await _context.EstacionamientoRegistro.FindAsync(idRegistro);
-                if (registro != null && registro.IdEspacio.HasValue)
-                {
-                    var sqlLibera = "UPDATE estacionamiento SET disponible = 1 WHERE id_estacionamiento = :p_esp";
-                    await _context.Database.ExecuteSqlRawAsync(sqlLibera, new OracleParameter("p_esp", registro.IdEspacio.Value));
-                }
-
-                await transaction.CommitAsync();
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar EstacionamientoRegistroModel: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Actualizar(int id, EstacionamientoRegistroModel m)
+        {
+            try
             {
-                await transaction.RollbackAsync();
-                throw;
+                string sql = "BEGIN pkg_estacionamiento_registro.update_registro(:p_id_registro, :p_id_espacio, :p_id_pasajero, :p_id_vuelo, :p_placa_vehiculo, :p_fecha_entrada, :p_fecha_salida, :p_tiempo_total_horas, :p_tarifa_aplicada, :p_total_pagar, :p_estado_pago, :p_metodo_pago); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_registro", id),
+                new OracleParameter("p_id_espacio", (object?)m.IdEspacio ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+                new OracleParameter("p_placa_vehiculo", (object?)m.PlacaVehiculo ?? DBNull.Value),
+                new OracleParameter("p_fecha_entrada", (object?)m.FechaEntrada ?? DBNull.Value),
+                new OracleParameter("p_fecha_salida", (object?)m.FechaSalida ?? DBNull.Value),
+                new OracleParameter("p_tiempo_total_horas", (object?)m.TiempoTotalHoras ?? DBNull.Value),
+                new OracleParameter("p_tarifa_aplicada", (object?)m.TarifaAplicada ?? DBNull.Value),
+                new OracleParameter("p_total_pagar", (object?)m.TotalPagar ?? DBNull.Value),
+                new OracleParameter("p_estado_pago", m.EstadoPago),
+                new OracleParameter("p_metodo_pago", (object?)m.MetodoPago ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
             }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar EstacionamientoRegistroModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<EstacionamientoRegistroModel>> ListarVehiculosActivos()
+        public async Task<bool> Eliminar(int id)
         {
-            // Retorna los vehículos que no han salido del parqueo (Estado de pago pendiente / sin fecha de salida)
-            return await _context.EstacionamientoRegistro
-                .Where(r => r.FechaSalida == null)
-                .OrderByDescending(r => r.FechaEntrada)
-                .ToListAsync();
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM estacionamiento_registro WHERE id_registro = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_estacionamiento_registro.delete_registro(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar EstacionamientoRegistroModel: {ex.Message}"); return false; }
         }
     }
 }

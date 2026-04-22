@@ -1,62 +1,85 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class IncidentesInvolucradosService : IIncidentesInvolucradosService
     {
         private readonly DBContext _context;
-
         public IncidentesInvolucradosService(DBContext context) => _context = context;
+
+        public async Task<List<IncidentesInvolucradosModel>> ListarTodo()
+        {
+            try { return await _context.IncidentesInvolucrados.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo IncidentesInvolucradosModel: {ex.Message}"); return new List<IncidentesInvolucradosModel>(); }
+        }
+
+        public async Task<IncidentesInvolucradosModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.IncidentesInvolucrados.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId IncidentesInvolucradosModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(IncidentesInvolucradosModel m)
         {
-            var sql = @"INSERT INTO incidentes_involucrados 
-                        (id_incidente, tipo_persona, id_pasajero, id_tripulante, nombre_completo, 
-                         tipo_documento, numero_documento, nacionalidad, rol_en_incidente, declaracion) 
-                        VALUES (:p_inc, :p_tipo, :p_pas, :p_trip, :p_nom, :p_tdoc, :p_ndoc, :p_nac, :p_rol, :p_decl)";
-
-            var parametros = new[] {
-                new OracleParameter("p_inc", m.IdIncidente),
-                new OracleParameter("p_tipo", m.TipoPersona),
-                new OracleParameter("p_pas", (object?)m.IdPasajero ?? DBNull.Value),
-                new OracleParameter("p_trip", (object?)m.IdTripulante ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreCompleto ?? DBNull.Value),
-                new OracleParameter("p_tdoc", (object?)m.TipoDocumento ?? DBNull.Value),
-                new OracleParameter("p_ndoc", (object?)m.NumeroDocumento ?? DBNull.Value),
-                new OracleParameter("p_nac", (object?)m.Nacionalidad ?? DBNull.Value),
-                new OracleParameter("p_rol", (object?)m.RolEnIncidente ?? DBNull.Value),
-                new OracleParameter("p_decl", (object?)m.Declaracion ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_incidentes_involucrados.insert_involucrado(:p_id_incidente, :p_tipo_persona, :p_id_pasajero, :p_id_tripulante, :p_nombre_completo, :p_tipo_documento, :p_numero_documento, :p_nacionalidad, :p_rol_en_incidente, :p_declaracion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_incidente", m.IdIncidente),
+                new OracleParameter("p_tipo_persona", (object?)m.TipoPersona ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_tripulante", (object?)m.IdTripulante ?? DBNull.Value),
+                new OracleParameter("p_nombre_completo", (object?)m.NombreCompleto ?? DBNull.Value),
+                new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                new OracleParameter("p_nacionalidad", (object?)m.Nacionalidad ?? DBNull.Value),
+                new OracleParameter("p_rol_en_incidente", (object?)m.RolEnIncidente ?? DBNull.Value),
+                new OracleParameter("p_declaracion", (object?)m.Declaracion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar IncidentesInvolucradosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<IncidentesInvolucradosModel>> ListarPorIncidente(int idIncidente)
+        public async Task<bool> Actualizar(int id, IncidentesInvolucradosModel m)
         {
-            return await _context.IncidentesInvolucrados
-                .Where(i => i.IdIncidente == idIncidente)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_incidentes_involucrados.update_involucrado(:p_id_involucrado, :p_id_incidente, :p_tipo_persona, :p_id_pasajero, :p_id_tripulante, :p_nombre_completo, :p_tipo_documento, :p_numero_documento, :p_nacionalidad, :p_rol_en_incidente, :p_declaracion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_involucrado", id),
+                new OracleParameter("p_id_incidente", m.IdIncidente),
+                new OracleParameter("p_tipo_persona", (object?)m.TipoPersona ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_tripulante", (object?)m.IdTripulante ?? DBNull.Value),
+                new OracleParameter("p_nombre_completo", (object?)m.NombreCompleto ?? DBNull.Value),
+                new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                new OracleParameter("p_nacionalidad", (object?)m.Nacionalidad ?? DBNull.Value),
+                new OracleParameter("p_rol_en_incidente", (object?)m.RolEnIncidente ?? DBNull.Value),
+                new OracleParameter("p_declaracion", (object?)m.Declaracion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar IncidentesInvolucradosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ActualizarDeclaracion(int id, string nuevaDeclaracion)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "UPDATE incidentes_involucrados SET declaracion = :p_decl WHERE id_involucrado = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_decl", nuevaDeclaracion),
-                new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM incidentes_involucrados WHERE id_involucrado = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_incidentes_involucrados.delete_involucrado(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar IncidentesInvolucradosModel: {ex.Message}"); return false; }
         }
     }
 }

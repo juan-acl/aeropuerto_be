@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ITransporteTerrestreService
     {
-        Task<bool> RegistrarTransporte(TransporteTerrestreModel modelo);
-        Task<List<TransporteTerrestreModel>> ListarPorAeropuerto(string codigoAeropuerto);
-        Task<List<TransporteTerrestreModel>> ListarActivos(string codigoAeropuerto, string? tipoTransporte = null);
-        Task<bool> DesactivarTransporte(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<List<TransporteTerrestreModel>> ListarTodo();
+        Task<TransporteTerrestreModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(TransporteTerrestreModel modelo);
+        Task<bool> Actualizar(int id, TransporteTerrestreModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

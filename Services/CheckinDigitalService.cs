@@ -1,58 +1,81 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class CheckinDigitalService : ICheckinDigitalService
     {
         private readonly DBContext _context;
-
         public CheckinDigitalService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarCheckin(CheckinDigitalModel m)
+        public async Task<List<CheckinDigitalModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO checkin_digital 
-                        (id_reserva, fecha_checkin, ip_origen, dispositivo, pase_abordaje_generado, codigo_qr, enviado_email, enviado_sms) 
-                        VALUES (:p_res, SYSTIMESTAMP, :p_ip, :p_disp, :p_pase, :p_qr, :p_mail, :p_sms)";
-
-            var parametros = new[] {
-                new OracleParameter("p_res", m.IdReserva),
-                new OracleParameter("p_ip", (object?)m.IpOrigen ?? DBNull.Value),
-                new OracleParameter("p_disp", (object?)m.Dispositivo ?? DBNull.Value),
-                new OracleParameter("p_pase", m.PaseAbordajeGenerado),
-                new OracleParameter("p_qr", (object?)m.CodigoQr ?? DBNull.Value),
-                new OracleParameter("p_mail", m.EnviadoEmail),
-                new OracleParameter("p_sms", m.EnviadoSms)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.CheckinDigital.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo CheckinDigitalModel: {ex.Message}"); return new List<CheckinDigitalModel>(); }
         }
 
-        public async Task<CheckinDigitalModel?> ObtenerPorReserva(int idReserva)
+        public async Task<CheckinDigitalModel?> ObtenerPorId(int id)
         {
-            return await _context.CheckinDigital
-                .FirstOrDefaultAsync(c => c.IdReserva == idReserva);
+            try { return await _context.CheckinDigital.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId CheckinDigitalModel: {ex.Message}"); return null; }
         }
 
-        public async Task<bool> ActualizarNotificaciones(int id, bool email, bool sms)
+        public async Task<bool> Insertar(CheckinDigitalModel m)
         {
-            var sql = "UPDATE checkin_digital SET enviado_email = :p_mail, enviado_sms = :p_sms WHERE id_checkin = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_mail", email ? 1 : 0),
-                new OracleParameter("p_sms", sms ? 1 : 0),
-                new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_checkin_digital.insert_checkin(:p_id_reserva, :p_fecha_checkin, :p_ip_origen, :p_dispositivo, :p_pase_abordaje_generado, :p_codigo_qr, :p_enviado_email, :p_enviado_sms); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_fecha_checkin", (object?)m.FechaCheckin ?? DBNull.Value),
+                new OracleParameter("p_ip_origen", (object?)m.IpOrigen ?? DBNull.Value),
+                new OracleParameter("p_dispositivo", (object?)m.Dispositivo ?? DBNull.Value),
+                new OracleParameter("p_pase_abordaje_generado", m.PaseAbordajeGenerado),
+                new OracleParameter("p_codigo_qr", (object?)m.CodigoQr ?? DBNull.Value),
+                new OracleParameter("p_enviado_email", m.EnviadoEmail),
+                new OracleParameter("p_enviado_sms", m.EnviadoSms)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar CheckinDigitalModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Actualizar(int id, CheckinDigitalModel m)
         {
-            var sql = "DELETE FROM checkin_digital WHERE id_checkin = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_checkin_digital.update_checkin(:p_id_checkin, :p_id_reserva, :p_fecha_checkin, :p_ip_origen, :p_dispositivo, :p_pase_abordaje_generado, :p_codigo_qr, :p_enviado_email, :p_enviado_sms); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_checkin", id),
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_fecha_checkin", (object?)m.FechaCheckin ?? DBNull.Value),
+                new OracleParameter("p_ip_origen", (object?)m.IpOrigen ?? DBNull.Value),
+                new OracleParameter("p_dispositivo", (object?)m.Dispositivo ?? DBNull.Value),
+                new OracleParameter("p_pase_abordaje_generado", m.PaseAbordajeGenerado),
+                new OracleParameter("p_codigo_qr", (object?)m.CodigoQr ?? DBNull.Value),
+                new OracleParameter("p_enviado_email", m.EnviadoEmail),
+                new OracleParameter("p_enviado_sms", m.EnviadoSms)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar CheckinDigitalModel: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_checkin_digital.delete_checkin(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar CheckinDigitalModel: {ex.Message}"); return false; }
         }
     }
 }

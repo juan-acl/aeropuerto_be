@@ -4,22 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ISegmentoClienteService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(SegmentosClientes modelo);
-
-        // Actualiza los datos del registro por ID
-        // Nota: Ajusta los parámetros adicionales según los campos de la tabla
-        Task<bool> Actualizar(int id, SegmentosClientes modelo);
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<SegmentosClientes>> ListarTodo();
-
-        // Buscar por ID específico
         Task<SegmentosClientes?> ObtenerPorId(int id);
+        Task<bool> Insertar(SegmentosClientes modelo);
+        Task<bool> Actualizar(int id, SegmentosClientes modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

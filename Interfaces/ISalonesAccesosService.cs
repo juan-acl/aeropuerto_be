@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ISalonesAccesosService
     {
-        Task<int> RegistrarEntrada(SalonesAccesosModel modelo);
-        Task<bool> RegistrarSalida(int idAcceso);
-        Task<List<SalonesAccesosModel>> ListarAccesosActivos(int idSalon);
-        Task<List<SalonesAccesosModel>> ListarHistorialPorSalon(int idSalon, DateTime fecha);
-        Task<bool> EliminarFisico(int id);
+        Task<List<SalonesAccesosModel>> ListarTodo();
+        Task<SalonesAccesosModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(SalonesAccesosModel modelo);
+        Task<bool> Actualizar(int id, SalonesAccesosModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

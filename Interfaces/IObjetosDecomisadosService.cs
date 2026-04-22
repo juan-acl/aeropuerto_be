@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IObjetosDecomisadosService
     {
-        Task<bool> RegistrarDecomiso(ObjetosDecomisadosModel modelo);
-        Task<List<ObjetosDecomisadosModel>> ListarPorControl(int idControl);
-        Task<List<ObjetosDecomisadosModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> ActualizarDestino(int id, string nuevoDestino);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ObjetosDecomisadosModel>> ListarTodo();
+        Task<ObjetosDecomisadosModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ObjetosDecomisadosModel modelo);
+        Task<bool> Actualizar(int id, ObjetosDecomisadosModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

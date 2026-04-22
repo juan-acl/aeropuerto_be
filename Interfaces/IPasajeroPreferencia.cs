@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IPasajeroPreferenciaService
     {
+        Task<List<PasajeroPreferenciaModel>> ListarTodo();
+        Task<PasajeroPreferenciaModel?> ObtenerPorId(int id);
         Task<bool> Insertar(PasajeroPreferenciaModel modelo);
-        Task<List<PasajeroPreferenciaModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> ActualizarPreferencia(int id, string descripcion);
-        Task<bool> EliminarLogico(int id);
+        Task<bool> Actualizar(int id, PasajeroPreferenciaModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

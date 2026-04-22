@@ -4,63 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class TiendasProductosController : ControllerBase
     {
         private readonly ITiendasProductosService _service;
-
         public TiendasProductosController(ITiendasProductosService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] TiendasProductosModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarProducto(modelo);
-                return Ok(new { mensaje = "Producto registrado en la concesión correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] TiendasProductosModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("concesion/{idConcesion}")]
-        public async Task<IActionResult> GetByConcesion(int idConcesion)
-        {
-            var result = await _service.ListarPorConcesion(idConcesion);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] TiendasProductosModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpGet("concesion/{idConcesion}/alertas-stock")]
-        public async Task<IActionResult> GetBajoStock(int idConcesion)
-        {
-            var result = await _service.ListarBajoStockMinimo(idConcesion);
-            return Ok(result);
-        }
-
-        [HttpPatch("{id}/stock")]
-        public async Task<IActionResult> PatchStock(int id, [FromBody] int nuevoStock)
-        {
-            if (nuevoStock < 0) return BadRequest("El stock no puede ser un valor negativo.");
-
-            await _service.ActualizarStock(id, nuevoStock);
-            return Ok(new { mensaje = "Inventario del producto actualizado." });
-        }
-
-        [HttpPatch("{id}/desactivar")]
-        public async Task<IActionResult> PatchDesactivar(int id)
-        {
-            await _service.DesactivarProducto(id);
-            return Ok(new { mensaje = "Producto descontinuado (Soft Delete)." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Producto eliminado físicamente del catálogo." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IBotiquinesVueloService
     {
-        Task<bool> RegistrarVerificacion(BotiquinesVueloModel modelo);
-        Task<List<BotiquinesVueloModel>> ListarPorVuelo(int idVuelo);
-        Task<BotiquinesVueloModel?> ObtenerUltimaVerificacion(int idVuelo);
+        Task<List<BotiquinesVueloModel>> ListarTodo();
+        Task<BotiquinesVueloModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(BotiquinesVueloModel modelo);
         Task<bool> Actualizar(int id, BotiquinesVueloModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<bool> Eliminar(int id);
     }
 }

@@ -1,72 +1,81 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class IncidentesMedidasService : IIncidentesMedidasService
     {
         private readonly DBContext _context;
-
         public IncidentesMedidasService(DBContext context) => _context = context;
 
-        public async Task<bool> AplicarMedida(IncidentesMedidasModel m)
+        public async Task<List<IncidentesMedidasModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO incidentes_medidas 
-                        (id_incidente, tipo_medida, descripcion, fecha_aplicacion, aplicado_por, 
-                         vigencia_dias, fecha_vencimiento, observaciones) 
-                        VALUES (:p_inc, :p_tipo, :p_desc, SYSTIMESTAMP, :p_user, 
-                                :p_dias, :p_venc, :p_obs)";
+            try { return await _context.IncidentesMedidas.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo IncidentesMedidasModel: {ex.Message}"); return new List<IncidentesMedidasModel>(); }
+        }
 
-            // Cálculo opcional de fecha de vencimiento si hay vigencia
-            object fechaVenc = DBNull.Value;
-            if (m.VigenciaDias.HasValue)
+        public async Task<IncidentesMedidasModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.IncidentesMedidas.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId IncidentesMedidasModel: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(IncidentesMedidasModel m)
+        {
+            try
             {
-                fechaVenc = DateTime.Now.AddDays(m.VigenciaDias.Value);
+                string sql = "BEGIN pkg_incidentes_medidas.insert_medida(:p_id_incidente, :p_tipo_medida, :p_descripcion, :p_fecha_aplicacion, :p_aplicado_por, :p_vigencia_dias, :p_fecha_vencimiento, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_incidente", m.IdIncidente),
+                new OracleParameter("p_tipo_medida", (object?)m.TipoMedida ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_fecha_aplicacion", (object?)m.FechaAplicacion ?? DBNull.Value),
+                new OracleParameter("p_aplicado_por", (object?)m.AplicadoPor ?? DBNull.Value),
+                new OracleParameter("p_vigencia_dias", (object?)m.VigenciaDias ?? DBNull.Value),
+                new OracleParameter("p_fecha_vencimiento", (object?)m.FechaVencimiento ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
             }
-
-            var parametros = new[] {
-                new OracleParameter("p_inc", m.IdIncidente),
-                new OracleParameter("p_tipo", m.TipoMedida),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_user", (object?)m.AplicadoPor ?? DBNull.Value),
-                new OracleParameter("p_dias", (object?)m.VigenciaDias ?? DBNull.Value),
-                new OracleParameter("p_venc", m.FechaVencimiento ?? fechaVenc),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar IncidentesMedidasModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<IncidentesMedidasModel>> ListarPorIncidente(int idIncidente)
+        public async Task<bool> Actualizar(int id, IncidentesMedidasModel m)
         {
-            return await _context.IncidentesMedidas
-                .Where(m => m.IdIncidente == idIncidente)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_incidentes_medidas.update_medida(:p_id_medida, :p_id_incidente, :p_tipo_medida, :p_descripcion, :p_fecha_aplicacion, :p_aplicado_por, :p_vigencia_dias, :p_fecha_vencimiento, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_medida", id),
+                new OracleParameter("p_id_incidente", m.IdIncidente),
+                new OracleParameter("p_tipo_medida", (object?)m.TipoMedida ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_fecha_aplicacion", (object?)m.FechaAplicacion ?? DBNull.Value),
+                new OracleParameter("p_aplicado_por", (object?)m.AplicadoPor ?? DBNull.Value),
+                new OracleParameter("p_vigencia_dias", (object?)m.VigenciaDias ?? DBNull.Value),
+                new OracleParameter("p_fecha_vencimiento", (object?)m.FechaVencimiento ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar IncidentesMedidasModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ActualizarMedida(int id, IncidentesMedidasModel m)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = @"UPDATE incidentes_medidas 
-                        SET tipo_medida = :p_tipo, descripcion = :p_desc, observaciones = :p_obs 
-                        WHERE id_medida = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_tipo", m.TipoMedida),
-                new OracleParameter("p_desc", m.Descripcion),
-                new OracleParameter("p_obs", m.Observaciones),
-                new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM incidentes_medidas WHERE id_medida = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_incidentes_medidas.delete_medida(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar IncidentesMedidasModel: {ex.Message}"); return false; }
         }
     }
 }

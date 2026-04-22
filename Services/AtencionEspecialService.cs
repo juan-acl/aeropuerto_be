@@ -1,6 +1,6 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -10,80 +10,70 @@ namespace Aeropuerto.Backend.Services
     public class AtencionEspecialService : IAtencionEspecialService
     {
         private readonly DBContext _context;
-
         public AtencionEspecialService(DBContext context) => _context = context;
 
-        public async Task<int> SolicitarAtencion(AtencionEspecialModel m)
+        public async Task<List<AtencionEspecialModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO atencion_especial 
-                        (id_pasajero, id_reserva, tipo_atencion, fecha_solicitud, observaciones) 
-                        VALUES (:p_pas, :p_res, :p_tipo, SYSTIMESTAMP, :p_obs)
-                        RETURNING id_atencion INTO :p_id_out";
-
-            var idOutParam = new OracleParameter("p_id_out", OracleDbType.Int32, ParameterDirection.Output);
-
-            var parametros = new[] {
-                new OracleParameter("p_pas", (object?)m.IdPasajero ?? DBNull.Value),
-                new OracleParameter("p_res", (object?)m.IdReserva ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoAtencion.ToUpper()),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value),
-                idOutParam
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return Convert.ToInt32(idOutParam.Value.ToString());
+            try { return await _context.AtencionEspecial.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo AtencionEspecialModel: {ex.Message}"); return new List<AtencionEspecialModel>(); }
         }
 
-        public async Task<bool> AsignarAsistente(int idAtencion, string nombreAsistente)
+        public async Task<AtencionEspecialModel?> ObtenerPorId(int id)
         {
-            var sql = @"UPDATE atencion_especial 
-                        SET asistente_asignado = :p_asistente 
-                        WHERE id_atencion = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_asistente", nombreAsistente),
-                new OracleParameter("p_id", idAtencion));
-
-            return true;
+            try { return await _context.AtencionEspecial.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId AtencionEspecialModel: {ex.Message}"); return null; }
         }
 
-        public async Task<bool> FinalizarAtencion(int idAtencion, string? observaciones)
+        public async Task<bool> Insertar(AtencionEspecialModel m)
         {
-            // Se marca la hora exacta en la que el servicio fue provisto y se añaden notas finales si existen
-            var sql = @"UPDATE atencion_especial 
-                        SET fecha_atencion = SYSTIMESTAMP,
-                            observaciones = observaciones || ' | Cierre: ' || :p_obs 
-                        WHERE id_atencion = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_obs", (object?)observaciones ?? "Sin novedades"),
-                new OracleParameter("p_id", idAtencion));
-
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_atencion_especial.insert_atencion(:p_id_pasajero, :p_id_reserva, :p_tipo_atencion, :p_fecha_solicitud, :p_fecha_atencion, :p_asistente_asignado, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_reserva", (object?)m.IdReserva ?? DBNull.Value),
+                new OracleParameter("p_tipo_atencion", (object?)m.TipoAtencion ?? DBNull.Value),
+                new OracleParameter("p_fecha_solicitud", (object?)m.FechaSolicitud ?? DBNull.Value),
+                new OracleParameter("p_fecha_atencion", (object?)m.FechaAtencion ?? DBNull.Value),
+                new OracleParameter("p_asistente_asignado", (object?)m.AsistenteAsignado ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar AtencionEspecialModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<AtencionEspecialModel>> ListarPendientes()
+        public async Task<bool> Actualizar(int id, AtencionEspecialModel m)
         {
-            // Las solicitudes pendientes son aquellas que aún no tienen una 'fecha_atencion' registrada
-            return await _context.AtencionEspecial
-                .Where(a => a.FechaAtencion == null)
-                .OrderBy(a => a.FechaSolicitud)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_atencion_especial.update_atencion(:p_id_atencion, :p_id_pasajero, :p_id_reserva, :p_tipo_atencion, :p_fecha_solicitud, :p_fecha_atencion, :p_asistente_asignado, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_atencion", id),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_reserva", (object?)m.IdReserva ?? DBNull.Value),
+                new OracleParameter("p_tipo_atencion", (object?)m.TipoAtencion ?? DBNull.Value),
+                new OracleParameter("p_fecha_solicitud", (object?)m.FechaSolicitud ?? DBNull.Value),
+                new OracleParameter("p_fecha_atencion", (object?)m.FechaAtencion ?? DBNull.Value),
+                new OracleParameter("p_asistente_asignado", (object?)m.AsistenteAsignado ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar AtencionEspecialModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<AtencionEspecialModel>> ListarPorReserva(int idReserva)
+        public async Task<bool> Eliminar(int id)
         {
-            return await _context.AtencionEspecial
-                .Where(a => a.IdReserva == idReserva)
-                .OrderByDescending(a => a.FechaSolicitud)
-                .ToListAsync();
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM atencion_especial WHERE id_atencion = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_atencion_especial.delete_atencion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar AtencionEspecialModel: {ex.Message}"); return false; }
         }
     }
 }

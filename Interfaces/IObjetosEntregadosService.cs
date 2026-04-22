@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IObjetosEntregadosService
     {
-        Task<bool> RegistrarEntrega(ObjetosEntregadosModel modelo);
-        Task<List<ObjetosEntregadosModel>> ListarEntregas();
-        Task<ObjetosEntregadosModel?> ObtenerFirma(int idEntrega);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ObjetosEntregadosModel>> ListarTodo();
+        Task<ObjetosEntregadosModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ObjetosEntregadosModel modelo);
+        Task<bool> Actualizar(int id, ObjetosEntregadosModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

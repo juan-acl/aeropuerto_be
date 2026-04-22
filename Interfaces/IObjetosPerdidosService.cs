@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IObjetosPerdidosService
     {
-        Task<bool> RegistrarObjeto(ObjetosPerdidosModel modelo);
-        Task<List<ObjetosPerdidosModel>> ListarNoEntregados(string? codigoAeropuerto = null);
-        Task<ObjetosPerdidosModel?> ObtenerFoto(int id);
-        Task<bool> EntregarObjeto(int id, int idPasajero);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ObjetosPerdidosModel>> ListarTodo();
+        Task<ObjetosPerdidosModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ObjetosPerdidosModel modelo);
+        Task<bool> Actualizar(int id, ObjetosPerdidosModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

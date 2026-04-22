@@ -1,72 +1,77 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class PuertasEmbarqueAsignacionService : IPuertasEmbarqueAsignacionService
     {
         private readonly DBContext _context;
-
         public PuertasEmbarqueAsignacionService(DBContext context) => _context = context;
+
+        public async Task<List<PuertasEmbarqueAsignacionModel>> ListarTodo()
+        {
+            try { return await _context.PuertasEmbarqueAsignacion.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo PuertasEmbarqueAsignacionModel: {ex.Message}"); return new List<PuertasEmbarqueAsignacionModel>(); }
+        }
+
+        public async Task<PuertasEmbarqueAsignacionModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.PuertasEmbarqueAsignacion.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId PuertasEmbarqueAsignacionModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(PuertasEmbarqueAsignacionModel m)
         {
-            var sql = @"INSERT INTO puertas_embarque_asignacion 
-                        (id_puerta, id_vuelo, fecha_asignacion, hora_inicio, hora_fin, asignado_por) 
-                        VALUES (:p_puerta, :p_vuelo, SYSTIMESTAMP, :p_inicio, :p_fin, :p_user)";
-
-            var parametros = new[] {
-                new OracleParameter("p_puerta", m.IdPuerta),
-                new OracleParameter("p_vuelo", m.IdVuelo),
-                new OracleParameter("p_inicio", m.HoraInicio),
-                new OracleParameter("p_fin", m.HoraFin),
-                new OracleParameter("p_user", m.AsignadoPor)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<List<PuertasEmbarqueAsignacionModel>> ListarPorVuelo(int idVuelo)
-        {
-            return await _context.PuertasEmbarqueAsignacion
-                .Where(a => a.IdVuelo == idVuelo)
-                .ToListAsync();
-        }
-
-        public async Task<List<PuertasEmbarqueAsignacionModel>> ListarOcupacionActual()
-        {
-            var ahora = DateTime.Now;
-            return await _context.PuertasEmbarqueAsignacion
-                .Where(a => ahora >= a.HoraInicio && ahora <= a.HoraFin)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_puertas_embarque_asignacion.insert_asignacion(:p_id_puerta, :p_id_vuelo, :p_fecha_asignacion, :p_hora_inicio, :p_hora_fin, :p_asignado_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_puerta", m.IdPuerta),
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
+                new OracleParameter("p_fecha_asignacion", (object?)m.FechaAsignacion ?? DBNull.Value),
+                new OracleParameter("p_hora_inicio", m.HoraInicio),
+                new OracleParameter("p_hora_fin", m.HoraFin),
+                new OracleParameter("p_asignado_por", m.AsignadoPor)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar PuertasEmbarqueAsignacionModel: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, PuertasEmbarqueAsignacionModel m)
         {
-            var sql = @"UPDATE puertas_embarque_asignacion 
-                        SET id_puerta = :p_puerta, hora_inicio = :p_inicio, hora_fin = :p_fin 
-                        WHERE id_asignacion_puerta = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_puerta", m.IdPuerta),
-                new OracleParameter("p_inicio", m.HoraInicio),
-                new OracleParameter("p_fin", m.HoraFin),
-                new OracleParameter("p_id", id)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_puertas_embarque_asignacion.update_asignacion(:p_id_asignacion_puerta, :p_id_puerta, :p_id_vuelo, :p_fecha_asignacion, :p_hora_inicio, :p_hora_fin, :p_asignado_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_asignacion_puerta", id),
+                new OracleParameter("p_id_puerta", m.IdPuerta),
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
+                new OracleParameter("p_fecha_asignacion", (object?)m.FechaAsignacion ?? DBNull.Value),
+                new OracleParameter("p_hora_inicio", m.HoraInicio),
+                new OracleParameter("p_hora_fin", m.HoraFin),
+                new OracleParameter("p_asignado_por", m.AsignadoPor)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar PuertasEmbarqueAsignacionModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM puertas_embarque_asignacion WHERE id_asignacion_puerta = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_puertas_embarque_asignacion.delete_asignacion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar PuertasEmbarqueAsignacionModel: {ex.Message}"); return false; }
         }
     }
 }

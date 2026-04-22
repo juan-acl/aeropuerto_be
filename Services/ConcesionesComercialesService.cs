@@ -1,94 +1,95 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ConcesionesComercialesService : IConcesionesComercialesService
     {
         private readonly DBContext _context;
-
         public ConcesionesComercialesService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarConcesion(ConcesionesComercialesModel m)
+        public async Task<List<ConcesionesComercialesModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO concesiones_comerciales 
-                        (codigo_aeropuerto, nombre_comercial, tipo_negocio, empresa, ruc, 
-                         representante, telefono_contacto, email_contacto, fecha_inicio_concesion, 
-                         fecha_fin_concesion, canon_mensual, ubicacion_terminal, local_numero, area_m2, activo) 
-                        VALUES (:p_aero, :p_nom, :p_tipo, :p_emp, :p_ruc, 
-                                :p_rep, :p_tel, :p_email, :p_inicio, :p_fin, 
-                                :p_canon, :p_term, :p_loc, :p_area, 1)";
+            try { return await _context.ConcesionesComerciales.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ConcesionesComercialesModel: {ex.Message}"); return new List<ConcesionesComercialesModel>(); }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreComercial ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoNegocio),
-                new OracleParameter("p_emp", (object?)m.Empresa ?? DBNull.Value),
+        public async Task<ConcesionesComercialesModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.ConcesionesComerciales.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ConcesionesComercialesModel: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(ConcesionesComercialesModel m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_concesiones_comerciales.insert_concesion(:p_codigo_aeropuerto, :p_nombre_comercial, :p_tipo_negocio, :p_empresa, :p_ruc, :p_representante, :p_telefono_contacto, :p_email_contacto, :p_fecha_inicio_concesion, :p_fecha_fin_concesion, :p_canon_mensual, :p_ubicacion_terminal, :p_local_numero, :p_area_m2, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_comercial", (object?)m.NombreComercial ?? DBNull.Value),
+                new OracleParameter("p_tipo_negocio", (object?)m.TipoNegocio ?? DBNull.Value),
+                new OracleParameter("p_empresa", (object?)m.Empresa ?? DBNull.Value),
                 new OracleParameter("p_ruc", (object?)m.Ruc ?? DBNull.Value),
-                new OracleParameter("p_rep", (object?)m.Representante ?? DBNull.Value),
-                new OracleParameter("p_tel", (object?)m.TelefonoContacto ?? DBNull.Value),
-                new OracleParameter("p_email", (object?)m.EmailContacto ?? DBNull.Value),
-                new OracleParameter("p_inicio", (object?)m.FechaInicioConcesion ?? DBNull.Value),
-                new OracleParameter("p_fin", (object?)m.FechaFinConcesion ?? DBNull.Value),
-                new OracleParameter("p_canon", (object?)m.CanonMensual ?? DBNull.Value),
-                new OracleParameter("p_term", (object?)m.UbicacionTerminal ?? DBNull.Value),
-                new OracleParameter("p_loc", (object?)m.LocalNumero ?? DBNull.Value),
-                new OracleParameter("p_area", (object?)m.AreaM2 ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+                new OracleParameter("p_representante", (object?)m.Representante ?? DBNull.Value),
+                new OracleParameter("p_telefono_contacto", (object?)m.TelefonoContacto ?? DBNull.Value),
+                new OracleParameter("p_email_contacto", (object?)m.EmailContacto ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio_concesion", (object?)m.FechaInicioConcesion ?? DBNull.Value),
+                new OracleParameter("p_fecha_fin_concesion", (object?)m.FechaFinConcesion ?? DBNull.Value),
+                new OracleParameter("p_canon_mensual", (object?)m.CanonMensual ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_terminal", (object?)m.UbicacionTerminal ?? DBNull.Value),
+                new OracleParameter("p_local_numero", (object?)m.LocalNumero ?? DBNull.Value),
+                new OracleParameter("p_area_m2", (object?)m.AreaM2 ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar ConcesionesComercialesModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<ConcesionesComercialesModel>> ListarPorAeropuerto(string codigo)
+        public async Task<bool> Actualizar(int id, ConcesionesComercialesModel m)
         {
-            return await _context.ConcesionesComerciales
-                .Where(c => c.CodigoAeropuerto == codigo)
-                .OrderBy(c => c.NombreComercial)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_concesiones_comerciales.update_concesion(:p_id_concesion, :p_codigo_aeropuerto, :p_nombre_comercial, :p_tipo_negocio, :p_empresa, :p_ruc, :p_representante, :p_telefono_contacto, :p_email_contacto, :p_fecha_inicio_concesion, :p_fecha_fin_concesion, :p_canon_mensual, :p_ubicacion_terminal, :p_local_numero, :p_area_m2, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_concesion", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_comercial", (object?)m.NombreComercial ?? DBNull.Value),
+                new OracleParameter("p_tipo_negocio", (object?)m.TipoNegocio ?? DBNull.Value),
+                new OracleParameter("p_empresa", (object?)m.Empresa ?? DBNull.Value),
+                new OracleParameter("p_ruc", (object?)m.Ruc ?? DBNull.Value),
+                new OracleParameter("p_representante", (object?)m.Representante ?? DBNull.Value),
+                new OracleParameter("p_telefono_contacto", (object?)m.TelefonoContacto ?? DBNull.Value),
+                new OracleParameter("p_email_contacto", (object?)m.EmailContacto ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio_concesion", (object?)m.FechaInicioConcesion ?? DBNull.Value),
+                new OracleParameter("p_fecha_fin_concesion", (object?)m.FechaFinConcesion ?? DBNull.Value),
+                new OracleParameter("p_canon_mensual", (object?)m.CanonMensual ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_terminal", (object?)m.UbicacionTerminal ?? DBNull.Value),
+                new OracleParameter("p_local_numero", (object?)m.LocalNumero ?? DBNull.Value),
+                new OracleParameter("p_area_m2", (object?)m.AreaM2 ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ConcesionesComercialesModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<ConcesionesComercialesModel>> ListarActivas(string codigo)
+        public async Task<bool> Eliminar(int id)
         {
-            return await _context.ConcesionesComerciales
-                .Where(c => c.CodigoAeropuerto == codigo && c.Activo == 1)
-                .OrderBy(c => c.NombreComercial)
-                .ToListAsync();
-        }
-
-        public async Task<bool> RenovarContrato(int idConcesion, DateTime nuevaFechaFin, decimal nuevoCanon)
-        {
-            var sql = @"UPDATE concesiones_comerciales 
-                        SET fecha_fin_concesion = :p_fin, 
-                            canon_mensual = :p_canon 
-                        WHERE id_concesion = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_fin", nuevaFechaFin),
-                new OracleParameter("p_canon", nuevoCanon),
-                new OracleParameter("p_id", idConcesion)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<bool> DesactivarConcesion(int id)
-        {
-            // Soft delete para mantener el registro histórico de inquilinos pasados
-            var sql = "UPDATE concesiones_comerciales SET activo = 0 WHERE id_concesion = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM concesiones_comerciales WHERE id_concesion = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_concesiones_comerciales.delete_concesion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ConcesionesComercialesModel: {ex.Message}"); return false; }
         }
     }
 }

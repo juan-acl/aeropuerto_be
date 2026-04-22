@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IRestaurantesMenusService
     {
-        Task<bool> RegistrarPlato(RestaurantesMenusModel modelo);
-        Task<List<RestaurantesMenusModel>> ListarPorConcesion(int idConcesion);
-        Task<List<RestaurantesMenusModel>> ListarDisponiblesPorConcesion(int idConcesion);
-        Task<bool> CambiarDisponibilidad(int idMenu, int disponible);
-        Task<bool> EliminarFisico(int id);
+        Task<List<RestaurantesMenusModel>> ListarTodo();
+        Task<RestaurantesMenusModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(RestaurantesMenusModel modelo);
+        Task<bool> Actualizar(int id, RestaurantesMenusModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

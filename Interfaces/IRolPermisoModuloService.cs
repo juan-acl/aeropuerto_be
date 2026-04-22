@@ -4,16 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IRolPermisoModuloService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(RolesPermisosModulos modelo);
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<RolesPermisosModulos>> ListarTodo();
-
+        Task<RolesPermisosModulos?> ObtenerPorId(int id);
+        Task<bool> Insertar(RolesPermisosModulos modelo);
+        Task<bool> Actualizar(int id, RolesPermisosModulos modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

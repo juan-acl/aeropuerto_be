@@ -1,74 +1,81 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ReclamacionesObjetosService : IReclamacionesObjetosService
     {
         private readonly DBContext _context;
-
         public ReclamacionesObjetosService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarReclamacion(ReclamacionesObjetosModel m)
+        public async Task<List<ReclamacionesObjetosModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO reclamaciones_objetos 
-                        (id_pasajero, id_objeto, fecha_reclamacion, descripcion_reclamacion, estado) 
-                        VALUES (:p_pas, :p_obj, SYSTIMESTAMP, :p_desc, 'PENDIENTE')";
-
-            var parametros = new[] {
-                new OracleParameter("p_pas", (object?)m.IdPasajero ?? DBNull.Value),
-                new OracleParameter("p_obj", (object?)m.IdObjeto ?? DBNull.Value),
-                new OracleParameter("p_desc", (object?)m.DescripcionReclamacion ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.ReclamacionesObjetos.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ReclamacionesObjetosModel: {ex.Message}"); return new List<ReclamacionesObjetosModel>(); }
         }
 
-        public async Task<List<ReclamacionesObjetosModel>> ListarPendientes()
+        public async Task<ReclamacionesObjetosModel?> ObtenerPorId(int id)
         {
-            return await _context.ReclamacionesObjetos
-                .Where(r => r.Estado == "PENDIENTE")
-                .OrderBy(r => r.FechaReclamacion)
-                .ToListAsync();
+            try { return await _context.ReclamacionesObjetos.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ReclamacionesObjetosModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<ReclamacionesObjetosModel>> ListarPorPasajero(int idPasajero)
+        public async Task<bool> Insertar(ReclamacionesObjetosModel m)
         {
-            return await _context.ReclamacionesObjetos
-                .Where(r => r.IdPasajero == idPasajero)
-                .OrderByDescending(r => r.FechaReclamacion)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_reclamaciones_objetos.insert_reclamacion(:p_id_pasajero, :p_id_objeto, :p_fecha_reclamacion, :p_descripcion_reclamacion, :p_estado, :p_fecha_resolucion, :p_resolucion, :p_resuelto_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_objeto", (object?)m.IdObjeto ?? DBNull.Value),
+                new OracleParameter("p_fecha_reclamacion", (object?)m.FechaReclamacion ?? DBNull.Value),
+                new OracleParameter("p_descripcion_reclamacion", (object?)m.DescripcionReclamacion ?? DBNull.Value),
+                new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
+                new OracleParameter("p_fecha_resolucion", (object?)m.FechaResolucion ?? DBNull.Value),
+                new OracleParameter("p_resolucion", (object?)m.Resolucion ?? DBNull.Value),
+                new OracleParameter("p_resuelto_por", (object?)m.ResueltoPor ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar ReclamacionesObjetosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ResolverReclamacion(int idReclamacion, string estado, string resolucion, string resueltoPor)
+        public async Task<bool> Actualizar(int id, ReclamacionesObjetosModel m)
         {
-            var sql = @"UPDATE reclamaciones_objetos 
-                        SET estado = :p_estado, 
-                            fecha_resolucion = SYSTIMESTAMP, 
-                            resolucion = :p_res, 
-                            resuelto_por = :p_user 
-                        WHERE id_reclamacion = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_estado", estado),
-                new OracleParameter("p_res", resolucion),
-                new OracleParameter("p_user", resueltoPor),
-                new OracleParameter("p_id", idReclamacion)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_reclamaciones_objetos.update_reclamacion(:p_id_reclamacion, :p_id_pasajero, :p_id_objeto, :p_fecha_reclamacion, :p_descripcion_reclamacion, :p_estado, :p_fecha_resolucion, :p_resolucion, :p_resuelto_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_reclamacion", id),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_id_objeto", (object?)m.IdObjeto ?? DBNull.Value),
+                new OracleParameter("p_fecha_reclamacion", (object?)m.FechaReclamacion ?? DBNull.Value),
+                new OracleParameter("p_descripcion_reclamacion", (object?)m.DescripcionReclamacion ?? DBNull.Value),
+                new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
+                new OracleParameter("p_fecha_resolucion", (object?)m.FechaResolucion ?? DBNull.Value),
+                new OracleParameter("p_resolucion", (object?)m.Resolucion ?? DBNull.Value),
+                new OracleParameter("p_resuelto_por", (object?)m.ResueltoPor ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ReclamacionesObjetosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM reclamaciones_objetos WHERE id_reclamacion = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_reclamaciones_objetos.delete_reclamacion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ReclamacionesObjetosModel: {ex.Message}"); return false; }
         }
     }
 }

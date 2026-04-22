@@ -4,76 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class QuejasSugerenciasController : ControllerBase
     {
         private readonly IQuejasSugerenciasService _service;
-
         public QuejasSugerenciasController(IQuejasSugerenciasService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] QuejasSugerenciasModel modelo)
-        {
-            try
-            {
-                int ticketId = await _service.RegistrarContacto(modelo);
-                return Ok(new
-                {
-                    mensaje = "Su caso ha sido registrado. Nuestro equipo lo revisará pronto.",
-                    numeroTicket = ticketId
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al registrar el caso: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] QuejasSugerenciasModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        public class RespuestaDto
-        {
-            public string TextoRespuesta { get; set; } = null!;
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] QuejasSugerenciasModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpPatch("{id}/responder")]
-        public async Task<IActionResult> PatchResponder(int id, [FromBody] RespuestaDto dto)
-        {
-            if (string.IsNullOrWhiteSpace(dto.TextoRespuesta))
-                return BadRequest("La respuesta no puede estar vacía.");
-
-            await _service.ResponderContacto(id, dto.TextoRespuesta);
-            return Ok(new { mensaje = "Caso actualizado a estado RESPONDIDO y fecha estampada." });
-        }
-
-        [HttpPatch("{id}/calificar")]
-        public async Task<IActionResult> PatchCalificar(int id, [FromBody] int satisfaccion)
-        {
-            if (satisfaccion < 1 || satisfaccion > 5)
-                return BadRequest("El nivel de satisfacción debe estar entre 1 y 5.");
-
-            await _service.CalificarRespuesta(id, satisfaccion);
-            return Ok(new { mensaje = "Calificación registrada y caso CERRADO exitosamente." });
-        }
-
-        [HttpGet("estado/{estado}")]
-        public async Task<IActionResult> GetByEstado(string estado)
-        {
-            var result = await _service.ListarPorEstado(estado);
-            return Ok(result);
-        }
-
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> GetByPasajero(int idPasajero)
-        {
-            var result = await _service.ListarPorPasajero(idPasajero);
-            return Ok(result);
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro eliminado físicamente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

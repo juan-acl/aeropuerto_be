@@ -4,55 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PromocionesController : ControllerBase
     {
         private readonly IPromocionesService _service;
-
         public PromocionesController(IPromocionesService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PromocionesModel modelo)
-        {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Promoción creada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var promociones = await _service.ListarTodas();
-            return Ok(promociones);
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet("validar/{codigo}")]
-        public async Task<IActionResult> Validate(string codigo)
-        {
-            var promo = await _service.ObtenerPorCodigo(codigo);
-            if (promo == null) return NotFound("Código de promoción inválido o inactivo.");
-            return Ok(promo);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] PromocionesModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PromocionesModel modelo)
-        {
-            await _service.Actualizar(id, modelo);
-            return Ok(new { mensaje = "Promoción actualizada." });
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] PromocionesModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Promoción eliminada físicamente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

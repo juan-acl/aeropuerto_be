@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,9 +12,24 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public NewsletterSuscripcionService(DBContext context) => _context = context;
 
+        public async Task<List<NewsletterSuscripciones>> ListarTodo()
+        {
+            try { return await _context.NewsletterSuscripciones.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo NewsletterSuscripciones: {ex.Message}"); return new List<NewsletterSuscripciones>(); }
+        }
+
+        public async Task<NewsletterSuscripciones?> ObtenerPorId(int id)
+        {
+            try { return await _context.NewsletterSuscripciones.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId NewsletterSuscripciones: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(NewsletterSuscripciones m)
         {
-            var p = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_newsletter_suscripciones.insert_suscripcion(:p_id_pasajero, :p_email, :p_nombre, :p_fecha_suscripcion, :p_fecha_baja, :p_frecuencia, :p_temas_interes, :p_confirmado, :p_token_confirmacion, :p_activo); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
                 new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
                 new OracleParameter("p_nombre", (object?)m.Nombre ?? DBNull.Value),
@@ -23,18 +39,21 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_temas_interes", (object?)m.TemasInteres ?? DBNull.Value),
                 new OracleParameter("p_confirmado", (object?)m.Confirmado ?? DBNull.Value),
                 new OracleParameter("p_token_confirmacion", (object?)m.TokenConfirmacion ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_newsletter_suscripciones.insert_suscripcion(:p_id_pasajero, :p_email, :p_nombre, :p_fecha_suscripcion, :p_fecha_baja, :p_frecuencia, :p_temas_interes, :p_confirmado, :p_token_confirmacion, :p_activo); END;", p);
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar NewsletterSuscripciones: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, NewsletterSuscripciones m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_suscripcion_newsletter", m.IdSuscripcionNewsletter)
-            };
-            p.AddRange(new[] {
+            try
+            {
+                string sql = "BEGIN pkg_newsletter_suscripciones.update_suscripcion(:p_id_suscripcion_newsletter, :p_id_pasajero, :p_email, :p_nombre, :p_fecha_suscripcion, :p_fecha_baja, :p_frecuencia, :p_temas_interes, :p_confirmado, :p_token_confirmacion, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_suscripcion_newsletter", id),
                 new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
                 new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
                 new OracleParameter("p_nombre", (object?)m.Nombre ?? DBNull.Value),
@@ -44,22 +63,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_temas_interes", (object?)m.TemasInteres ?? DBNull.Value),
                 new OracleParameter("p_confirmado", (object?)m.Confirmado ?? DBNull.Value),
                 new OracleParameter("p_token_confirmacion", (object?)m.TokenConfirmacion ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_newsletter_suscripciones.update_suscripcion(:p_id_suscripcion_newsletter, :p_id_pasajero, :p_email, :p_nombre, :p_fecha_suscripcion, :p_fecha_baja, :p_frecuencia, :p_temas_interes, :p_confirmado, :p_token_confirmacion, :p_activo); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar NewsletterSuscripciones: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_newsletter_suscripciones.delete_suscripcion(:p_id_suscripcion_newsletter); END;", 
-                new OracleParameter("p_id_suscripcion_newsletter", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_newsletter_suscripciones.delete_suscripcion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar NewsletterSuscripciones: {ex.Message}"); return false; }
         }
-
-        public async Task<List<NewsletterSuscripciones>> ListarTodo() => await _context.Set<NewsletterSuscripciones>().ToListAsync();
-
-        public async Task<NewsletterSuscripciones?> ObtenerPorId(int id) => await _context.Set<NewsletterSuscripciones>().FindAsync(id);
     }
 }

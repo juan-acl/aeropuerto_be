@@ -1,6 +1,6 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -10,16 +10,27 @@ namespace Aeropuerto.Backend.Services
     public class HuellaCarbonoVueloService : IHuellaCarbonoVueloService
     {
         private readonly DBContext _context;
+        public HuellaCarbonoVueloService(DBContext context) => _context = context;
 
-        public HuellaCarbonoVueloService(DBContext context)
+        public async Task<List<HuellaCarbonoVuelo>> ListarTodo()
         {
-            _context = context;
+            try { return await _context.HuellaCarbonoVuelo.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HuellaCarbonoVuelo: {ex.Message}"); return new List<HuellaCarbonoVuelo>(); }
+        }
+
+        public async Task<HuellaCarbonoVuelo?> ObtenerPorId(int id)
+        {
+            try { return await _context.HuellaCarbonoVuelo.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId HuellaCarbonoVuelo: {ex.Message}"); return null; }
         }
 
         public async Task<bool> Insertar(HuellaCarbonoVuelo m)
         {
-            var parametros = new[] {
-                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_huella_carbono_vuelo.insert_huella(:p_id_vuelo, :p_combustible_consumido_litros, :p_factor_emision_co2, :p_co2_emitido_kg, :p_co2_por_pasajero_kg, :p_co2_por_km, :p_distancia_vuelo_km, :p_categoria_vuelo, :p_eficiencia_combustible_kg_km, :p_fecha_calculo, :p_metodo_calculo, :p_certificado_compensacion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
                 new OracleParameter("p_combustible_consumido_litros", (object?)m.CombustibleConsumidoLitros ?? DBNull.Value),
                 new OracleParameter("p_factor_emision_co2", (object?)m.FactorEmisionCo2 ?? DBNull.Value),
                 new OracleParameter("p_co2_emitido_kg", (object?)m.Co2EmitidoKg ?? DBNull.Value),
@@ -30,19 +41,22 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_eficiencia_combustible_kg_km", (object?)m.EficienciaCombustibleKgKm ?? DBNull.Value),
                 new OracleParameter("p_fecha_calculo", (object?)m.FechaCalculo ?? DBNull.Value),
                 new OracleParameter("p_metodo_calculo", (object?)m.MetodoCalculo ?? DBNull.Value),
-                new OracleParameter("p_certificado_compensacion", (object?)m.CertificadoCompensacion ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_huella_carbono_vuelo.insert_huella(:p_id_vuelo, :p_combustible_consumido_litros, :p_factor_emision_co2, :p_co2_emitido_kg, :p_co2_por_pasajero_kg, :p_co2_por_km, :p_distancia_vuelo_km, :p_categoria_vuelo, :p_eficiencia_combustible_kg_km, :p_fecha_calculo, :p_metodo_calculo, :p_certificado_compensacion); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+                new OracleParameter("p_certificado_compensacion", (object?)m.CertificadoCompensacion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar HuellaCarbonoVuelo: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, HuellaCarbonoVuelo m)
         {
-            var parametros = new[] {
-                new OracleParameter("p_id_huella", (object?)id),
-                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_huella_carbono_vuelo.update_huella(:p_id_huella_carbono, :p_id_vuelo, :p_combustible_consumido_litros, :p_factor_emision_co2, :p_co2_emitido_kg, :p_co2_por_pasajero_kg, :p_co2_por_km, :p_distancia_vuelo_km, :p_categoria_vuelo, :p_eficiencia_combustible_kg_km, :p_fecha_calculo, :p_metodo_calculo, :p_certificado_compensacion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_huella_carbono", id),
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
                 new OracleParameter("p_combustible_consumido_litros", (object?)m.CombustibleConsumidoLitros ?? DBNull.Value),
                 new OracleParameter("p_factor_emision_co2", (object?)m.FactorEmisionCo2 ?? DBNull.Value),
                 new OracleParameter("p_co2_emitido_kg", (object?)m.Co2EmitidoKg ?? DBNull.Value),
@@ -53,26 +67,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_eficiencia_combustible_kg_km", (object?)m.EficienciaCombustibleKgKm ?? DBNull.Value),
                 new OracleParameter("p_fecha_calculo", (object?)m.FechaCalculo ?? DBNull.Value),
                 new OracleParameter("p_metodo_calculo", (object?)m.MetodoCalculo ?? DBNull.Value),
-                new OracleParameter("p_certificado_compensacion", (object?)m.CertificadoCompensacion ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_huella_carbono_vuelo.update_huella(:p_id_huella, :p_id_vuelo, :p_combustible_consumido_litros, :p_factor_emision_co2, :p_co2_emitido_kg, :p_co2_por_pasajero_kg, :p_co2_por_km, :p_distancia_vuelo_km, :p_categoria_vuelo, :p_eficiencia_combustible_kg_km, :p_fecha_calculo, :p_metodo_calculo, :p_certificado_compensacion); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+                new OracleParameter("p_certificado_compensacion", (object?)m.CertificadoCompensacion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar HuellaCarbonoVuelo: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            var sql = "BEGIN pkg_huella_carbono_vuelo.delete_huella(:p_id_huella); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id_huella", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_huella_carbono_vuelo.delete_huella(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar HuellaCarbonoVuelo: {ex.Message}"); return false; }
         }
-
-        public async Task<List<HuellaCarbonoVuelo>> ListarTodo()
-        {
-            return await _context.Set<HuellaCarbonoVuelo>().ToListAsync();
-        }
-
-        public async Task<HuellaCarbonoVuelo?> ObtenerPorId(int id) => await _context.Set<HuellaCarbonoVuelo>().FindAsync(id);
     }
 }

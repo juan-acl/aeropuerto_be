@@ -4,22 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IInventarioCombustibleService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(InventarioCombustible modelo);
-
-        // Actualiza los datos del registro por ID
-        // Nota: Ajusta los parámetros adicionales según los campos de la tabla
-        Task<bool> Actualizar(int id, InventarioCombustible modelo);
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<InventarioCombustible>> ListarTodo();
-
-        // Buscar por ID específico
         Task<InventarioCombustible?> ObtenerPorId(int id);
+        Task<bool> Insertar(InventarioCombustible modelo);
+        Task<bool> Actualizar(int id, InventarioCombustible modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

@@ -4,22 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IAuditoriaSeguridadService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(AuditoriasSeguridad modelo);
-
-        // Actualiza los datos del registro por ID
-        // Nota: Ajusta los parámetros adicionales según los campos de la tabla
-        Task<bool> Actualizar(int id, AuditoriasSeguridad modelo);
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<AuditoriasSeguridad>> ListarTodo();
-
-        // Buscar por ID específico
         Task<AuditoriasSeguridad?> ObtenerPorId(int id);
+        Task<bool> Insertar(AuditoriasSeguridad modelo);
+        Task<bool> Actualizar(int id, AuditoriasSeguridad modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

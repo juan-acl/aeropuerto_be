@@ -4,47 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ReservasPagosController : ControllerBase
     {
         private readonly IReservasPagosService _service;
-
         public ReservasPagosController(IReservasPagosService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ReservasPagosModel modelo)
-        {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Pago registrado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] ReservasPagosModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("reserva/{idReserva}")]
-        public async Task<IActionResult> Get(int idReserva)
-        {
-            var result = await _service.ListarPorReserva(idReserva);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ReservasPagosModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpPatch("{id}/estado")]
-        public async Task<IActionResult> PatchEstado(int id, [FromBody] string nuevoEstado)
-        {
-            await _service.ActualizarEstado(id, nuevoEstado);
-            return Ok(new { mensaje = "Estado de pago actualizado." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de pago eliminado físicamente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

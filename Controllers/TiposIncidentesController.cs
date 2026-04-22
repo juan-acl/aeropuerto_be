@@ -4,47 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class TiposIncidentesController : ControllerBase
     {
         private readonly ITiposIncidentesService _service;
-
         public TiposIncidentesController(ITiposIncidentesService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] TiposIncidentesModel modelo)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Nuevo tipo de incidente/protocolo registrado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            var result = await _service.ListarActivos();
-            return Ok(result);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] TiposIncidentesModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] TiposIncidentesModel modelo)
-        {
-            await _service.Actualizar(id, modelo);
-            return Ok(new { mensaje = "Protocolo de incidente actualizado." });
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] TiposIncidentesModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarLogico(id);
-            return Ok(new { mensaje = "Tipo de incidente desactivado del sistema." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

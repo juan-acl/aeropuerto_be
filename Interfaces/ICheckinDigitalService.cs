@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ICheckinDigitalService
     {
-        Task<bool> RegistrarCheckin(CheckinDigitalModel modelo);
-        Task<CheckinDigitalModel?> ObtenerPorReserva(int idReserva);
-        Task<bool> ActualizarNotificaciones(int id, bool email, bool sms);
-        Task<bool> EliminarFisico(int id);
+        Task<List<CheckinDigitalModel>> ListarTodo();
+        Task<CheckinDigitalModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(CheckinDigitalModel modelo);
+        Task<bool> Actualizar(int id, CheckinDigitalModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

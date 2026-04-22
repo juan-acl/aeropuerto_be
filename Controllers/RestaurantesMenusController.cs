@@ -4,57 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class RestaurantesMenusController : ControllerBase
     {
         private readonly IRestaurantesMenusService _service;
-
         public RestaurantesMenusController(IRestaurantesMenusService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RestaurantesMenusModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarPlato(modelo);
-                return Ok(new { mensaje = "Plato registrado en el menú exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] RestaurantesMenusModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("concesion/{idConcesion}")]
-        public async Task<IActionResult> GetByConcesion(int idConcesion)
-        {
-            var result = await _service.ListarPorConcesion(idConcesion);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] RestaurantesMenusModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpGet("concesion/{idConcesion}/disponibles")]
-        public async Task<IActionResult> GetDisponibles(int idConcesion)
-        {
-            var result = await _service.ListarDisponiblesPorConcesion(idConcesion);
-            return Ok(result);
-        }
-
-        [HttpPatch("{id}/disponibilidad")]
-        public async Task<IActionResult> PatchDisponibilidad(int id, [FromBody] int disponible)
-        {
-            if (disponible != 0 && disponible != 1)
-                return BadRequest("El valor de disponibilidad debe ser 0 o 1.");
-
-            await _service.CambiarDisponibilidad(id, disponible);
-            return Ok(new { mensaje = disponible == 1 ? "Plato marcado como disponible." : "Plato marcado como agotado." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Plato eliminado del menú." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

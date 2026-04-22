@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IEncuestasSatisfaccionService
     {
-        Task<int> RegistrarEncuesta(EncuestasSatisfaccionModel modelo);
-        Task<List<EncuestasSatisfaccionModel>> ListarPorVuelo(int idVuelo);
-        Task<object> ObtenerEstadisticasPorVuelo(int idVuelo);
-        Task<bool> EliminarFisico(int id);
+        Task<List<EncuestasSatisfaccionModel>> ListarTodo();
+        Task<EncuestasSatisfaccionModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(EncuestasSatisfaccionModel modelo);
+        Task<bool> Actualizar(int id, EncuestasSatisfaccionModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IControlAbordajeService
     {
-        Task<bool> RegistrarAbordaje(ControlAbordajeModel modelo);
-        Task<List<ControlAbordajeModel>> ListarPorVuelo(int idVuelo);
-        Task<int> ContarPasajerosAbordados(int idVuelo);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ControlAbordajeModel>> ListarTodo();
+        Task<ControlAbordajeModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ControlAbordajeModel modelo);
+        Task<bool> Actualizar(int id, ControlAbordajeModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

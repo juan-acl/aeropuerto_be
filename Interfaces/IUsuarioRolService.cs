@@ -4,17 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IUsuarioRolService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(UsuariosRoles modelo);
-
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<UsuariosRoles>> ListarTodo();
-
+        Task<UsuariosRoles?> ObtenerPorId(int id);
+        Task<bool> Insertar(UsuariosRoles modelo);
+        Task<bool> Actualizar(int id, UsuariosRoles modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

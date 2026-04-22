@@ -4,55 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class GruposViajeController : ControllerBase
     {
         private readonly IGruposViajeService _service;
-
         public GruposViajeController(IGruposViajeService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] GruposViajeModel modelo)
-        {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Grupo de viaje creado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var grupos = await _service.ListarTodos();
-            return Ok(grupos);
-        }
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var grupo = await _service.ObtenerPorId(id);
-            if (grupo == null) return NotFound("Grupo no encontrado.");
-            return Ok(grupo);
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] GruposViajeModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] GruposViajeModel modelo)
-        {
-            await _service.Actualizar(id, modelo);
-            return Ok(new { mensaje = "Información del grupo actualizada." });
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] GruposViajeModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Grupo eliminado permanentemente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

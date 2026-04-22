@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IPasesAbordajeService
     {
-        Task<bool> GenerarPase(PasesAbordajeModel modelo);
-        Task<PasesAbordajeModel?> ObtenerPorReserva(int idReserva);
-        Task<bool> RegistrarUso(int idPase);
-        Task<bool> EliminarFisico(int idPase);
+        Task<List<PasesAbordajeModel>> ListarTodo();
+        Task<PasesAbordajeModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(PasesAbordajeModel modelo);
+        Task<bool> Actualizar(int id, PasesAbordajeModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

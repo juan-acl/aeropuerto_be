@@ -1,6 +1,6 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -10,70 +10,78 @@ namespace Aeropuerto.Backend.Services
     public class RetrasosTiempoRealService : IRetrasosTiempoRealService
     {
         private readonly DBContext _context;
-
-        public RetrasosTiempoRealService(DBContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<bool> Insertar(RetrasosTiempoReal m)
-        {
-            var parametros = new[] {
-                new OracleParameter("p_i_dv_ue_lo", (object?)m.IdVuelo ?? DBNull.Value),
-                new OracleParameter("p_f_ec_ha_ho_ra_re_gi_st_ro", (object?)m.FechaHoraRegistro ?? DBNull.Value),
-                new OracleParameter("p_t_ip_or_et_ra_so", (object?)m.TipoRetraso ?? DBNull.Value),
-                new OracleParameter("p_c_au_sa_es_pe_ci_fi_ca", (object?)m.CausaEspecifica ?? DBNull.Value),
-                new OracleParameter("p_m_in_ut_os_re_tr_as_oa_ct_ua_le_s", (object?)m.MinutosRetrasoActuales ?? DBNull.Value),
-                new OracleParameter("p_m_in_ut_os_re_tr_as_oe_st_im_ad_os", (object?)m.MinutosRetrasoEstimados ?? DBNull.Value),
-                new OracleParameter("p_i_mp_ac_to_gl_ob_al", (object?)m.ImpactoGlobal ?? DBNull.Value),
-                new OracleParameter("p_a_fe_ct_ac_on_ex_io_ne_s", (object?)m.AfectaConexiones ?? DBNull.Value),
-                new OracleParameter("p_n_ot_if_ic_ad_op_as_aj_er_os", (object?)m.NotificadoPasajeros ?? DBNull.Value),
-                new OracleParameter("p_a_ct_ua_li_za_do_po_r", (object?)m.ActualizadoPor ?? DBNull.Value),
-                new OracleParameter("p_o_bs_er_va_ci_on_es", (object?)m.Observaciones ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_retrasos_tiempo_real.insert_real(:p_i_dv_ue_lo, :p_f_ec_ha_ho_ra_re_gi_st_ro, :p_t_ip_or_et_ra_so, :p_c_au_sa_es_pe_ci_fi_ca, :p_m_in_ut_os_re_tr_as_oa_ct_ua_le_s, :p_m_in_ut_os_re_tr_as_oe_st_im_ad_os, :p_i_mp_ac_to_gl_ob_al, :p_a_fe_ct_ac_on_ex_io_ne_s, :p_n_ot_if_ic_ad_op_as_aj_er_os, :p_a_ct_ua_li_za_do_po_r, :p_o_bs_er_va_ci_on_es); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<bool> Actualizar(int id, RetrasosTiempoReal m)
-        {
-            var parametros = new[] {
-                new OracleParameter("p_i_dr_et_ra_so_ti_em_po_re_al", (object?)m.IdRetrasoTiempoReal ?? DBNull.Value),
-                new OracleParameter("p_i_dv_ue_lo", (object?)m.IdVuelo ?? DBNull.Value),
-                new OracleParameter("p_f_ec_ha_ho_ra_re_gi_st_ro", (object?)m.FechaHoraRegistro ?? DBNull.Value),
-                new OracleParameter("p_t_ip_or_et_ra_so", (object?)m.TipoRetraso ?? DBNull.Value),
-                new OracleParameter("p_c_au_sa_es_pe_ci_fi_ca", (object?)m.CausaEspecifica ?? DBNull.Value),
-                new OracleParameter("p_m_in_ut_os_re_tr_as_oa_ct_ua_le_s", (object?)m.MinutosRetrasoActuales ?? DBNull.Value),
-                new OracleParameter("p_m_in_ut_os_re_tr_as_oe_st_im_ad_os", (object?)m.MinutosRetrasoEstimados ?? DBNull.Value),
-                new OracleParameter("p_i_mp_ac_to_gl_ob_al", (object?)m.ImpactoGlobal ?? DBNull.Value),
-                new OracleParameter("p_a_fe_ct_ac_on_ex_io_ne_s", (object?)m.AfectaConexiones ?? DBNull.Value),
-                new OracleParameter("p_n_ot_if_ic_ad_op_as_aj_er_os", (object?)m.NotificadoPasajeros ?? DBNull.Value),
-                new OracleParameter("p_a_ct_ua_li_za_do_po_r", (object?)m.ActualizadoPor ?? DBNull.Value),
-                new OracleParameter("p_o_bs_er_va_ci_on_es", (object?)m.Observaciones ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_retrasos_tiempo_real.update_real(:p_i_dr_et_ra_so_ti_em_po_re_al, :p_i_dv_ue_lo, :p_f_ec_ha_ho_ra_re_gi_st_ro, :p_t_ip_or_et_ra_so, :p_c_au_sa_es_pe_ci_fi_ca, :p_m_in_ut_os_re_tr_as_oa_ct_ua_le_s, :p_m_in_ut_os_re_tr_as_oe_st_im_ad_os, :p_i_mp_ac_to_gl_ob_al, :p_a_fe_ct_ac_on_ex_io_ne_s, :p_n_ot_if_ic_ad_op_as_aj_er_os, :p_a_ct_ua_li_za_do_po_r, :p_o_bs_er_va_ci_on_es); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<bool> Eliminar(int id)
-        {
-            var sql = "BEGIN pkg_retrasos_tiempo_real.delete_real(:p_id_retraso_tiempo_real); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id_retraso_tiempo_real", id));
-            return true;
-        }
+        public RetrasosTiempoRealService(DBContext context) => _context = context;
 
         public async Task<List<RetrasosTiempoReal>> ListarTodo()
         {
-            return await _context.Set<RetrasosTiempoReal>().ToListAsync();
+            try { return await _context.RetrasosTiempoReal.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo RetrasosTiempoReal: {ex.Message}"); return new List<RetrasosTiempoReal>(); }
         }
 
         public async Task<RetrasosTiempoReal?> ObtenerPorId(int id)
         {
-            return await _context.Set<RetrasosTiempoReal>().FirstOrDefaultAsync(x => x.IdRetrasoTiempoReal == id);
+            try { return await _context.RetrasosTiempoReal.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId RetrasosTiempoReal: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(RetrasosTiempoReal m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_retrasos_tiempo_real.insert_retraso(:p_id_vuelo, :p_fecha_hora_registro, :p_tipo_retraso, :p_causa_especifica, :p_minutos_retraso_actuales, :p_minutos_retraso_estimados, :p_impacto_global, :p_afecta_conexiones, :p_notificado_pasajeros, :p_actualizado_por, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
+                new OracleParameter("p_fecha_hora_registro", (object?)m.FechaHoraRegistro ?? DBNull.Value),
+                new OracleParameter("p_tipo_retraso", (object?)m.TipoRetraso ?? DBNull.Value),
+                new OracleParameter("p_causa_especifica", (object?)m.CausaEspecifica ?? DBNull.Value),
+                new OracleParameter("p_minutos_retraso_actuales", (object?)m.MinutosRetrasoActuales ?? DBNull.Value),
+                new OracleParameter("p_minutos_retraso_estimados", (object?)m.MinutosRetrasoEstimados ?? DBNull.Value),
+                new OracleParameter("p_impacto_global", (object?)m.ImpactoGlobal ?? DBNull.Value),
+                new OracleParameter("p_afecta_conexiones", (object?)m.AfectaConexiones ?? DBNull.Value),
+                new OracleParameter("p_notificado_pasajeros", (object?)m.NotificadoPasajeros ?? DBNull.Value),
+                new OracleParameter("p_actualizado_por", (object?)m.ActualizadoPor ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar RetrasosTiempoReal: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Actualizar(int id, RetrasosTiempoReal m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_retrasos_tiempo_real.update_retraso(:p_id_retraso_tiempo_real, :p_id_vuelo, :p_fecha_hora_registro, :p_tipo_retraso, :p_causa_especifica, :p_minutos_retraso_actuales, :p_minutos_retraso_estimados, :p_impacto_global, :p_afecta_conexiones, :p_notificado_pasajeros, :p_actualizado_por, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_retraso_tiempo_real", id),
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
+                new OracleParameter("p_fecha_hora_registro", (object?)m.FechaHoraRegistro ?? DBNull.Value),
+                new OracleParameter("p_tipo_retraso", (object?)m.TipoRetraso ?? DBNull.Value),
+                new OracleParameter("p_causa_especifica", (object?)m.CausaEspecifica ?? DBNull.Value),
+                new OracleParameter("p_minutos_retraso_actuales", (object?)m.MinutosRetrasoActuales ?? DBNull.Value),
+                new OracleParameter("p_minutos_retraso_estimados", (object?)m.MinutosRetrasoEstimados ?? DBNull.Value),
+                new OracleParameter("p_impacto_global", (object?)m.ImpactoGlobal ?? DBNull.Value),
+                new OracleParameter("p_afecta_conexiones", (object?)m.AfectaConexiones ?? DBNull.Value),
+                new OracleParameter("p_notificado_pasajeros", (object?)m.NotificadoPasajeros ?? DBNull.Value),
+                new OracleParameter("p_actualizado_por", (object?)m.ActualizadoPor ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar RetrasosTiempoReal: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_retrasos_tiempo_real.delete_retraso(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar RetrasosTiempoReal: {ex.Message}"); return false; }
         }
     }
 }

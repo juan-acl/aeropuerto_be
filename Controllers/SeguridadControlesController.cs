@@ -4,48 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class SeguridadControlesController : ControllerBase
     {
         private readonly ISeguridadControlesService _service;
-
         public SeguridadControlesController(ISeguridadControlesService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] SeguridadControlesModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarControl(modelo);
-                return Ok(new { mensaje = "Reporte de control de seguridad guardado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] SeguridadControlesModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("aeropuerto/{codigo}")]
-        public async Task<IActionResult> GetByAero(string codigo)
-        {
-            var result = await _service.ListarPorAeropuerto(codigo);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] SeguridadControlesModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpGet("resumen/{codigo}")]
-        public async Task<IActionResult> GetSummary(string codigo, [FromQuery] DateTime? fecha)
-        {
-            var f = fecha ?? DateTime.Now;
-            var resumen = await _service.ObtenerResumenEstadistico(codigo, f);
-            return Ok(resumen);
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de control eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

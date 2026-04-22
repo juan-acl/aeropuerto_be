@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IFacturasService
     {
-        Task<bool> Insertar(FacturasModel modelo);
-        Task<FacturasModel?> ObtenerPorReserva(int idReserva);
         Task<List<FacturasModel>> ListarTodo();
+        Task<FacturasModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(FacturasModel modelo);
         Task<bool> Actualizar(int id, FacturasModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<bool> Eliminar(int id);
     }
 }

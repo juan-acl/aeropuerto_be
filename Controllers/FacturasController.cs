@@ -4,48 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class FacturasController : ControllerBase
     {
         private readonly IFacturasService _service;
-
         public FacturasController(IFacturasService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] FacturasModel modelo)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Factura generada y guardada." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet("reserva/{idReserva}")]
-        public async Task<IActionResult> GetByReserva(int idReserva)
-        {
-            var factura = await _service.ObtenerPorReserva(idReserva);
-            if (factura == null) return NotFound("No se encontró factura para esta reserva.");
-            return Ok(factura);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] FacturasModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] FacturasModel modelo)
-        {
-            await _service.Actualizar(id, modelo);
-            return Ok(new { mensaje = "Datos de la factura actualizados." });
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] FacturasModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Factura eliminada del sistema." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

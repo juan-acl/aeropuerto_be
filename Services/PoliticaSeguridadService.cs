@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,9 +12,24 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public PoliticaSeguridadService(DBContext context) => _context = context;
 
+        public async Task<List<PoliticasSeguridad>> ListarTodo()
+        {
+            try { return await _context.PoliticasSeguridad.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo PoliticasSeguridad: {ex.Message}"); return new List<PoliticasSeguridad>(); }
+        }
+
+        public async Task<PoliticasSeguridad?> ObtenerPorId(int id)
+        {
+            try { return await _context.PoliticasSeguridad.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId PoliticasSeguridad: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(PoliticasSeguridad m)
         {
-            var p = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_politicas_seguridad.insert_politica(:p_nombre_politica, :p_version, :p_fecha_aprobacion, :p_fecha_vigencia, :p_fecha_revision, :p_contenido, :p_aprobado_por, :p_responsable_ejecucion, :p_activa); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_nombre_politica", (object?)m.NombrePolitica ?? DBNull.Value),
                 new OracleParameter("p_version", (object?)m.Version ?? DBNull.Value),
                 new OracleParameter("p_fecha_aprobacion", (object?)m.FechaAprobacion ?? DBNull.Value),
@@ -22,18 +38,21 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
                 new OracleParameter("p_aprobado_por", (object?)m.AprobadoPor ?? DBNull.Value),
                 new OracleParameter("p_responsable_ejecucion", (object?)m.ResponsableEjecucion ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_politicas_seguridad.insert_politica(:p_nombre_politica, :p_version, :p_fecha_aprobacion, :p_fecha_vigencia, :p_fecha_revision, :p_contenido, :p_aprobado_por, :p_responsable_ejecucion, :p_activa); END;", p);
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar PoliticasSeguridad: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, PoliticasSeguridad m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_politica", m.IdPolitica)
-            };
-            p.AddRange(new[] {
+            try
+            {
+                string sql = "BEGIN pkg_politicas_seguridad.update_politica(:p_id_politica, :p_nombre_politica, :p_version, :p_fecha_aprobacion, :p_fecha_vigencia, :p_fecha_revision, :p_contenido, :p_aprobado_por, :p_responsable_ejecucion, :p_activa); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_politica", id),
                 new OracleParameter("p_nombre_politica", (object?)m.NombrePolitica ?? DBNull.Value),
                 new OracleParameter("p_version", (object?)m.Version ?? DBNull.Value),
                 new OracleParameter("p_fecha_aprobacion", (object?)m.FechaAprobacion ?? DBNull.Value),
@@ -42,22 +61,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
                 new OracleParameter("p_aprobado_por", (object?)m.AprobadoPor ?? DBNull.Value),
                 new OracleParameter("p_responsable_ejecucion", (object?)m.ResponsableEjecucion ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_politicas_seguridad.update_politica(:p_id_politica, :p_nombre_politica, :p_version, :p_fecha_aprobacion, :p_fecha_vigencia, :p_fecha_revision, :p_contenido, :p_aprobado_por, :p_responsable_ejecucion, :p_activa); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar PoliticasSeguridad: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_politicas_seguridad.delete_politica(:p_id_politica); END;",
-                new OracleParameter("p_id_politica", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_politicas_seguridad.delete_politica(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar PoliticasSeguridad: {ex.Message}"); return false; }
         }
-
-        public async Task<List<PoliticasSeguridad>> ListarTodo() => await _context.Set<PoliticasSeguridad>().ToListAsync();
-
-        public async Task<PoliticasSeguridad?> ObtenerPorId(int id) => await _context.Set<PoliticasSeguridad>().FindAsync(id);
     }
 }

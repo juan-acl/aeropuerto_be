@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,9 +12,24 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public VehiculoTransporteService(DBContext context) => _context = context;
 
+        public async Task<List<VehiculosTransporte>> ListarTodo()
+        {
+            try { return await _context.VehiculosTransporte.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo VehiculosTransporte: {ex.Message}"); return new List<VehiculosTransporte>(); }
+        }
+
+        public async Task<VehiculosTransporte?> ObtenerPorId(int id)
+        {
+            try { return await _context.VehiculosTransporte.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId VehiculosTransporte: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(VehiculosTransporte m)
         {
-            var p = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_vehiculos_transporte.insert_vehiculo(:p_placa, :p_tipo_vehiculo, :p_marca, :p_modelo, :p_anio, :p_capacidad_pasajeros, :p_capacidad_maletas, :p_tiene_aire_acondicionado, :p_tiene_wifi, :p_tiene_accesibilidad, :p_propietario, :p_empresa_operadora, :p_fecha_ultimo_mantenimiento, :p_fecha_proximo_mantenimiento, :p_disponible, :p_activo); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_placa", (object?)m.Placa ?? DBNull.Value),
                 new OracleParameter("p_tipo_vehiculo", (object?)m.TipoVehiculo ?? DBNull.Value),
                 new OracleParameter("p_marca", (object?)m.Marca ?? DBNull.Value),
@@ -29,18 +45,21 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_fecha_ultimo_mantenimiento", (object?)m.FechaUltimoMantenimiento ?? DBNull.Value),
                 new OracleParameter("p_fecha_proximo_mantenimiento", (object?)m.FechaProximoMantenimiento ?? DBNull.Value),
                 new OracleParameter("p_disponible", (object?)m.Disponible ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_vehiculos_transporte.insert_vehiculo(:p_placa, :p_tipo_vehiculo, :p_marca, :p_modelo, :p_anio, :p_capacidad_pasajeros, :p_capacidad_maletas, :p_tiene_aire_acondicionado, :p_tiene_wifi, :p_tiene_accesibilidad, :p_propietario, :p_empresa_operadora, :p_fecha_ultimo_mantenimiento, :p_fecha_proximo_mantenimiento, :p_disponible, :p_activo); END;", p);
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar VehiculosTransporte: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, VehiculosTransporte m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_vehiculo_transporte", m.IdVehiculoTransporte)
-            };
-            p.AddRange(new[] {
+            try
+            {
+                string sql = "BEGIN pkg_vehiculos_transporte.update_vehiculo(:p_id_vehiculo_transporte, :p_placa, :p_tipo_vehiculo, :p_marca, :p_modelo, :p_anio, :p_capacidad_pasajeros, :p_capacidad_maletas, :p_tiene_aire_acondicionado, :p_tiene_wifi, :p_tiene_accesibilidad, :p_propietario, :p_empresa_operadora, :p_fecha_ultimo_mantenimiento, :p_fecha_proximo_mantenimiento, :p_disponible, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_vehiculo_transporte", id),
                 new OracleParameter("p_placa", (object?)m.Placa ?? DBNull.Value),
                 new OracleParameter("p_tipo_vehiculo", (object?)m.TipoVehiculo ?? DBNull.Value),
                 new OracleParameter("p_marca", (object?)m.Marca ?? DBNull.Value),
@@ -56,22 +75,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_fecha_ultimo_mantenimiento", (object?)m.FechaUltimoMantenimiento ?? DBNull.Value),
                 new OracleParameter("p_fecha_proximo_mantenimiento", (object?)m.FechaProximoMantenimiento ?? DBNull.Value),
                 new OracleParameter("p_disponible", (object?)m.Disponible ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_vehiculos_transporte.update_vehiculo(:p_id_vehiculo_transporte, :p_placa, :p_tipo_vehiculo, :p_marca, :p_modelo, :p_anio, :p_capacidad_pasajeros, :p_capacidad_maletas, :p_tiene_aire_acondicionado, :p_tiene_wifi, :p_tiene_accesibilidad, :p_propietario, :p_empresa_operadora, :p_fecha_ultimo_mantenimiento, :p_fecha_proximo_mantenimiento, :p_disponible, :p_activo); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar VehiculosTransporte: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_vehiculos_transporte.delete_vehiculo(:p_id_vehiculo_transporte); END;", 
-                new OracleParameter("p_id_vehiculo_transporte", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_vehiculos_transporte.delete_vehiculo(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar VehiculosTransporte: {ex.Message}"); return false; }
         }
-
-        public async Task<List<VehiculosTransporte>> ListarTodo() => await _context.Set<VehiculosTransporte>().ToListAsync();
-
-        public async Task<VehiculosTransporte?> ObtenerPorId(int id) => await _context.Set<VehiculosTransporte>().FindAsync(id);
     }
 }

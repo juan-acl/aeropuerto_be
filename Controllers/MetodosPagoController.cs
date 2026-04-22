@@ -4,61 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class MetodosPagoController : ControllerBase
     {
         private readonly IMetodosPagoService _service;
-
         public MetodosPagoController(IMetodosPagoService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] MetodosPagoModel modelo)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Método de pago creado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var result = await _service.ListarActivos();
-            return Ok(result);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] MetodosPagoModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] MetodosPagoModel modelo)
-        {
-            try
-            {
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = "Método de pago actualizado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] MetodosPagoModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                await _service.EliminarFisico(id);
-                return Ok(new { mensaje = "Método de pago eliminado permanentemente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IProgramaLealtadService
     {
-        Task<int> RegistrarMembresia(ProgramaLealtadModel modelo);
-        Task<ProgramaLealtadModel?> ObtenerPorPasajero(int idPasajero);
-        Task<bool> SumarActividad(int idPasajero, int puntos, int millas);
-        Task<bool> CanjearPuntos(int idPasajero, int puntosACanjear);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ProgramaLealtadModel>> ListarTodo();
+        Task<ProgramaLealtadModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ProgramaLealtadModel modelo);
+        Task<bool> Actualizar(int id, ProgramaLealtadModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

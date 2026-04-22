@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IEstacionamientoService
     {
-        Task<bool> RegistrarEspacio(EstacionamientoModel modelo);
-        Task<List<EstacionamientoModel>> ListarPorAeropuerto(string codigoAeropuerto);
-        Task<List<EstacionamientoModel>> ListarDisponiblesPorTipo(string codigoAeropuerto, string tipoEspacio);
-        Task<bool> CambiarDisponibilidad(int idEstacionamiento, int disponible);
-        Task<bool> EliminarFisico(int id);
+        Task<List<EstacionamientoModel>> ListarTodo();
+        Task<EstacionamientoModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(EstacionamientoModel modelo);
+        Task<bool> Actualizar(int id, EstacionamientoModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

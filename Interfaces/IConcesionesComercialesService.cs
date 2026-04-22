@@ -4,11 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IConcesionesComercialesService
     {
-        Task<bool> RegistrarConcesion(ConcesionesComercialesModel modelo);
-        Task<List<ConcesionesComercialesModel>> ListarPorAeropuerto(string codigoAeropuerto);
-        Task<List<ConcesionesComercialesModel>> ListarActivas(string codigoAeropuerto);
-        Task<bool> RenovarContrato(int idConcesion, DateTime nuevaFechaFin, decimal nuevoCanon);
-        Task<bool> DesactivarConcesion(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ConcesionesComercialesModel>> ListarTodo();
+        Task<ConcesionesComercialesModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ConcesionesComercialesModel modelo);
+        Task<bool> Actualizar(int id, ConcesionesComercialesModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

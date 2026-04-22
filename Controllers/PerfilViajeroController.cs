@@ -1,50 +1,36 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-	[ApiController]
-	[Route("api/[controller]")]
-	public class PerfilesViajeroController : ControllerBase
-	{
-		private readonly IPerfilViajeroService _service;
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PerfilesViajeroController : ControllerBase
+    {
+        private readonly IPerfilViajeroService _service;
+        public PerfilesViajeroController(IPerfilViajeroService service) => _service = service;
 
-		public PerfilesViajeroController(IPerfilViajeroService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
 
-		[HttpPost]
-		public async Task<IActionResult> Crear([FromBody] PerfilViajeroModel modelo)
-		{
-			try
-			{
-				await _service.Insertar(modelo);
-				return Ok(new { mensaje = "Perfil de viajero creado exitosamente." });
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, $"Error: {ex.Message}");
-			}
-		}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
 
-		[HttpGet("pasajero/{idPasajero}")]
-		public async Task<IActionResult> GetByPasajero(int idPasajero)
-		{
-			var perfil = await _service.ObtenerPorPasajero(idPasajero);
-			if (perfil == null) return NotFound("El pasajero no tiene un perfil asociado.");
-			return Ok(perfil);
-		}
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] PerfilViajeroModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-		[HttpPatch("{id}/sumar-puntos")]
-		public async Task<IActionResult> AddPoints(int id, [FromBody] int puntos)
-		{
-			await _service.SumarPuntos(id, puntos);
-			return Ok(new { mensaje = $"{puntos} puntos sumados correctamente." });
-		}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] PerfilViajeroModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.Eliminar(id);
-            return Ok(new { mensaje = "Perfil desactivado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

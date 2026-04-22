@@ -1,72 +1,91 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class VisitasSeguridadService : IVisitasSeguridadService
     {
         private readonly DBContext _context;
-
         public VisitasSeguridadService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarIngreso(VisitasSeguridadModel m)
+        public async Task<List<VisitasSeguridadModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO visitas_seguridad 
-                        (codigo_aeropuerto, fecha_visita, hora_entrada, nombre_visitante, 
-                         tipo_documento, numero_documento, empresa, motivo_visita, 
-                         persona_autoriza, area_visitada, escort_requerido, escort_asignado) 
-                        VALUES (:p_aero, SYSDATE, SYSTIMESTAMP, :p_nom, :p_tdoc, :p_ndoc, 
-                                :p_emp, :p_mot, :p_aut, :p_area, :p_req, :p_asig)";
-
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreVisitante ?? DBNull.Value),
-                new OracleParameter("p_tdoc", (object?)m.TipoDocumento ?? DBNull.Value),
-                new OracleParameter("p_ndoc", (object?)m.NumeroDocumento ?? DBNull.Value),
-                new OracleParameter("p_emp", (object?)m.Empresa ?? DBNull.Value),
-                new OracleParameter("p_mot", (object?)m.MotivoVisita ?? DBNull.Value),
-                new OracleParameter("p_aut", (object?)m.PersonaAutoriza ?? DBNull.Value),
-                new OracleParameter("p_area", (object?)m.AreaVisitada ?? DBNull.Value),
-                new OracleParameter("p_req", m.EscortRequerido),
-                new OracleParameter("p_asig", (object?)m.EscortAsignado ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.VisitasSeguridad.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo VisitasSeguridadModel: {ex.Message}"); return new List<VisitasSeguridadModel>(); }
         }
 
-        public async Task<List<VisitasSeguridadModel>> ListarPorAeropuerto(string codigo)
+        public async Task<VisitasSeguridadModel?> ObtenerPorId(int id)
         {
-            return await _context.VisitasSeguridad
-                .Where(v => v.CodigoAeropuerto == codigo)
-                .OrderByDescending(v => v.HoraEntrada)
-                .ToListAsync();
+            try { return await _context.VisitasSeguridad.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId VisitasSeguridadModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<VisitasSeguridadModel>> ListarVisitantesActivos(string codigo)
+        public async Task<bool> Insertar(VisitasSeguridadModel m)
         {
-            // Visitantes que han entrado pero no han registrado su salida
-            return await _context.VisitasSeguridad
-                .Where(v => v.CodigoAeropuerto == codigo && v.HoraSalida == null)
-                .OrderBy(v => v.HoraEntrada)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_visitas_seguridad.insert_visita(:p_codigo_aeropuerto, :p_fecha_visita, :p_hora_entrada, :p_hora_salida, :p_nombre_visitante, :p_tipo_documento, :p_numero_documento, :p_empresa, :p_motivo_visita, :p_persona_autoriza, :p_area_visitada, :p_escort_requerido, :p_escort_asignado); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_fecha_visita", (object?)m.FechaVisita ?? DBNull.Value),
+                new OracleParameter("p_hora_entrada", (object?)m.HoraEntrada ?? DBNull.Value),
+                new OracleParameter("p_hora_salida", (object?)m.HoraSalida ?? DBNull.Value),
+                new OracleParameter("p_nombre_visitante", (object?)m.NombreVisitante ?? DBNull.Value),
+                new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                new OracleParameter("p_empresa", (object?)m.Empresa ?? DBNull.Value),
+                new OracleParameter("p_motivo_visita", (object?)m.MotivoVisita ?? DBNull.Value),
+                new OracleParameter("p_persona_autoriza", (object?)m.PersonaAutoriza ?? DBNull.Value),
+                new OracleParameter("p_area_visitada", (object?)m.AreaVisitada ?? DBNull.Value),
+                new OracleParameter("p_escort_requerido", m.EscortRequerido),
+                new OracleParameter("p_escort_asignado", (object?)m.EscortAsignado ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar VisitasSeguridadModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> RegistrarSalida(int id)
+        public async Task<bool> Actualizar(int id, VisitasSeguridadModel m)
         {
-            var sql = "UPDATE visitas_seguridad SET hora_salida = SYSTIMESTAMP WHERE id_visita = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_visitas_seguridad.update_visita(:p_id_visita, :p_codigo_aeropuerto, :p_fecha_visita, :p_hora_entrada, :p_hora_salida, :p_nombre_visitante, :p_tipo_documento, :p_numero_documento, :p_empresa, :p_motivo_visita, :p_persona_autoriza, :p_area_visitada, :p_escort_requerido, :p_escort_asignado); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_visita", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_fecha_visita", (object?)m.FechaVisita ?? DBNull.Value),
+                new OracleParameter("p_hora_entrada", (object?)m.HoraEntrada ?? DBNull.Value),
+                new OracleParameter("p_hora_salida", (object?)m.HoraSalida ?? DBNull.Value),
+                new OracleParameter("p_nombre_visitante", (object?)m.NombreVisitante ?? DBNull.Value),
+                new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                new OracleParameter("p_empresa", (object?)m.Empresa ?? DBNull.Value),
+                new OracleParameter("p_motivo_visita", (object?)m.MotivoVisita ?? DBNull.Value),
+                new OracleParameter("p_persona_autoriza", (object?)m.PersonaAutoriza ?? DBNull.Value),
+                new OracleParameter("p_area_visitada", (object?)m.AreaVisitada ?? DBNull.Value),
+                new OracleParameter("p_escort_requerido", m.EscortRequerido),
+                new OracleParameter("p_escort_asignado", (object?)m.EscortAsignado ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar VisitasSeguridadModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM visitas_seguridad WHERE id_visita = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_visitas_seguridad.delete_visita(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar VisitasSeguridadModel: {ex.Message}"); return false; }
         }
     }
 }

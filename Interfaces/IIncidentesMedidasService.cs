@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IIncidentesMedidasService
     {
-        Task<bool> AplicarMedida(IncidentesMedidasModel modelo);
-        Task<List<IncidentesMedidasModel>> ListarPorIncidente(int idIncidente);
-        Task<bool> ActualizarMedida(int id, IncidentesMedidasModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<List<IncidentesMedidasModel>> ListarTodo();
+        Task<IncidentesMedidasModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(IncidentesMedidasModel modelo);
+        Task<bool> Actualizar(int id, IncidentesMedidasModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

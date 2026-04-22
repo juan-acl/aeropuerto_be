@@ -1,106 +1,105 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ObjetosPerdidosService : IObjetosPerdidosService
     {
         private readonly DBContext _context;
-
         public ObjetosPerdidosService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarObjeto(ObjetosPerdidosModel m)
+        public async Task<List<ObjetosPerdidosModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO objetos_perdidos 
-                        (descripcion, categoria_objeto, fecha_reporte, hora_reporte, 
-                         lugar_encontrado, ubicacion_detallada, id_vuelo, codigo_aeropuerto, 
-                         color, marca, modelo, numero_serie, valor_estimado, encontrado_por, 
-                         ubicacion_actual, estado, observaciones, foto_objeto) 
-                        VALUES (:p_desc, :p_cat, SYSDATE, SYSTIMESTAMP, :p_lugar, :p_udetal, 
-                                :p_vuelo, :p_aero, :p_col, :p_mar, :p_mod, :p_num, :p_val, 
-                                :p_enc, :p_uact, 'ENCONTRADO', :p_obs, :p_foto)";
-
-            var parametros = new[] {
-                new OracleParameter("p_desc", m.Descripcion),
-                new OracleParameter("p_cat", (object?)m.CategoriaObjeto ?? DBNull.Value),
-                new OracleParameter("p_lugar", (object?)m.LugarEncontrado ?? DBNull.Value),
-                new OracleParameter("p_udetal", (object?)m.UbicacionDetallada ?? DBNull.Value),
-                new OracleParameter("p_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_col", (object?)m.Color ?? DBNull.Value),
-                new OracleParameter("p_mar", (object?)m.Marca ?? DBNull.Value),
-                new OracleParameter("p_mod", (object?)m.Modelo ?? DBNull.Value),
-                new OracleParameter("p_num", (object?)m.NumeroSerie ?? DBNull.Value),
-                new OracleParameter("p_val", (object?)m.ValorEstimado ?? DBNull.Value),
-                new OracleParameter("p_enc", (object?)m.EncontradoPor ?? DBNull.Value),
-                new OracleParameter("p_uact", (object?)m.UbicacionActual ?? DBNull.Value),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value),
-                new OracleParameter("p_foto", (object?)m.FotoObjeto ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.ObjetosPerdidos.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ObjetosPerdidosModel: {ex.Message}"); return new List<ObjetosPerdidosModel>(); }
         }
 
-        public async Task<List<ObjetosPerdidosModel>> ListarNoEntregados(string? codigoAeropuerto = null)
+        public async Task<ObjetosPerdidosModel?> ObtenerPorId(int id)
         {
-            var query = _context.ObjetosPerdidos
-                .Where(o => o.Estado == "ENCONTRADO" || o.Estado == "EN_PROCESO");
+            try { return await _context.ObjetosPerdidos.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ObjetosPerdidosModel: {ex.Message}"); return null; }
+        }
 
-            if (!string.IsNullOrEmpty(codigoAeropuerto))
+        public async Task<bool> Insertar(ObjetosPerdidosModel m)
+        {
+            try
             {
-                query = query.Where(o => o.CodigoAeropuerto == codigoAeropuerto);
+                string sql = "BEGIN pkg_objetos_perdidos.insert_objeto(:p_descripcion, :p_categoria_objeto, :p_fecha_reporte, :p_hora_reporte, :p_lugar_encontrado, :p_ubicacion_detallada, :p_id_vuelo, :p_codigo_aeropuerto, :p_color, :p_marca, :p_modelo, :p_numero_serie, :p_valor_estimado, :p_encontrado_por, :p_ubicacion_actual, :p_estado, :p_fecha_entrega, :p_id_pasajero_entrega, :p_observaciones, :p_foto_objeto); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_categoria_objeto", (object?)m.CategoriaObjeto ?? DBNull.Value),
+                new OracleParameter("p_fecha_reporte", (object?)m.FechaReporte ?? DBNull.Value),
+                new OracleParameter("p_hora_reporte", (object?)m.HoraReporte ?? DBNull.Value),
+                new OracleParameter("p_lugar_encontrado", (object?)m.LugarEncontrado ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_detallada", (object?)m.UbicacionDetallada ?? DBNull.Value),
+                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_color", (object?)m.Color ?? DBNull.Value),
+                new OracleParameter("p_marca", (object?)m.Marca ?? DBNull.Value),
+                new OracleParameter("p_modelo", (object?)m.Modelo ?? DBNull.Value),
+                new OracleParameter("p_numero_serie", (object?)m.NumeroSerie ?? DBNull.Value),
+                new OracleParameter("p_valor_estimado", (object?)m.ValorEstimado ?? DBNull.Value),
+                new OracleParameter("p_encontrado_por", (object?)m.EncontradoPor ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_actual", (object?)m.UbicacionActual ?? DBNull.Value),
+                new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
+                new OracleParameter("p_fecha_entrega", (object?)m.FechaEntrega ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero_entrega", (object?)m.IdPasajeroEntrega ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value),
+                new OracleParameter("p_foto_objeto", OracleDbType.Blob) { Value = (object?)m.FotoObjeto ?? DBNull.Value }
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
             }
-
-            // Usamos proyección para omitir el BLOB en la lista general
-            return await query
-                .Select(o => new ObjetosPerdidosModel
-                {
-                    IdObjeto = o.IdObjeto,
-                    Descripcion = o.Descripcion,
-                    CategoriaObjeto = o.CategoriaObjeto,
-                    FechaReporte = o.FechaReporte,
-                    LugarEncontrado = o.LugarEncontrado,
-                    Marca = o.Marca,
-                    Color = o.Color,
-                    Estado = o.Estado,
-                    UbicacionActual = o.UbicacionActual,
-                    FotoObjeto = null // Omitimos el binario aquí
-                })
-                .OrderByDescending(o => o.FechaReporte)
-                .ToListAsync();
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar ObjetosPerdidosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<ObjetosPerdidosModel?> ObtenerFoto(int id)
+        public async Task<bool> Actualizar(int id, ObjetosPerdidosModel m)
         {
-            return await _context.ObjetosPerdidos
-                .Where(o => o.IdObjeto == id)
-                .Select(o => new ObjetosPerdidosModel { FotoObjeto = o.FotoObjeto })
-                .FirstOrDefaultAsync();
+            try
+            {
+                string sql = "BEGIN pkg_objetos_perdidos.update_objeto(:p_id_objeto, :p_descripcion, :p_categoria_objeto, :p_fecha_reporte, :p_hora_reporte, :p_lugar_encontrado, :p_ubicacion_detallada, :p_id_vuelo, :p_codigo_aeropuerto, :p_color, :p_marca, :p_modelo, :p_numero_serie, :p_valor_estimado, :p_encontrado_por, :p_ubicacion_actual, :p_estado, :p_fecha_entrega, :p_id_pasajero_entrega, :p_observaciones, :p_foto_objeto); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_objeto", id),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_categoria_objeto", (object?)m.CategoriaObjeto ?? DBNull.Value),
+                new OracleParameter("p_fecha_reporte", (object?)m.FechaReporte ?? DBNull.Value),
+                new OracleParameter("p_hora_reporte", (object?)m.HoraReporte ?? DBNull.Value),
+                new OracleParameter("p_lugar_encontrado", (object?)m.LugarEncontrado ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_detallada", (object?)m.UbicacionDetallada ?? DBNull.Value),
+                new OracleParameter("p_id_vuelo", (object?)m.IdVuelo ?? DBNull.Value),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_color", (object?)m.Color ?? DBNull.Value),
+                new OracleParameter("p_marca", (object?)m.Marca ?? DBNull.Value),
+                new OracleParameter("p_modelo", (object?)m.Modelo ?? DBNull.Value),
+                new OracleParameter("p_numero_serie", (object?)m.NumeroSerie ?? DBNull.Value),
+                new OracleParameter("p_valor_estimado", (object?)m.ValorEstimado ?? DBNull.Value),
+                new OracleParameter("p_encontrado_por", (object?)m.EncontradoPor ?? DBNull.Value),
+                new OracleParameter("p_ubicacion_actual", (object?)m.UbicacionActual ?? DBNull.Value),
+                new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
+                new OracleParameter("p_fecha_entrega", (object?)m.FechaEntrega ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero_entrega", (object?)m.IdPasajeroEntrega ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value),
+                new OracleParameter("p_foto_objeto", OracleDbType.Blob) { Value = (object?)m.FotoObjeto ?? DBNull.Value }
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ObjetosPerdidosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EntregarObjeto(int id, int idPasajero)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = @"UPDATE objetos_perdidos 
-                        SET estado = 'ENTREGADO', 
-                            fecha_entrega = SYSDATE, 
-                            id_pasajero_entrega = :p_pas 
-                        WHERE id_objeto = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_pas", idPasajero),
-                new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM objetos_perdidos WHERE id_objeto = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_objetos_perdidos.delete_objeto(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ObjetosPerdidosModel: {ex.Message}"); return false; }
         }
     }
 }

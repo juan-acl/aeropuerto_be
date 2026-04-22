@@ -1,85 +1,87 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class HotelesCercanosService : IHotelesCercanosService
     {
         private readonly DBContext _context;
-
         public HotelesCercanosService(DBContext context) => _context = context;
-
-        public async Task<bool> RegistrarHotel(HotelesCercanosModel m)
-        {
-            var sql = @"INSERT INTO hoteles_cercanos 
-                        (codigo_aeropuerto, nombre_hotel, categoria, direccion, distancia_km, 
-                         telefono, email, website, tarifa_noche_desde, tiene_shuttle, activo) 
-                        VALUES (:p_aero, :p_nom, :p_cat, :p_dir, :p_dist, 
-                                :p_tel, :p_email, :p_web, :p_tarifa, :p_shut, 1)";
-
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreHotel ?? DBNull.Value),
-                new OracleParameter("p_cat", m.Categoria),
-                new OracleParameter("p_dir", (object?)m.Direccion ?? DBNull.Value),
-                new OracleParameter("p_dist", (object?)m.DistanciaKm ?? DBNull.Value),
-                new OracleParameter("p_tel", (object?)m.Telefono ?? DBNull.Value),
-                new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
-                new OracleParameter("p_web", (object?)m.Website ?? DBNull.Value),
-                new OracleParameter("p_tarifa", (object?)m.TarifaNocheDesde ?? DBNull.Value),
-                new OracleParameter("p_shut", m.TieneShuttle)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<List<HotelesCercanosModel>> ListarPorAeropuerto(string codigoAeropuerto)
-        {
-            return await _context.HotelesCercanos
-                .Where(h => h.CodigoAeropuerto == codigoAeropuerto)
-                .OrderBy(h => h.DistanciaKm)
-                .ToListAsync();
-        }
 
         public async Task<List<HotelesCercanosModel>> ListarTodo()
         {
-            return await _context.HotelesCercanos
-                .OrderBy(h => h.DistanciaKm)
-                .ToListAsync();
+            try { return await _context.HotelesCercanos.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HotelesCercanosModel: {ex.Message}"); return new List<HotelesCercanosModel>(); }
         }
 
-        public async Task<List<HotelesCercanosModel>> ListarActivos(string codigoAeropuerto, bool? conShuttle = null)
+        public async Task<HotelesCercanosModel?> ObtenerPorId(int id)
         {
-            var query = _context.HotelesCercanos
-                .Where(h => h.CodigoAeropuerto == codigoAeropuerto && h.Activo == 1);
+            try { return await _context.HotelesCercanos.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId HotelesCercanosModel: {ex.Message}"); return null; }
+        }
 
-            // Filtro dinámico si el usuario solo quiere hoteles que incluyan transporte al aeropuerto
-            if (conShuttle.HasValue && conShuttle.Value)
+        public async Task<bool> Insertar(HotelesCercanosModel m)
+        {
+            try
             {
-                query = query.Where(h => h.TieneShuttle == 1);
+                string sql = "BEGIN pkg_hoteles_cercanos.insert_hotel(:p_codigo_aeropuerto, :p_nombre_hotel, :p_categoria, :p_direccion, :p_distancia_km, :p_telefono, :p_email, :p_website, :p_tarifa_noche_desde, :p_tiene_shuttle, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_hotel", (object?)m.NombreHotel ?? DBNull.Value),
+                new OracleParameter("p_categoria", (object?)m.Categoria ?? DBNull.Value),
+                new OracleParameter("p_direccion", (object?)m.Direccion ?? DBNull.Value),
+                new OracleParameter("p_distancia_km", (object?)m.DistanciaKm ?? DBNull.Value),
+                new OracleParameter("p_telefono", (object?)m.Telefono ?? DBNull.Value),
+                new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
+                new OracleParameter("p_website", (object?)m.Website ?? DBNull.Value),
+                new OracleParameter("p_tarifa_noche_desde", (object?)m.TarifaNocheDesde ?? DBNull.Value),
+                new OracleParameter("p_tiene_shuttle", m.TieneShuttle),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
             }
-
-            return await query
-                .OrderBy(h => h.DistanciaKm) // Siempre ordenamos del más cercano al más lejano
-                .ToListAsync();
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar HotelesCercanosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> DesactivarHotel(int id)
+        public async Task<bool> Actualizar(int id, HotelesCercanosModel m)
         {
-            var sql = "UPDATE hoteles_cercanos SET activo = 0 WHERE id_hotel = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_hoteles_cercanos.update_hotel(:p_id_hotel, :p_codigo_aeropuerto, :p_nombre_hotel, :p_categoria, :p_direccion, :p_distancia_km, :p_telefono, :p_email, :p_website, :p_tarifa_noche_desde, :p_tiene_shuttle, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_hotel", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_hotel", (object?)m.NombreHotel ?? DBNull.Value),
+                new OracleParameter("p_categoria", (object?)m.Categoria ?? DBNull.Value),
+                new OracleParameter("p_direccion", (object?)m.Direccion ?? DBNull.Value),
+                new OracleParameter("p_distancia_km", (object?)m.DistanciaKm ?? DBNull.Value),
+                new OracleParameter("p_telefono", (object?)m.Telefono ?? DBNull.Value),
+                new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
+                new OracleParameter("p_website", (object?)m.Website ?? DBNull.Value),
+                new OracleParameter("p_tarifa_noche_desde", (object?)m.TarifaNocheDesde ?? DBNull.Value),
+                new OracleParameter("p_tiene_shuttle", m.TieneShuttle),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar HotelesCercanosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM hoteles_cercanos WHERE id_hotel = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_hoteles_cercanos.delete_hotel(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar HotelesCercanosModel: {ex.Message}"); return false; }
         }
     }
 }

@@ -4,90 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PublicidadController : ControllerBase
     {
         private readonly IPublicidadService _service;
-
         public PublicidadController(IPublicidadService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PublicidadModel modelo)
-        {
-            try
-            {
-                int idGenerado = await _service.RegistrarPublicidad(modelo);
-                return Ok(new
-                {
-                    mensaje = "Espacio publicitario registrado. Por favor asocie el contrato firmado.",
-                    idPublicidad = idGenerado
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] PublicidadModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("aeropuerto/{codigo}")]
-        public async Task<IActionResult> GetByAeropuerto(string codigo)
-        {
-            var result = await _service.ListarPorAeropuerto(codigo);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] PublicidadModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpGet("aeropuerto/{codigo}/vigentes")]
-        public async Task<IActionResult> GetVigentes(string codigo)
-        {
-            var result = await _service.ListarActivas(codigo);
-            return Ok(result);
-        }
-
-        // --- Manejo del BLOB (Archivo de Contrato) ---
-
-        [HttpPost("{id}/contrato")]
-        public async Task<IActionResult> PostUploadContrato(int id, IFormFile archivo)
-        {
-            if (archivo == null || archivo.Length == 0)
-                return BadRequest("Debe enviar un archivo válido.");
-
-            // Convertimos el IFormFile (Multipart/form-data) a byte array
-            using var memoryStream = new MemoryStream();
-            await archivo.CopyToAsync(memoryStream);
-            var documentoBytes = memoryStream.ToArray();
-
-            await _service.SubirContrato(id, documentoBytes);
-
-            return Ok(new { mensaje = "Contrato asociado correctamente a la pauta publicitaria." });
-        }
-
-        [HttpGet("{id}/contrato")]
-        public async Task<IActionResult> GetDownloadContrato(int id)
-        {
-            var contratoBytes = await _service.ObtenerContrato(id);
-
-            if (contratoBytes == null || contratoBytes.Length == 0)
-                return NotFound("Esta publicidad no tiene un contrato digitalizado asociado.");
-
-            // Retornamos el BLOB como un archivo PDF por defecto (puedes ajustar el MIME type según necesites)
-            return File(contratoBytes, "application/pdf", $"Contrato_Publicidad_{id}.pdf");
-        }
-
-        // ---------------------------------------------
-
-        [HttpPatch("{id}/desactivar")]
-        public async Task<IActionResult> PatchDesactivar(int id)
-        {
-            await _service.DesactivarPublicidad(id);
-            return Ok(new { mensaje = "Pauta publicitaria finalizada/desactivada." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro publicitario eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

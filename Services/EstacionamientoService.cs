@@ -1,76 +1,81 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class EstacionamientoService : IEstacionamientoService
     {
         private readonly DBContext _context;
-
         public EstacionamientoService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarEspacio(EstacionamientoModel m)
+        public async Task<List<EstacionamientoModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO estacionamiento 
-                        (codigo_aeropuerto, numero_espacio, tipo_espacio, terminal_cercana, 
-                         tarifa_por_hora, tarifa_diaria, disponible, observaciones) 
-                        VALUES (:p_aero, :p_num, :p_tipo, :p_term, 
-                                :p_hora, :p_dia, :p_disp, :p_obs)";
-
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_num", (object?)m.NumeroEspacio ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoEspacio),
-                new OracleParameter("p_term", (object?)m.TerminalCercana ?? DBNull.Value),
-                new OracleParameter("p_hora", (object?)m.TarifaPorHora ?? DBNull.Value),
-                new OracleParameter("p_dia", (object?)m.TarifaDiaria ?? DBNull.Value),
-                new OracleParameter("p_disp", m.Disponible),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.Estacionamiento.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo EstacionamientoModel: {ex.Message}"); return new List<EstacionamientoModel>(); }
         }
 
-        public async Task<List<EstacionamientoModel>> ListarPorAeropuerto(string codigoAeropuerto)
+        public async Task<EstacionamientoModel?> ObtenerPorId(int id)
         {
-            return await _context.Estacionamiento
-                .Where(e => e.CodigoAeropuerto == codigoAeropuerto)
-                .OrderBy(e => e.TerminalCercana).ThenBy(e => e.NumeroEspacio)
-                .ToListAsync();
+            try { return await _context.Estacionamiento.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId EstacionamientoModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<EstacionamientoModel>> ListarDisponiblesPorTipo(string codigoAeropuerto, string tipoEspacio)
+        public async Task<bool> Insertar(EstacionamientoModel m)
         {
-            // Ideal para paneles luminosos a la entrada del parqueo o apps móviles
-            return await _context.Estacionamiento
-                .Where(e => e.CodigoAeropuerto == codigoAeropuerto
-                         && e.Disponible == 1
-                         && e.TipoEspacio == tipoEspacio)
-                .OrderBy(e => e.TerminalCercana).ThenBy(e => e.NumeroEspacio)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_estacionamiento.insert_estacionamiento(:p_codigo_aeropuerto, :p_numero_espacio, :p_tipo_espacio, :p_terminal_cercana, :p_tarifa_por_hora, :p_tarifa_diaria, :p_disponible, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_numero_espacio", (object?)m.NumeroEspacio ?? DBNull.Value),
+                new OracleParameter("p_tipo_espacio", (object?)m.TipoEspacio ?? DBNull.Value),
+                new OracleParameter("p_terminal_cercana", (object?)m.TerminalCercana ?? DBNull.Value),
+                new OracleParameter("p_tarifa_por_hora", (object?)m.TarifaPorHora ?? DBNull.Value),
+                new OracleParameter("p_tarifa_diaria", (object?)m.TarifaDiaria ?? DBNull.Value),
+                new OracleParameter("p_disponible", m.Disponible),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar EstacionamientoModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> CambiarDisponibilidad(int idEstacionamiento, int disponible)
+        public async Task<bool> Actualizar(int id, EstacionamientoModel m)
         {
-            var sql = @"UPDATE estacionamiento 
-                        SET disponible = :p_disp 
-                        WHERE id_estacionamiento = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_disp", disponible),
-                new OracleParameter("p_id", idEstacionamiento));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_estacionamiento.update_estacionamiento(:p_id_estacionamiento, :p_codigo_aeropuerto, :p_numero_espacio, :p_tipo_espacio, :p_terminal_cercana, :p_tarifa_por_hora, :p_tarifa_diaria, :p_disponible, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_estacionamiento", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_numero_espacio", (object?)m.NumeroEspacio ?? DBNull.Value),
+                new OracleParameter("p_tipo_espacio", (object?)m.TipoEspacio ?? DBNull.Value),
+                new OracleParameter("p_terminal_cercana", (object?)m.TerminalCercana ?? DBNull.Value),
+                new OracleParameter("p_tarifa_por_hora", (object?)m.TarifaPorHora ?? DBNull.Value),
+                new OracleParameter("p_tarifa_diaria", (object?)m.TarifaDiaria ?? DBNull.Value),
+                new OracleParameter("p_disponible", m.Disponible),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar EstacionamientoModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM estacionamiento WHERE id_estacionamiento = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_estacionamiento.delete_estacionamiento(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar EstacionamientoModel: {ex.Message}"); return false; }
         }
     }
 }

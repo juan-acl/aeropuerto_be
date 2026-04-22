@@ -4,18 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IRolSistemaService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(RolesSistema modelo);
-
-
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<RolesSistema>> ListarTodo();
-
-        // Buscar por ID específico
-
+        Task<RolesSistema?> ObtenerPorId(int id);
+        Task<bool> Insertar(RolesSistema modelo);
+        Task<bool> Actualizar(int id, RolesSistema modelo);
+        Task<bool> Eliminar(int id);
     }
 }

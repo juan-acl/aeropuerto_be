@@ -1,76 +1,79 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class GruposViajeService : IGruposViajeService
     {
         private readonly DBContext _context;
-
         public GruposViajeService(DBContext context) => _context = context;
 
-        public async Task<bool> Insertar(GruposViajeModel m)
+        public async Task<List<GruposViajeModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO grupos_viaje 
-                        (nombre_grupo, tipo_grupo, cantidad_pasajeros, contacto_responsable, telefono_responsable, email_responsable, observaciones) 
-                        VALUES (:p_nom, :p_tipo, :p_cant, :p_cont, :p_tel, :p_mail, :p_obs)";
-
-            var parametros = new[] {
-                new OracleParameter("p_nom", (object?)m.NombreGrupo ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoGrupo),
-                new OracleParameter("p_cant", m.CantidadPasajeros),
-                new OracleParameter("p_cont", (object?)m.ContactoResponsable ?? DBNull.Value),
-                new OracleParameter("p_tel", (object?)m.TelefonoResponsable ?? DBNull.Value),
-                new OracleParameter("p_mail", (object?)m.EmailResponsable ?? DBNull.Value),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<List<GruposViajeModel>> ListarTodos()
-        {
-            return await _context.GruposViaje.ToListAsync();
+            try { return await _context.GruposViaje.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo GruposViajeModel: {ex.Message}"); return new List<GruposViajeModel>(); }
         }
 
         public async Task<GruposViajeModel?> ObtenerPorId(int id)
         {
-            return await _context.GruposViaje.FindAsync(id);
+            try { return await _context.GruposViaje.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId GruposViajeModel: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(GruposViajeModel m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_grupos_viaje.insert_grupo(:p_nombre_grupo, :p_tipo_grupo, :p_cantidad_pasajeros, :p_contacto_responsable, :p_telefono_responsable, :p_email_responsable, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_nombre_grupo", (object?)m.NombreGrupo ?? DBNull.Value),
+                new OracleParameter("p_tipo_grupo", (object?)m.TipoGrupo ?? DBNull.Value),
+                new OracleParameter("p_cantidad_pasajeros", m.CantidadPasajeros),
+                new OracleParameter("p_contacto_responsable", (object?)m.ContactoResponsable ?? DBNull.Value),
+                new OracleParameter("p_telefono_responsable", (object?)m.TelefonoResponsable ?? DBNull.Value),
+                new OracleParameter("p_email_responsable", (object?)m.EmailResponsable ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar GruposViajeModel: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, GruposViajeModel m)
         {
-            var sql = @"UPDATE grupos_viaje 
-                        SET nombre_grupo = :p_nom, tipo_grupo = :p_tipo, 
-                            cantidad_pasajeros = :p_cant, contacto_responsable = :p_cont, 
-                            telefono_responsable = :p_tel, email_responsable = :p_mail, 
-                            observaciones = :p_obs 
-                        WHERE id_grupo = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_nom", m.NombreGrupo),
-                new OracleParameter("p_tipo", m.TipoGrupo),
-                new OracleParameter("p_cant", m.CantidadPasajeros),
-                new OracleParameter("p_cont", m.ContactoResponsable),
-                new OracleParameter("p_tel", m.TelefonoResponsable),
-                new OracleParameter("p_mail", m.EmailResponsable),
-                new OracleParameter("p_obs", m.Observaciones),
-                new OracleParameter("p_id", id)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_grupos_viaje.update_grupo(:p_id_grupo, :p_nombre_grupo, :p_tipo_grupo, :p_cantidad_pasajeros, :p_contacto_responsable, :p_telefono_responsable, :p_email_responsable, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_grupo", id),
+                new OracleParameter("p_nombre_grupo", (object?)m.NombreGrupo ?? DBNull.Value),
+                new OracleParameter("p_tipo_grupo", (object?)m.TipoGrupo ?? DBNull.Value),
+                new OracleParameter("p_cantidad_pasajeros", m.CantidadPasajeros),
+                new OracleParameter("p_contacto_responsable", (object?)m.ContactoResponsable ?? DBNull.Value),
+                new OracleParameter("p_telefono_responsable", (object?)m.TelefonoResponsable ?? DBNull.Value),
+                new OracleParameter("p_email_responsable", (object?)m.EmailResponsable ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar GruposViajeModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM grupos_viaje WHERE id_grupo = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_grupos_viaje.delete_grupo(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar GruposViajeModel: {ex.Message}"); return false; }
         }
     }
 }

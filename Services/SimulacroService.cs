@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,10 +12,25 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public SimulacroService(DBContext context) => _context = context;
 
+        public async Task<List<Simulacros>> ListarTodo()
+        {
+            try { return await _context.Simulacros.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo Simulacros: {ex.Message}"); return new List<Simulacros>(); }
+        }
+
+        public async Task<Simulacros?> ObtenerPorId(int id)
+        {
+            try { return await _context.Simulacros.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId Simulacros: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(Simulacros m)
         {
-            var p = new[] {
-                new OracleParameter("p_fecha_simulacro", (object?)m.FechaSimulacro ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_simulacros.insert_simulacro(:p_fecha_simulacro, :p_tipo_simulacro, :p_id_plan_emergencia, :p_alcance, :p_participantes, :p_duracion_horas, :p_objetivos, :p_resultados, :p_observaciones, :p_evaluacion, :p_coordinador, :p_fecha_proximo_simulacro); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_fecha_simulacro", m.FechaSimulacro),
                 new OracleParameter("p_tipo_simulacro", (object?)m.TipoSimulacro ?? DBNull.Value),
                 new OracleParameter("p_id_plan_emergencia", (object?)m.IdPlanEmergencia ?? DBNull.Value),
                 new OracleParameter("p_alcance", (object?)m.Alcance ?? DBNull.Value),
@@ -25,19 +41,22 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value),
                 new OracleParameter("p_evaluacion", (object?)m.Evaluacion ?? DBNull.Value),
                 new OracleParameter("p_coordinador", (object?)m.Coordinador ?? DBNull.Value),
-                new OracleParameter("p_fecha_proximo_simulacro", (object?)m.FechaProximoSimulacro ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_simulacros.insert_simulacro(:p_fecha_simulacro, :p_tipo_simulacro, :p_id_plan_emergencia, :p_alcance, :p_participantes, :p_duracion_horas, :p_objetivos, :p_resultados, :p_observaciones, :p_evaluacion, :p_coordinador, :p_fecha_proximo_simulacro); END;", p);
-            return true;
+                new OracleParameter("p_fecha_proximo_simulacro", (object?)m.FechaProximoSimulacro ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar Simulacros: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, Simulacros m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_simulacro", m.IdSimulacro)
-            };
-            p.AddRange(new[] {
-                new OracleParameter("p_fecha_simulacro", (object?)m.FechaSimulacro ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_simulacros.update_simulacro(:p_id_simulacro, :p_fecha_simulacro, :p_tipo_simulacro, :p_id_plan_emergencia, :p_alcance, :p_participantes, :p_duracion_horas, :p_objetivos, :p_resultados, :p_observaciones, :p_evaluacion, :p_coordinador, :p_fecha_proximo_simulacro); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_simulacro", id),
+                new OracleParameter("p_fecha_simulacro", m.FechaSimulacro),
                 new OracleParameter("p_tipo_simulacro", (object?)m.TipoSimulacro ?? DBNull.Value),
                 new OracleParameter("p_id_plan_emergencia", (object?)m.IdPlanEmergencia ?? DBNull.Value),
                 new OracleParameter("p_alcance", (object?)m.Alcance ?? DBNull.Value),
@@ -48,22 +67,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value),
                 new OracleParameter("p_evaluacion", (object?)m.Evaluacion ?? DBNull.Value),
                 new OracleParameter("p_coordinador", (object?)m.Coordinador ?? DBNull.Value),
-                new OracleParameter("p_fecha_proximo_simulacro", (object?)m.FechaProximoSimulacro ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_simulacros.update_simulacro(:p_id_simulacro, :p_fecha_simulacro, :p_tipo_simulacro, :p_id_plan_emergencia, :p_alcance, :p_participantes, :p_duracion_horas, :p_objetivos, :p_resultados, :p_observaciones, :p_evaluacion, :p_coordinador, :p_fecha_proximo_simulacro); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_fecha_proximo_simulacro", (object?)m.FechaProximoSimulacro ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar Simulacros: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_simulacros.delete_simulacro(:p_id_simulacro); END;", 
-                new OracleParameter("p_id_simulacro", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_simulacros.delete_simulacro(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar Simulacros: {ex.Message}"); return false; }
         }
-
-        public async Task<List<Simulacros>> ListarTodo() => await _context.Set<Simulacros>().ToListAsync();
-
-        public async Task<Simulacros?> ObtenerPorId(int id) => await _context.Set<Simulacros>().FindAsync(id);
     }
 }

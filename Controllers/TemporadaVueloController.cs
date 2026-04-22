@@ -4,96 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class TemporadaVueloController : ControllerBase
     {
         private readonly ITemporadaVueloService _service;
+        public TemporadaVueloController(ITemporadaVueloService service) => _service = service;
 
-        public TemporadaVueloController(ITemporadaVueloService service)
-        {
-            _service = service;
-        }
-
-        // 1. LISTAR TODO (GET)
         [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try
-            {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener las temporadas: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
 
-        // 2. OBTENER POR ID (GET)
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var temporada = await _service.ObtenerPorId(id);
-                if (temporada == null) return NotFound($"Temporada con ID {id} no encontrada.");
-                return Ok(temporada);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al buscar la temporada: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        // 3. INSERTAR (POST) - Llama a pkg_temporadas_vuelo.insert_temporada
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] TemporadaVueloModel modelo)
-        {
-            if (modelo == null) return BadRequest("Datos de la temporada no válidos.");
+        public async Task<IActionResult> Post([FromBody] TemporadaVueloModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = $"Temporada '{modelo.NombreTemporada}' registrada con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al insertar la temporada: {ex.Message}");
-            }
-        }
-
-        // 4. ACTUALIZAR (PUT) - Llama a pkg_temporadas_vuelo.update_temporada
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, string nombre, DateTime inicio, DateTime fin, decimal factor, int activa)
-        {
-            try
-            {
-                var resultado = await _service.Actualizar(id, nombre, inicio, fin, factor, activa);
-                if (!resultado) return NotFound($"No se pudo actualizar: La temporada con ID {id} no existe.");
+        public async Task<IActionResult> Put(int id, [FromBody] TemporadaVueloModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-                return Ok(new { mensaje = $"Temporada con ID {id} actualizada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                // Captura errores de CHECK factor_demanda (0.5 - 2.0)
-                return StatusCode(500, $"Error al actualizar la temporada: {ex.Message}");
-            }
-        }
-
-        // 5. ELIMINAR (DELETE) - Llama a pkg_temporadas_vuelo.delete_temporada
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
-        {
-            try
-            {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = $"Temporada con ID {id} eliminada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar la temporada: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Delete(int id)
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

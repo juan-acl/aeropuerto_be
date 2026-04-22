@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IVisitasSeguridadService
     {
-        Task<bool> RegistrarIngreso(VisitasSeguridadModel modelo);
-        Task<List<VisitasSeguridadModel>> ListarPorAeropuerto(string codigoAeropuerto);
-        Task<List<VisitasSeguridadModel>> ListarVisitantesActivos(string codigoAeropuerto);
-        Task<bool> RegistrarSalida(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<List<VisitasSeguridadModel>> ListarTodo();
+        Task<VisitasSeguridadModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(VisitasSeguridadModel modelo);
+        Task<bool> Actualizar(int id, VisitasSeguridadModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,9 +12,24 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public SegmentoClienteService(DBContext context) => _context = context;
 
+        public async Task<List<SegmentosClientes>> ListarTodo()
+        {
+            try { return await _context.SegmentosClientes.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo SegmentosClientes: {ex.Message}"); return new List<SegmentosClientes>(); }
+        }
+
+        public async Task<SegmentosClientes?> ObtenerPorId(int id)
+        {
+            try { return await _context.SegmentosClientes.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId SegmentosClientes: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(SegmentosClientes m)
         {
-            var p = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_segmentos_clientes.insert_segmento(:p_nombre_segmento, :p_descripcion, :p_criterios_json, :p_frecuencia_viajes, :p_clase_preferida, :p_destinos_frecuentes, :p_edad_promedio, :p_nivel_ingresos, :p_activo); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_nombre_segmento", (object?)m.NombreSegmento ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
                 new OracleParameter("p_criterios_json", (object?)m.CriteriosJson ?? DBNull.Value),
@@ -22,18 +38,21 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_destinos_frecuentes", (object?)m.DestinosFrecuentes ?? DBNull.Value),
                 new OracleParameter("p_edad_promedio", (object?)m.EdadPromedio ?? DBNull.Value),
                 new OracleParameter("p_nivel_ingresos", (object?)m.NivelIngresos ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_segmentos_clientes.insert_segmento(:p_nombre_segmento, :p_descripcion, :p_criterios_json, :p_frecuencia_viajes, :p_clase_preferida, :p_destinos_frecuentes, :p_edad_promedio, :p_nivel_ingresos, :p_activo); END;", p);
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar SegmentosClientes: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, SegmentosClientes m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_segmento_cliente", m.IdSegmentoCliente)
-            };
-            p.AddRange(new[] {
+            try
+            {
+                string sql = "BEGIN pkg_segmentos_clientes.update_segmento(:p_id_segmento_cliente, :p_nombre_segmento, :p_descripcion, :p_criterios_json, :p_frecuencia_viajes, :p_clase_preferida, :p_destinos_frecuentes, :p_edad_promedio, :p_nivel_ingresos, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_segmento_cliente", id),
                 new OracleParameter("p_nombre_segmento", (object?)m.NombreSegmento ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
                 new OracleParameter("p_criterios_json", (object?)m.CriteriosJson ?? DBNull.Value),
@@ -42,22 +61,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_destinos_frecuentes", (object?)m.DestinosFrecuentes ?? DBNull.Value),
                 new OracleParameter("p_edad_promedio", (object?)m.EdadPromedio ?? DBNull.Value),
                 new OracleParameter("p_nivel_ingresos", (object?)m.NivelIngresos ?? DBNull.Value),
-                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_segmentos_clientes.update_segmento(:p_id_segmento_cliente, :p_nombre_segmento, :p_descripcion, :p_criterios_json, :p_frecuencia_viajes, :p_clase_preferida, :p_destinos_frecuentes, :p_edad_promedio, :p_nivel_ingresos, :p_activo); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activo", (object?)m.Activo ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar SegmentosClientes: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_segmentos_clientes.delete_segmento(:p_id_segmento_cliente); END;", 
-                new OracleParameter("p_id_segmento_cliente", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_segmentos_clientes.delete_segmento(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar SegmentosClientes: {ex.Message}"); return false; }
         }
-
-        public async Task<List<SegmentosClientes>> ListarTodo() => await _context.Set<SegmentosClientes>().ToListAsync();
-
-        public async Task<SegmentosClientes?> ObtenerPorId(int id) => await _context.Set<SegmentosClientes>().FindAsync(id);
     }
 }

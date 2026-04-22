@@ -4,47 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PasajerosPreferenciasController : ControllerBase
     {
         private readonly IPasajeroPreferenciaService _service;
-
         public PasajerosPreferenciasController(IPasajeroPreferenciaService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] PasajeroPreferenciaModel modelo)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Preferencia guardada con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> GetByPasajero(int idPasajero)
-        {
-            var prefs = await _service.ListarPorPasajero(idPasajero);
-            return Ok(prefs);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] PasajeroPreferenciaModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] string descripcion)
-        {
-            await _service.ActualizarPreferencia(id, descripcion);
-            return Ok(new { mensaje = "Preferencia actualizada." });
-        }
+        public async Task<IActionResult> Put(int id, [FromBody] PasajeroPreferenciaModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarLogico(id);
-            return Ok(new { mensaje = "Preferencia desactivada." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

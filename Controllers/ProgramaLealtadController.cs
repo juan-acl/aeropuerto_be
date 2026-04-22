@@ -4,79 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ProgramaLealtadController : ControllerBase
     {
         private readonly IProgramaLealtadService _service;
-
         public ProgramaLealtadController(IProgramaLealtadService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ProgramaLealtadModel modelo)
-        {
-            try
-            {
-                int idGenerado = await _service.RegistrarMembresia(modelo);
-                return Ok(new
-                {
-                    mensaje = "Pasajero inscrito exitosamente en el programa de lealtad.",
-                    idLealtad = idGenerado
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al inscribir pasajero: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] ProgramaLealtadModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> GetByPasajero(int idPasajero)
-        {
-            var result = await _service.ObtenerPorPasajero(idPasajero);
-            if (result == null)
-                return NotFound("El pasajero no está inscrito en el programa de lealtad.");
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ProgramaLealtadModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-            return Ok(result);
-        }
-
-        public class ActividadDto
-        {
-            public int Puntos { get; set; }
-            public int Millas { get; set; }
-        }
-
-        [HttpPatch("pasajero/{idPasajero}/sumar")]
-        public async Task<IActionResult> PatchSumarActividad(int idPasajero, [FromBody] ActividadDto dto)
-        {
-            await _service.SumarActividad(idPasajero, dto.Puntos, dto.Millas);
-            return Ok(new { mensaje = $"Se han sumado {dto.Puntos} puntos y {dto.Millas} millas a la cuenta." });
-        }
-
-        public class CanjeDto
-        {
-            public int PuntosACanjear { get; set; }
-        }
-
-        [HttpPatch("pasajero/{idPasajero}/canjear")]
-        public async Task<IActionResult> PatchCanjearPuntos(int idPasajero, [FromBody] CanjeDto dto)
-        {
-            try
-            {
-                await _service.CanjearPuntos(idPasajero, dto.PuntosACanjear);
-                return Ok(new { mensaje = $"Canje de {dto.PuntosACanjear} puntos realizado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro del programa de lealtad eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

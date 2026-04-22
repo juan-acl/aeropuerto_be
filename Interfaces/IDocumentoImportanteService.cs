@@ -2,24 +2,12 @@
 
 namespace Aeropuerto.Backend.Interfaces
 {
-    public interface IDocumentosImportantesService
+    public interface IDocumentoImportanteService
     {
-        // Inserta un nuevo registro
-        Task<bool> Insertar(DocumentosImportantes modelo);
-
-        // Actualiza los datos del registro por ID
-        // Nota: Ajusta los parámetros adicionales según los campos de la tabla
-        Task<bool> Actualizar(int id, DocumentosImportantes modelo);
-
-        // Eliminación por ID
-        Task<bool> Eliminar(int id);
-
-        // Obtiene la lista completa
         Task<List<DocumentosImportantes>> ListarTodo();
-
-        // Buscar por ID específico
         Task<DocumentosImportantes?> ObtenerPorId(int id);
+        Task<bool> Insertar(DocumentosImportantes modelo);
+        Task<bool> Actualizar(int id, DocumentosImportantes modelo);
+        Task<bool> Eliminar(int id);
     }
 }
-
-

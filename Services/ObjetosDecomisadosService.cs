@@ -1,69 +1,83 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ObjetosDecomisadosService : IObjetosDecomisadosService
     {
         private readonly DBContext _context;
-
         public ObjetosDecomisadosService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarDecomiso(ObjetosDecomisadosModel m)
+        public async Task<List<ObjetosDecomisadosModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO objetos_decomisados 
-                        (id_control, id_pasajero, tipo_objeto, descripcion, cantidad, 
-                         motivo_decomiso, destino_final, fecha_registro, registrado_por) 
-                        VALUES (:p_ctrl, :p_pas, :p_tipo, :p_desc, :p_cant, 
-                                :p_mot, :p_dest, SYSTIMESTAMP, :p_user)";
-
-            var parametros = new[] {
-                new OracleParameter("p_ctrl", (object?)m.IdControl ?? DBNull.Value),
-                new OracleParameter("p_pas", (object?)m.IdPasajero ?? DBNull.Value),
-                new OracleParameter("p_tipo", (object?)m.TipoObjeto ?? DBNull.Value),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_cant", m.Cantidad),
-                new OracleParameter("p_mot", (object?)m.MotivoDecomiso ?? DBNull.Value),
-                new OracleParameter("p_dest", (object?)m.DestinoFinal ?? DBNull.Value),
-                new OracleParameter("p_user", (object?)m.RegistradoPor ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.ObjetosDecomisados.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ObjetosDecomisadosModel: {ex.Message}"); return new List<ObjetosDecomisadosModel>(); }
         }
 
-        public async Task<List<ObjetosDecomisadosModel>> ListarPorControl(int idControl)
+        public async Task<ObjetosDecomisadosModel?> ObtenerPorId(int id)
         {
-            return await _context.ObjetosDecomisados
-                .Where(o => o.IdControl == idControl)
-                .ToListAsync();
+            try { return await _context.ObjetosDecomisados.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ObjetosDecomisadosModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<ObjetosDecomisadosModel>> ListarPorPasajero(int idPasajero)
+        public async Task<bool> Insertar(ObjetosDecomisadosModel m)
         {
-            return await _context.ObjetosDecomisados
-                .Where(o => o.IdPasajero == idPasajero)
-                .OrderByDescending(o => o.FechaRegistro)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_objetos_decomisados.insert_decomiso(:p_id_control, :p_id_pasajero, :p_tipo_objeto, :p_descripcion, :p_cantidad, :p_motivo_decomiso, :p_destino_final, :p_fecha_registro, :p_registrado_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_control", (object?)m.IdControl ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_tipo_objeto", (object?)m.TipoObjeto ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_cantidad", m.Cantidad),
+                new OracleParameter("p_motivo_decomiso", (object?)m.MotivoDecomiso ?? DBNull.Value),
+                new OracleParameter("p_destino_final", (object?)m.DestinoFinal ?? DBNull.Value),
+                new OracleParameter("p_fecha_registro", (object?)m.FechaRegistro ?? DBNull.Value),
+                new OracleParameter("p_registrado_por", (object?)m.RegistradoPor ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar ObjetosDecomisadosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ActualizarDestino(int id, string nuevoDestino)
+        public async Task<bool> Actualizar(int id, ObjetosDecomisadosModel m)
         {
-            var sql = "UPDATE objetos_decomisados SET destino_final = :p_dest WHERE id_decomiso = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_dest", nuevoDestino),
-                new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_objetos_decomisados.update_decomiso(:p_id_decomiso, :p_id_control, :p_id_pasajero, :p_tipo_objeto, :p_descripcion, :p_cantidad, :p_motivo_decomiso, :p_destino_final, :p_fecha_registro, :p_registrado_por); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_decomiso", id),
+                new OracleParameter("p_id_control", (object?)m.IdControl ?? DBNull.Value),
+                new OracleParameter("p_id_pasajero", (object?)m.IdPasajero ?? DBNull.Value),
+                new OracleParameter("p_tipo_objeto", (object?)m.TipoObjeto ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_cantidad", m.Cantidad),
+                new OracleParameter("p_motivo_decomiso", (object?)m.MotivoDecomiso ?? DBNull.Value),
+                new OracleParameter("p_destino_final", (object?)m.DestinoFinal ?? DBNull.Value),
+                new OracleParameter("p_fecha_registro", (object?)m.FechaRegistro ?? DBNull.Value),
+                new OracleParameter("p_registrado_por", (object?)m.RegistradoPor ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ObjetosDecomisadosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM objetos_decomisados WHERE id_decomiso = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_objetos_decomisados.delete_decomiso(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ObjetosDecomisadosModel: {ex.Message}"); return false; }
         }
     }
 }

@@ -4,57 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ObjetosPerdidosController : ControllerBase
     {
         private readonly IObjetosPerdidosService _service;
-
         public ObjetosPerdidosController(IObjetosPerdidosService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ObjetosPerdidosModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarObjeto(modelo);
-                return Ok(new { mensaje = "Objeto perdido registrado exitosamente en el sistema." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] ObjetosPerdidosModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("pendientes")]
-        public async Task<IActionResult> GetPendientes([FromQuery] string? codigoAeropuerto)
-        {
-            var result = await _service.ListarNoEntregados(codigoAeropuerto);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ObjetosPerdidosModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpGet("{id}/foto")]
-        public async Task<IActionResult> GetFoto(int id)
-        {
-            var objeto = await _service.ObtenerFoto(id);
-            if (objeto == null || objeto.FotoObjeto == null)
-                return NotFound("Imagen no disponible para este objeto.");
-
-            return File(objeto.FotoObjeto, "image/jpeg"); // O el mime type que estés usando
-        }
-
-        [HttpPatch("{id}/entregar")]
-        public async Task<IActionResult> PatchEntregar(int id, [FromBody] int idPasajero)
-        {
-            await _service.EntregarObjeto(id, idPasajero);
-            return Ok(new { mensaje = "Objeto marcado como ENTREGADO a su dueño." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de objeto perdido eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

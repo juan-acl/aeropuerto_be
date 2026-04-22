@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ITarifasEspecialesService
     {
+        Task<List<TarifasEspecialesModel>> ListarTodo();
+        Task<TarifasEspecialesModel?> ObtenerPorId(int id);
         Task<bool> Insertar(TarifasEspecialesModel modelo);
-        Task<List<TarifasEspecialesModel>> ListarPorAerolinea(int idAerolinea);
-        Task<List<TarifasEspecialesModel>> ListarActivas();
         Task<bool> Actualizar(int id, TarifasEspecialesModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<bool> Eliminar(int id);
     }
 }

@@ -1,6 +1,6 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
@@ -10,110 +10,74 @@ namespace Aeropuerto.Backend.Services
     public class PublicidadService : IPublicidadService
     {
         private readonly DBContext _context;
-
         public PublicidadService(DBContext context) => _context = context;
 
-        public async Task<int> RegistrarPublicidad(PublicidadModel m)
+        public async Task<List<PublicidadModel>> ListarTodo()
         {
-            // Nota: Inicialmente registramos sin el BLOB. El archivo se sube por separado para optimizar la red.
-            var sql = @"INSERT INTO publicidad 
-                        (codigo_aeropuerto, ubicacion, tipo_publicidad, empresa_anunciante, 
-                         fecha_inicio, fecha_fin, costo, activo) 
-                        VALUES (:p_aero, :p_ubic, :p_tipo, :p_empresa, 
-                                :p_inicio, :p_fin, :p_costo, 1)
-                        RETURNING id_publicidad INTO :p_id_out";
+            try { return await _context.Publicidad.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo PublicidadModel: {ex.Message}"); return new List<PublicidadModel>(); }
+        }
 
-            var idOutParam = new OracleParameter("p_id_out", OracleDbType.Int32, ParameterDirection.Output);
+        public async Task<PublicidadModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.Publicidad.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId PublicidadModel: {ex.Message}"); return null; }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_ubic", (object?)m.Ubicacion ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoPublicidad),
-                new OracleParameter("p_empresa", (object?)m.EmpresaAnunciante ?? DBNull.Value),
-                new OracleParameter("p_inicio", (object?)m.FechaInicio ?? DBNull.Value),
-                new OracleParameter("p_fin", (object?)m.FechaFin ?? DBNull.Value),
+        public async Task<bool> Insertar(PublicidadModel m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_publicidad.insert_publicidad(:p_codigo_aeropuerto, :p_ubicacion, :p_tipo_publicidad, :p_empresa_anunciante, :p_fecha_inicio, :p_fecha_fin, :p_costo, :p_contrato, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_ubicacion", (object?)m.Ubicacion ?? DBNull.Value),
+                new OracleParameter("p_tipo_publicidad", (object?)m.TipoPublicidad ?? DBNull.Value),
+                new OracleParameter("p_empresa_anunciante", (object?)m.EmpresaAnunciante ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio", (object?)m.FechaInicio ?? DBNull.Value),
+                new OracleParameter("p_fecha_fin", (object?)m.FechaFin ?? DBNull.Value),
                 new OracleParameter("p_costo", (object?)m.Costo ?? DBNull.Value),
-                idOutParam
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return Convert.ToInt32(idOutParam.Value.ToString());
+                new OracleParameter("p_contrato", OracleDbType.Blob) { Value = (object?)m.Contrato ?? DBNull.Value },
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar PublicidadModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<PublicidadModel>> ListarPorAeropuerto(string codigoAeropuerto)
+        public async Task<bool> Actualizar(int id, PublicidadModel m)
         {
-            // Excluimos el campo BLOB de las consultas de listado para no colapsar la memoria del servidor
-            return await _context.Publicidad
-                .Where(p => p.CodigoAeropuerto == codigoAeropuerto)
-                .Select(p => new PublicidadModel
-                {
-                    IdPublicidad = p.IdPublicidad,
-                    CodigoAeropuerto = p.CodigoAeropuerto,
-                    Ubicacion = p.Ubicacion,
-                    TipoPublicidad = p.TipoPublicidad,
-                    EmpresaAnunciante = p.EmpresaAnunciante,
-                    FechaInicio = p.FechaInicio,
-                    FechaFin = p.FechaFin,
-                    Costo = p.Costo,
-                    Activo = p.Activo
-                    // No incluimos 'Contrato' aquí
-                })
-                .OrderByDescending(p => p.FechaInicio)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_publicidad.update_publicidad(:p_id_publicidad, :p_codigo_aeropuerto, :p_ubicacion, :p_tipo_publicidad, :p_empresa_anunciante, :p_fecha_inicio, :p_fecha_fin, :p_costo, :p_contrato, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_publicidad", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_ubicacion", (object?)m.Ubicacion ?? DBNull.Value),
+                new OracleParameter("p_tipo_publicidad", (object?)m.TipoPublicidad ?? DBNull.Value),
+                new OracleParameter("p_empresa_anunciante", (object?)m.EmpresaAnunciante ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio", (object?)m.FechaInicio ?? DBNull.Value),
+                new OracleParameter("p_fecha_fin", (object?)m.FechaFin ?? DBNull.Value),
+                new OracleParameter("p_costo", (object?)m.Costo ?? DBNull.Value),
+                new OracleParameter("p_contrato", OracleDbType.Blob) { Value = (object?)m.Contrato ?? DBNull.Value },
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar PublicidadModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<PublicidadModel>> ListarActivas(string codigoAeropuerto)
+        public async Task<bool> Eliminar(int id)
         {
-            var hoy = DateTime.Now.Date;
-            return await _context.Publicidad
-                .Where(p => p.CodigoAeropuerto == codigoAeropuerto
-                         && p.Activo == 1
-                         && p.FechaInicio <= hoy
-                         && p.FechaFin >= hoy)
-                .Select(p => new PublicidadModel
-                {
-                    IdPublicidad = p.IdPublicidad,
-                    Ubicacion = p.Ubicacion,
-                    TipoPublicidad = p.TipoPublicidad,
-                    EmpresaAnunciante = p.EmpresaAnunciante,
-                    FechaFin = p.FechaFin
-                })
-                .ToListAsync();
-        }
-
-        public async Task<bool> SubirContrato(int idPublicidad, byte[] documentoContrato)
-        {
-            var sql = "UPDATE publicidad SET contrato = :p_blob WHERE id_publicidad = :p_id";
-
-            var blobParam = new OracleParameter("p_blob", OracleDbType.Blob) { Value = documentoContrato };
-            var idParam = new OracleParameter("p_id", idPublicidad);
-
-            await _context.Database.ExecuteSqlRawAsync(sql, blobParam, idParam);
-            return true;
-        }
-
-        public async Task<byte[]?> ObtenerContrato(int idPublicidad)
-        {
-            var publicidad = await _context.Publicidad
-                .Where(p => p.IdPublicidad == idPublicidad)
-                .Select(p => p.Contrato)
-                .FirstOrDefaultAsync();
-
-            return publicidad;
-        }
-
-        public async Task<bool> DesactivarPublicidad(int id)
-        {
-            var sql = "UPDATE publicidad SET activo = 0 WHERE id_publicidad = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM publicidad WHERE id_publicidad = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_publicidad.delete_publicidad(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar PublicidadModel: {ex.Message}"); return false; }
         }
     }
 }

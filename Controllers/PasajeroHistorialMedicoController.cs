@@ -4,44 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PasajerosHistorialMedicoController : ControllerBase
     {
         private readonly IPasajeroHistorialMedicoService _service;
-
         public PasajerosHistorialMedicoController(IPasajeroHistorialMedicoService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] PasajeroHistorialMedicoModel modelo)
-        {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Historial médico registrado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] PasajeroHistorialMedicoModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> GetByPasajero(int idPasajero)
-        {
-            var historial = await _service.ObtenerPorPasajero(idPasajero);
-            if (historial == null) return NotFound("No existe historial para este pasajero.");
-            return Ok(historial);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] PasajeroHistorialMedicoModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        /// <summary>
-        /// Elimina permanentemente el historial médico.
-        /// </summary>
-        [HttpDelete("fisico/{id}")]
-        public async Task<IActionResult> DeleteFisico(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Historial médico eliminado permanentemente." });
-        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

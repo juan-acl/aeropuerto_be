@@ -1,80 +1,83 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class SalonesVipService : ISalonesVipService
     {
         private readonly DBContext _context;
-
         public SalonesVipService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarSalon(SalonesVipModel m)
+        public async Task<List<SalonesVipModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO salones_vip 
-                        (codigo_aeropuerto, nombre_salon, ubicacion, capacidad, 
-                         horario_apertura, horario_cierre, servicios, requisitos_acceso, activo) 
-                        VALUES (:p_aero, :p_nom, :p_ubic, :p_cap, 
-                                :p_aper, :p_cier, :p_serv, :p_req, 1)";
-
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreSalon ?? DBNull.Value),
-                new OracleParameter("p_ubic", (object?)m.Ubicacion ?? DBNull.Value),
-                new OracleParameter("p_cap", (object?)m.Capacidad ?? DBNull.Value),
-                new OracleParameter("p_aper", (object?)m.HorarioApertura ?? DBNull.Value),
-                new OracleParameter("p_cier", (object?)m.HorarioCierre ?? DBNull.Value),
-                new OracleParameter("p_serv", (object?)m.Servicios ?? DBNull.Value),
-                new OracleParameter("p_req", (object?)m.RequisitosAcceso ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.SalonesVip.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo SalonesVipModel: {ex.Message}"); return new List<SalonesVipModel>(); }
         }
 
-        public async Task<List<SalonesVipModel>> ListarPorAeropuerto(string codigoAeropuerto)
+        public async Task<SalonesVipModel?> ObtenerPorId(int id)
         {
-            return await _context.SalonesVip
-                .Where(s => s.CodigoAeropuerto == codigoAeropuerto)
-                .OrderBy(s => s.NombreSalon)
-                .ToListAsync();
+            try { return await _context.SalonesVip.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId SalonesVipModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<SalonesVipModel>> ListarActivos(string codigoAeropuerto)
+        public async Task<bool> Insertar(SalonesVipModel m)
         {
-            return await _context.SalonesVip
-                .Where(s => s.CodigoAeropuerto == codigoAeropuerto && s.Activo == 1)
-                .OrderBy(s => s.NombreSalon)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_salones_vip.insert_salon(:p_codigo_aeropuerto, :p_nombre_salon, :p_ubicacion, :p_capacidad, :p_horario_apertura, :p_horario_cierre, :p_servicios, :p_requisitos_acceso, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_salon", (object?)m.NombreSalon ?? DBNull.Value),
+                new OracleParameter("p_ubicacion", (object?)m.Ubicacion ?? DBNull.Value),
+                new OracleParameter("p_capacidad", (object?)m.Capacidad ?? DBNull.Value),
+                new OracleParameter("p_horario_apertura", (object?)m.HorarioApertura ?? DBNull.Value),
+                new OracleParameter("p_horario_cierre", (object?)m.HorarioCierre ?? DBNull.Value),
+                new OracleParameter("p_servicios", (object?)m.Servicios ?? DBNull.Value),
+                new OracleParameter("p_requisitos_acceso", (object?)m.RequisitosAcceso ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar SalonesVipModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ActualizarCapacidad(int idSalon, int nuevaCapacidad)
+        public async Task<bool> Actualizar(int id, SalonesVipModel m)
         {
-            var sql = @"UPDATE salones_vip 
-                        SET capacidad = :p_cap 
-                        WHERE id_salon = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_cap", nuevaCapacidad),
-                new OracleParameter("p_id", idSalon));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_salones_vip.update_salon(:p_id_salon, :p_codigo_aeropuerto, :p_nombre_salon, :p_ubicacion, :p_capacidad, :p_horario_apertura, :p_horario_cierre, :p_servicios, :p_requisitos_acceso, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_salon", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_nombre_salon", (object?)m.NombreSalon ?? DBNull.Value),
+                new OracleParameter("p_ubicacion", (object?)m.Ubicacion ?? DBNull.Value),
+                new OracleParameter("p_capacidad", (object?)m.Capacidad ?? DBNull.Value),
+                new OracleParameter("p_horario_apertura", (object?)m.HorarioApertura ?? DBNull.Value),
+                new OracleParameter("p_horario_cierre", (object?)m.HorarioCierre ?? DBNull.Value),
+                new OracleParameter("p_servicios", (object?)m.Servicios ?? DBNull.Value),
+                new OracleParameter("p_requisitos_acceso", (object?)m.RequisitosAcceso ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar SalonesVipModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> DesactivarSalon(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "UPDATE salones_vip SET activo = 0 WHERE id_salon = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM salones_vip WHERE id_salon = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_salones_vip.delete_salon(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar SalonesVipModel: {ex.Message}"); return false; }
         }
     }
 }

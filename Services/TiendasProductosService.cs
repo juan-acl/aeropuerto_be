@@ -1,84 +1,87 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class TiendasProductosService : ITiendasProductosService
     {
         private readonly DBContext _context;
-
         public TiendasProductosService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarProducto(TiendasProductosModel m)
+        public async Task<List<TiendasProductosModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO tiendas_productos 
-                        (id_concesion, codigo_producto, nombre_producto, descripcion, categoria, 
-                         precio, moneda, stock_actual, stock_minimo, iva_aplicable, activo) 
-                        VALUES (:p_con, :p_cod, :p_nom, :p_desc, :p_cat, 
-                                :p_pre, :p_mon, :p_stock, :p_min, :p_iva, 1)";
-
-            var parametros = new[] {
-                new OracleParameter("p_con", (object?)m.IdConcesion ?? DBNull.Value),
-                new OracleParameter("p_cod", (object?)m.CodigoProducto ?? DBNull.Value),
-                new OracleParameter("p_nom", (object?)m.NombreProducto ?? DBNull.Value),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_cat", (object?)m.Categoria ?? DBNull.Value),
-                new OracleParameter("p_pre", (object?)m.Precio ?? DBNull.Value),
-                new OracleParameter("p_mon", (object?)m.Moneda ?? DBNull.Value),
-                new OracleParameter("p_stock", (object?)m.StockActual ?? DBNull.Value),
-                new OracleParameter("p_min", (object?)m.StockMinimo ?? DBNull.Value),
-                new OracleParameter("p_iva", (object?)m.IvaAplicable ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.TiendasProductos.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo TiendasProductosModel: {ex.Message}"); return new List<TiendasProductosModel>(); }
         }
 
-        public async Task<List<TiendasProductosModel>> ListarPorConcesion(int idConcesion)
+        public async Task<TiendasProductosModel?> ObtenerPorId(int id)
         {
-            return await _context.TiendasProductos
-                .Where(p => p.IdConcesion == idConcesion && p.Activo == 1)
-                .OrderBy(p => p.NombreProducto)
-                .ToListAsync();
+            try { return await _context.TiendasProductos.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId TiendasProductosModel: {ex.Message}"); return null; }
         }
 
-        public async Task<List<TiendasProductosModel>> ListarBajoStockMinimo(int idConcesion)
+        public async Task<bool> Insertar(TiendasProductosModel m)
         {
-            // Retorna productos que necesitan reabastecimiento urgente
-            return await _context.TiendasProductos
-                .Where(p => p.IdConcesion == idConcesion && p.Activo == 1 && p.StockActual <= p.StockMinimo)
-                .OrderBy(p => p.StockActual)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_tiendas_productos.insert_producto(:p_id_concesion, :p_codigo_producto, :p_nombre_producto, :p_descripcion, :p_categoria, :p_precio, :p_moneda, :p_stock_actual, :p_stock_minimo, :p_iva_aplicable, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_concesion", (object?)m.IdConcesion ?? DBNull.Value),
+                new OracleParameter("p_codigo_producto", (object?)m.CodigoProducto ?? DBNull.Value),
+                new OracleParameter("p_nombre_producto", (object?)m.NombreProducto ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_categoria", (object?)m.Categoria ?? DBNull.Value),
+                new OracleParameter("p_precio", (object?)m.Precio ?? DBNull.Value),
+                new OracleParameter("p_moneda", (object?)m.Moneda ?? DBNull.Value),
+                new OracleParameter("p_stock_actual", (object?)m.StockActual ?? DBNull.Value),
+                new OracleParameter("p_stock_minimo", (object?)m.StockMinimo ?? DBNull.Value),
+                new OracleParameter("p_iva_aplicable", (object?)m.IvaAplicable ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar TiendasProductosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ActualizarStock(int idProducto, int nuevoStock)
+        public async Task<bool> Actualizar(int id, TiendasProductosModel m)
         {
-            var sql = @"UPDATE tiendas_productos 
-                        SET stock_actual = :p_stock 
-                        WHERE id_producto = :p_id";
-
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_stock", nuevoStock),
-                new OracleParameter("p_id", idProducto));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_tiendas_productos.update_producto(:p_id_producto, :p_id_concesion, :p_codigo_producto, :p_nombre_producto, :p_descripcion, :p_categoria, :p_precio, :p_moneda, :p_stock_actual, :p_stock_minimo, :p_iva_aplicable, :p_activo); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_producto", id),
+                new OracleParameter("p_id_concesion", (object?)m.IdConcesion ?? DBNull.Value),
+                new OracleParameter("p_codigo_producto", (object?)m.CodigoProducto ?? DBNull.Value),
+                new OracleParameter("p_nombre_producto", (object?)m.NombreProducto ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_categoria", (object?)m.Categoria ?? DBNull.Value),
+                new OracleParameter("p_precio", (object?)m.Precio ?? DBNull.Value),
+                new OracleParameter("p_moneda", (object?)m.Moneda ?? DBNull.Value),
+                new OracleParameter("p_stock_actual", (object?)m.StockActual ?? DBNull.Value),
+                new OracleParameter("p_stock_minimo", (object?)m.StockMinimo ?? DBNull.Value),
+                new OracleParameter("p_iva_aplicable", (object?)m.IvaAplicable ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar TiendasProductosModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> DesactivarProducto(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            // Soft delete para mantener el histórico de ventas
-            var sql = "UPDATE tiendas_productos SET activo = 0 WHERE id_producto = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM tiendas_productos WHERE id_producto = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_tiendas_productos.delete_producto(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar TiendasProductosModel: {ex.Message}"); return false; }
         }
     }
 }

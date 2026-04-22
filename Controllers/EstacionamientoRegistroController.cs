@@ -4,78 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class EstacionamientoRegistroController : ControllerBase
     {
         private readonly IEstacionamientoRegistroService _service;
-
         public EstacionamientoRegistroController(IEstacionamientoRegistroService service) => _service = service;
 
-        [HttpPost("entrada")]
-        public async Task<IActionResult> PostEntrada([FromBody] EstacionamientoRegistroModel modelo)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                int idGenerado = await _service.RegistrarEntrada(modelo);
-                return Ok(new
-                {
-                    mensaje = "Entrada registrada y espacio ocupado.",
-                    ticketId = idGenerado
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al registrar entrada: {ex.Message}");
-            }
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpPost("{id}/calcular-salida")]
-        public async Task<IActionResult> PostCalcularSalida(int id)
-        {
-            var registro = await _service.CalcularSalida(id);
-            if (registro == null)
-                return NotFound("No se encontró el registro o ya fue procesado.");
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] EstacionamientoRegistroModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-            return Ok(new
-            {
-                mensaje = "Cálculo realizado con éxito.",
-                tiempoHoras = registro.TiempoTotalHoras,
-                totalPagar = registro.TotalPagar
-            });
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] EstacionamientoRegistroModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        public class PagoDto
-        {
-            public string MetodoPago { get; set; } = null!;
-        }
-
-        [HttpPatch("{id}/pagar")]
-        public async Task<IActionResult> PatchPagar(int id, [FromBody] PagoDto dto)
-        {
-            try
-            {
-                await _service.ProcesarPago(id, dto.MetodoPago);
-                return Ok(new { mensaje = "Pago procesado exitosamente. La barrera puede ser levantada y el espacio está libre." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al procesar el pago: {ex.Message}");
-            }
-        }
-
-        [HttpGet("activos")]
-        public async Task<IActionResult> GetActivos()
-        {
-            var result = await _service.ListarVehiculosActivos();
-            return Ok(result);
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de estacionamiento eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

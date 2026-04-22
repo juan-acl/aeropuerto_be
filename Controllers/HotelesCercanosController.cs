@@ -1,66 +1,36 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class HotelesCercanosController : ControllerBase
     {
         private readonly IHotelesCercanosService _service;
-
         public HotelesCercanosController(IHotelesCercanosService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] HotelesCercanosModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarHotel(modelo);
-                return Ok(new { mensaje = "Hotel cercano registrado en el directorio." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var result = await _service.ListarTodo();
-            return Ok(result);
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet("aeropuerto/{codigo}")]
-        public async Task<IActionResult> GetAllByAeropuerto(string codigo)
-        {
-            var result = await _service.ListarPorAeropuerto(codigo);
-            return Ok(result);
-        }
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] HotelesCercanosModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("aeropuerto/{codigo}/activos")]
-        public async Task<IActionResult> GetActivos(string codigo, [FromQuery] bool? soloConShuttle)
-        {
-            // Ejemplo 1: GET /api/HotelesCercanos/aeropuerto/GUA/activos
-            // Ejemplo 2: GET /api/HotelesCercanos/aeropuerto/GUA/activos?soloConShuttle=true
-            var result = await _service.ListarActivos(codigo, soloConShuttle);
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] HotelesCercanosModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpPatch("{id}/desactivar")]
-        public async Task<IActionResult> PatchDesactivar(int id)
-        {
-            await _service.DesactivarHotel(id);
-            return Ok(new { mensaje = "Hotel desactivado del directorio público." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de hotel eliminado físicamente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

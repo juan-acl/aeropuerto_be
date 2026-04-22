@@ -1,64 +1,79 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class SolicitudesEspecialesService : ISolicitudesEspecialesService
     {
         private readonly DBContext _context;
-
         public SolicitudesEspecialesService(DBContext context) => _context = context;
+
+        public async Task<List<SolicitudesEspecialesModel>> ListarTodo()
+        {
+            try { return await _context.SolicitudesEspeciales.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo SolicitudesEspecialesModel: {ex.Message}"); return new List<SolicitudesEspecialesModel>(); }
+        }
+
+        public async Task<SolicitudesEspecialesModel?> ObtenerPorId(int id)
+        {
+            try { return await _context.SolicitudesEspeciales.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId SolicitudesEspecialesModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(SolicitudesEspecialesModel m)
         {
-            var sql = @"INSERT INTO solicitudes_especiales 
-                        (id_reserva, tipo_solicitud, descripcion, fecha_solicitud, estado_solicitud) 
-                        VALUES (:p_res, :p_tipo, :p_desc, SYSTIMESTAMP, :p_estado)";
-
-            var parametros = new[] {
-                new OracleParameter("p_res", m.IdReserva),
-                new OracleParameter("p_tipo", m.TipoSolicitud),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_estado", m.EstadoSolicitud)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_solicitudes_especiales.insert_solicitud(:p_id_reserva, :p_tipo_solicitud, :p_descripcion, :p_fecha_solicitud, :p_estado_solicitud, :p_fecha_resolucion, :p_resolucion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_tipo_solicitud", (object?)m.TipoSolicitud ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_fecha_solicitud", (object?)m.FechaSolicitud ?? DBNull.Value),
+                new OracleParameter("p_estado_solicitud", (object?)m.EstadoSolicitud ?? DBNull.Value),
+                new OracleParameter("p_fecha_resolucion", (object?)m.FechaResolucion ?? DBNull.Value),
+                new OracleParameter("p_resolucion", (object?)m.Resolucion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar SolicitudesEspecialesModel: {ex.Message}"); return false; }
         }
 
-        public async Task<List<SolicitudesEspecialesModel>> ListarPorReserva(int idReserva)
+        public async Task<bool> Actualizar(int id, SolicitudesEspecialesModel m)
         {
-            return await _context.SolicitudesEspeciales
-                .Where(s => s.IdReserva == idReserva)
-                .ToListAsync();
+            try
+            {
+                string sql = "BEGIN pkg_solicitudes_especiales.update_solicitud(:p_id_solicitud, :p_id_reserva, :p_tipo_solicitud, :p_descripcion, :p_fecha_solicitud, :p_estado_solicitud, :p_fecha_resolucion, :p_resolucion); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_solicitud", id),
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_tipo_solicitud", (object?)m.TipoSolicitud ?? DBNull.Value),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_fecha_solicitud", (object?)m.FechaSolicitud ?? DBNull.Value),
+                new OracleParameter("p_estado_solicitud", (object?)m.EstadoSolicitud ?? DBNull.Value),
+                new OracleParameter("p_fecha_resolucion", (object?)m.FechaResolucion ?? DBNull.Value),
+                new OracleParameter("p_resolucion", (object?)m.Resolucion ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar SolicitudesEspecialesModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> ResolverSolicitud(int id, string resolucion, string nuevoEstado)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = @"UPDATE solicitudes_especiales 
-                        SET resolucion = :p_res, 
-                            estado_solicitud = :p_estado, 
-                            fecha_resolucion = SYSTIMESTAMP 
-                        WHERE id_solicitud = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_res", resolucion),
-                new OracleParameter("p_estado", nuevoEstado),
-                new OracleParameter("p_id", id)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "DELETE FROM solicitudes_especiales WHERE id_solicitud = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_solicitudes_especiales.delete_solicitud(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar SolicitudesEspecialesModel: {ex.Message}"); return false; }
         }
     }
 }

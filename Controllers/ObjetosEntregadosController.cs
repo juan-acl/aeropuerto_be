@@ -4,51 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ObjetosEntregadosController : ControllerBase
     {
         private readonly IObjetosEntregadosService _service;
-
         public ObjetosEntregadosController(IObjetosEntregadosService service) => _service = service;
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ObjetosEntregadosModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarEntrega(modelo);
-                return Ok(new { mensaje = "Comprobante de entrega y firma registrados exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var result = await _service.ListarEntregas();
-            return Ok(result);
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
-        [HttpGet("{id}/firma")]
-        public async Task<IActionResult> GetFirma(int id)
-        {
-            var registro = await _service.ObtenerFirma(id);
-            if (registro == null || registro.FirmaDigital == null)
-                return NotFound("No se encontró una firma digital para este registro.");
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ObjetosEntregadosModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-            // Retornamos la firma como imagen (usualmente png o jpeg dependiendo del pad de firmas)
-            return File(registro.FirmaDigital, "image/png");
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ObjetosEntregadosModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de entrega eliminado." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

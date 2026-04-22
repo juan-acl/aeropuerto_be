@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ITiendasVentasService
     {
-        Task<int> RegistrarVentaCabecera(TiendasVentasModel modelo);
-        Task<List<TiendasVentasModel>> ListarPorConcesion(int idConcesion);
-        Task<List<TiendasVentasModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> EliminarFisico(int id);
+        Task<List<TiendasVentasModel>> ListarTodo();
+        Task<TiendasVentasModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(TiendasVentasModel modelo);
+        Task<bool> Actualizar(int id, TiendasVentasModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

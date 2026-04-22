@@ -4,48 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class CheckinDigitalController : ControllerBase
     {
         private readonly ICheckinDigitalService _service;
-
         public CheckinDigitalController(ICheckinDigitalService service) => _service = service;
 
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CheckinDigitalModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarCheckin(modelo);
-                return Ok(new { mensaje = "Check-in realizado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> Post([FromBody] CheckinDigitalModel m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpGet("reserva/{idReserva}")]
-        public async Task<IActionResult> Get(int idReserva)
-        {
-            var result = await _service.ObtenerPorReserva(idReserva);
-            if (result == null) return NotFound("No se encontró registro de check-in.");
-            return Ok(result);
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] CheckinDigitalModel m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
-        [HttpPatch("{id}/notificar")]
-        public async Task<IActionResult> PatchNotify(int id, [FromQuery] bool email, [FromQuery] bool sms)
-        {
-            await _service.ActualizarNotificaciones(id, email, sms);
-            return Ok(new { mensaje = "Estado de notificación actualizado." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro eliminado físicamente." });
-        }
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

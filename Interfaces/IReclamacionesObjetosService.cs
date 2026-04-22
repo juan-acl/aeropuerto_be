@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IReclamacionesObjetosService
     {
-        Task<bool> RegistrarReclamacion(ReclamacionesObjetosModel modelo);
-        Task<List<ReclamacionesObjetosModel>> ListarPendientes();
-        Task<List<ReclamacionesObjetosModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> ResolverReclamacion(int idReclamacion, string estado, string resolucion, string resueltoPor);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ReclamacionesObjetosModel>> ListarTodo();
+        Task<ReclamacionesObjetosModel?> ObtenerPorId(int id);
+        Task<bool> Insertar(ReclamacionesObjetosModel modelo);
+        Task<bool> Actualizar(int id, ReclamacionesObjetosModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

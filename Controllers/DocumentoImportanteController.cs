@@ -4,52 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class DocumentosImportantesController : ControllerBase
+    [ApiController]
+    public class DocumentoImportanteController : ControllerBase
     {
-        private readonly IDocumentosImportantesService _service;
+        private readonly IDocumentoImportanteService _service;
+        public DocumentoImportanteController(IDocumentoImportanteService service) => _service = service;
 
-        public DocumentosImportantesController(IDocumentosImportantesService service)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            _service = service;
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] DocumentosImportantes modelo)
-        {
-            if (modelo == null) return BadRequest("Datos inválidos");
-            try {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "DocumentosImportantes insertado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        public async Task<IActionResult> Post([FromBody] DocumentosImportantes m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpPut]
-        public async Task<IActionResult> Actualizar([FromBody] DocumentosImportantes modelo)
-        {
-            try {
-                await _service.Actualizar(modelo.IdDocumentoImportante, modelo);
-                return Ok(new { mensaje = "DocumentosImportantes actualizado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] DocumentosImportantes m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
-        {
-            try {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = "DocumentosImportantes eliminado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        public async Task<IActionResult> Delete(int id)
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

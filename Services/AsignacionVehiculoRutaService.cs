@@ -1,8 +1,9 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,49 +12,68 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public AsignacionVehiculoRutaService(DBContext context) => _context = context;
 
+        public async Task<List<AsignacionVehiculosRutas>> ListarTodo()
+        {
+            try { return await _context.AsignacionesVehiculosRutas.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo AsignacionVehiculosRutas: {ex.Message}"); return new List<AsignacionVehiculosRutas>(); }
+        }
+
+        public async Task<AsignacionVehiculosRutas?> ObtenerPorId(int id)
+        {
+            try { return await _context.AsignacionesVehiculosRutas.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId AsignacionVehiculosRutas: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(AsignacionVehiculosRutas m)
         {
-            var p = new[] {
-                new OracleParameter("p_id_vehiculo_transporte", (object?)m.IdVehiculoTransporte ?? DBNull.Value),
-                new OracleParameter("p_id_ruta_transporte", (object?)m.IdRutaTransporte ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_asignacion_vehiculos_rutas.insert_asignacion(:p_id_vehiculo_transporte, :p_id_ruta_transporte, :p_fecha_asignacion, :p_fecha_inicio_vigencia, :p_fecha_fin_vigencia, :p_horario_servicio, :p_activa); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_vehiculo_transporte", m.IdVehiculoTransporte),
+                new OracleParameter("p_id_ruta_transporte", m.IdRutaTransporte),
                 new OracleParameter("p_fecha_asignacion", (object?)m.FechaAsignacion ?? DBNull.Value),
-                new OracleParameter("p_fecha_inicio_vigencia", (object?)m.FechaInicioVigencia ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio_vigencia", m.FechaInicioVigencia),
                 new OracleParameter("p_fecha_fin_vigencia", (object?)m.FechaFinVigencia ?? DBNull.Value),
                 new OracleParameter("p_horario_servicio", (object?)m.HorarioServicio ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_asignacion_vehiculos_rutas.insert_asignacion(:p_id_vehiculo_transporte, :p_id_ruta_transporte, :p_fecha_asignacion, :p_fecha_inicio_vigencia, :p_fecha_fin_vigencia, :p_horario_servicio, :p_activa); END;", p);
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar AsignacionVehiculosRutas: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, AsignacionVehiculosRutas m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_asignacion_vehiculo_ruta", m.IdAsignacionVehiculoRuta)
-            };
-            p.AddRange(new[] {
-                new OracleParameter("p_id_vehiculo_transporte", (object?)m.IdVehiculoTransporte ?? DBNull.Value),
-                new OracleParameter("p_id_ruta_transporte", (object?)m.IdRutaTransporte ?? DBNull.Value),
+            try
+            {
+                string sql = "BEGIN pkg_asignacion_vehiculos_rutas.update_asignacion(:p_id_asignacion_vehiculo_ruta, :p_id_vehiculo_transporte, :p_id_ruta_transporte, :p_fecha_asignacion, :p_fecha_inicio_vigencia, :p_fecha_fin_vigencia, :p_horario_servicio, :p_activa); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_asignacion_vehiculo_ruta", id),
+                new OracleParameter("p_id_vehiculo_transporte", m.IdVehiculoTransporte),
+                new OracleParameter("p_id_ruta_transporte", m.IdRutaTransporte),
                 new OracleParameter("p_fecha_asignacion", (object?)m.FechaAsignacion ?? DBNull.Value),
-                new OracleParameter("p_fecha_inicio_vigencia", (object?)m.FechaInicioVigencia ?? DBNull.Value),
+                new OracleParameter("p_fecha_inicio_vigencia", m.FechaInicioVigencia),
                 new OracleParameter("p_fecha_fin_vigencia", (object?)m.FechaFinVigencia ?? DBNull.Value),
                 new OracleParameter("p_horario_servicio", (object?)m.HorarioServicio ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_asignacion_vehiculos_rutas.update_asignacion(:p_id_asignacion_vehiculo_ruta, :p_id_vehiculo_transporte, :p_id_ruta_transporte, :p_fecha_asignacion, :p_fecha_inicio_vigencia, :p_fecha_fin_vigencia, :p_horario_servicio, :p_activa); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar AsignacionVehiculosRutas: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_asignacion_vehiculos_rutas.delete_asignacion(:p_id_asignacion_vehiculo_ruta); END;", 
-                new OracleParameter("p_id_asignacion_vehiculo_ruta", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_asignacion_vehiculos_rutas.delete_asignacion(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar AsignacionVehiculosRutas: {ex.Message}"); return false; }
         }
-
-        public async Task<List<AsignacionVehiculosRutas>> ListarTodo() => await _context.Set<AsignacionVehiculosRutas>().ToListAsync();
-
-        public async Task<AsignacionVehiculosRutas?> ObtenerPorId(int id) => await _context.Set<AsignacionVehiculosRutas>().FindAsync(id);
     }
 }

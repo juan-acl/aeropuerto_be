@@ -1,24 +1,35 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
-    public class ProyectoEficienciaService : IProyectosEficienciaEnergeticaService
+    public class ProyectoEficienciaService : IProyectoEficienciaService
     {
         private readonly DBContext _context;
+        public ProyectoEficienciaService(DBContext context) => _context = context;
 
-        public ProyectoEficienciaService(DBContext context)
+        public async Task<List<ProyectosEficienciaEnergetica>> ListarTodo()
         {
-            _context = context;
+            try { return await _context.ProyectosEficiencia.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ProyectosEficienciaEnergetica: {ex.Message}"); return new List<ProyectosEficienciaEnergetica>(); }
+        }
+
+        public async Task<ProyectosEficienciaEnergetica?> ObtenerPorId(int id)
+        {
+            try { return await _context.ProyectosEficiencia.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ProyectosEficienciaEnergetica: {ex.Message}"); return null; }
         }
 
         public async Task<bool> Insertar(ProyectosEficienciaEnergetica m)
         {
-            var parametros = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_proyectos_eficiencia.insert_proyecto(:p_nombre_proyecto, :p_descripcion, :p_tipo_proyecto, :p_inversion_total, :p_ahorro_energetico_anual_kwh, :p_reduccion_co2_anual_kg, :p_fecha_inicio, :p_fecha_finalizacion, :p_periodo_retorno_anios, :p_estado, :p_responsable_proyecto, :p_resultados_obtenidos); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_nombre_proyecto", (object?)m.NombreProyecto ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
                 new OracleParameter("p_tipo_proyecto", (object?)m.TipoProyecto ?? DBNull.Value),
@@ -30,17 +41,20 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_periodo_retorno_anios", (object?)m.PeriodoRetornoAnios ?? DBNull.Value),
                 new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
                 new OracleParameter("p_responsable_proyecto", (object?)m.ResponsableProyecto ?? DBNull.Value),
-                new OracleParameter("p_resultados_obtenidos", (object?)m.ResultadosObtenidos ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_proyectos_eficiencia.insert_proyecto(:p_nombre_proyecto, :p_descripcion, :p_tipo_proyecto, :p_inversion_total, :p_ahorro_energetico_anual_kwh, :p_reduccion_co2_anual_kg, :p_fecha_inicio, :p_fecha_finalizacion, :p_periodo_retorno_anios, :p_estado, :p_responsable_proyecto, :p_resultados_obtenidos); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+                new OracleParameter("p_resultados_obtenidos", (object?)m.ResultadosObtenidos ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar ProyectosEficienciaEnergetica: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, ProyectosEficienciaEnergetica m)
         {
-            var parametros = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_proyectos_eficiencia.update_proyecto(:p_id_proyecto_eficiencia, :p_nombre_proyecto, :p_descripcion, :p_tipo_proyecto, :p_inversion_total, :p_ahorro_energetico_anual_kwh, :p_reduccion_co2_anual_kg, :p_fecha_inicio, :p_fecha_finalizacion, :p_periodo_retorno_anios, :p_estado, :p_responsable_proyecto, :p_resultados_obtenidos); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_id_proyecto_eficiencia", id),
                 new OracleParameter("p_nombre_proyecto", (object?)m.NombreProyecto ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
@@ -53,26 +67,23 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_periodo_retorno_anios", (object?)m.PeriodoRetornoAnios ?? DBNull.Value),
                 new OracleParameter("p_estado", (object?)m.Estado ?? DBNull.Value),
                 new OracleParameter("p_responsable_proyecto", (object?)m.ResponsableProyecto ?? DBNull.Value),
-                new OracleParameter("p_resultados_obtenidos", (object?)m.ResultadosObtenidos ?? DBNull.Value),
-            };
-
-            string sql = "BEGIN pkg_proyectos_eficiencia.update_proyecto(:p_id_proyecto_eficiencia, :p_nombre_proyecto, :p_descripcion, :p_tipo_proyecto, :p_inversion_total, :p_ahorro_energetico_anual_kwh, :p_reduccion_co2_anual_kg, :p_fecha_inicio, :p_fecha_finalizacion, :p_periodo_retorno_anios, :p_estado, :p_responsable_proyecto, :p_resultados_obtenidos); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+                new OracleParameter("p_resultados_obtenidos", (object?)m.ResultadosObtenidos ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ProyectosEficienciaEnergetica: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            var sql = "BEGIN pkg_proyectos_eficiencia.delete_proyecto(:p_id_proyecto_eficiencia); END;";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id_proyecto_eficiencia", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_proyectos_eficiencia.delete_proyecto(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ProyectosEficienciaEnergetica: {ex.Message}"); return false; }
         }
-
-        public async Task<List<ProyectosEficienciaEnergetica>> ListarTodo()
-        {
-            return await _context.Set<ProyectosEficienciaEnergetica>().ToListAsync();
-        }
-
-        public async Task<ProyectosEficienciaEnergetica?> ObtenerPorId(int id) => await _context.Set<ProyectosEficienciaEnergetica>().FindAsync(id);
     }
 }

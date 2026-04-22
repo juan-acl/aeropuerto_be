@@ -1,65 +1,81 @@
-﻿using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class SeguridadControlesService : ISeguridadControlesService
     {
         private readonly DBContext _context;
-
         public SeguridadControlesService(DBContext context) => _context = context;
 
-        public async Task<bool> RegistrarControl(SeguridadControlesModel m)
+        public async Task<List<SeguridadControlesModel>> ListarTodo()
         {
-            var sql = @"INSERT INTO seguridad_controles 
-                        (codigo_aeropuerto, fecha_control, hora_control, tipo_control, 
-                         numero_pasajeros_revisados, numero_incidencias, supervisor, observaciones) 
-                        VALUES (:p_aero, SYSDATE, SYSTIMESTAMP, :p_tipo, :p_pas, :p_inc, :p_super, :p_obs)";
-
-            var parametros = new[] {
-                new OracleParameter("p_aero", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoControl),
-                new OracleParameter("p_pas", m.NumeroPasajerosRevisados),
-                new OracleParameter("p_inc", m.NumeroIncidencias),
-                new OracleParameter("p_super", (object?)m.Supervisor ?? DBNull.Value),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.SeguridadControles.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo SeguridadControlesModel: {ex.Message}"); return new List<SeguridadControlesModel>(); }
         }
 
-        public async Task<List<SeguridadControlesModel>> ListarPorAeropuerto(string codigo)
+        public async Task<SeguridadControlesModel?> ObtenerPorId(int id)
         {
-            return await _context.SeguridadControles
-                .Where(s => s.CodigoAeropuerto == codigo)
-                .OrderByDescending(s => s.HoraControl)
-                .ToListAsync();
+            try { return await _context.SeguridadControles.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId SeguridadControlesModel: {ex.Message}"); return null; }
         }
 
-        public async Task<object> ObtenerResumenEstadistico(string codigo, DateTime fecha)
+        public async Task<bool> Insertar(SeguridadControlesModel m)
         {
-            var controles = await _context.SeguridadControles
-                .Where(s => s.CodigoAeropuerto == codigo && s.FechaControl.Value.Date == fecha.Date)
-                .ToListAsync();
-
-            return new
+            try
             {
-                TotalPasajeros = controles.Sum(c => c.NumeroPasajerosRevisados),
-                TotalIncidencias = controles.Sum(c => c.NumeroIncidencias),
-                PorTipo = controles.GroupBy(c => c.TipoControl)
-                                   .Select(g => new { Tipo = g.Key, Cantidad = g.Count() })
-            };
+                string sql = "BEGIN pkg_seguridad_controles.insert_control(:p_codigo_aeropuerto, :p_fecha_control, :p_hora_control, :p_tipo_control, :p_numero_pasajeros, :p_numero_incidencias, :p_supervisor, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_fecha_control", (object?)m.FechaControl ?? DBNull.Value),
+                new OracleParameter("p_hora_control", (object?)m.HoraControl ?? DBNull.Value),
+                new OracleParameter("p_tipo_control", (object?)m.TipoControl ?? DBNull.Value),
+                new OracleParameter("p_numero_pasajeros", DBNull.Value /* NumeroPasajeros */),
+                new OracleParameter("p_numero_incidencias", m.NumeroIncidencias),
+                new OracleParameter("p_supervisor", (object?)m.Supervisor ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar SeguridadControlesModel: {ex.Message}"); return false; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Actualizar(int id, SeguridadControlesModel m)
         {
-            var sql = "DELETE FROM seguridad_controles WHERE id_control = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_seguridad_controles.update_control(:p_id_control, :p_codigo_aeropuerto, :p_fecha_control, :p_hora_control, :p_tipo_control, :p_numero_pasajeros, :p_numero_incidencias, :p_supervisor, :p_observaciones); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_control", id),
+                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
+                new OracleParameter("p_fecha_control", (object?)m.FechaControl ?? DBNull.Value),
+                new OracleParameter("p_hora_control", (object?)m.HoraControl ?? DBNull.Value),
+                new OracleParameter("p_tipo_control", (object?)m.TipoControl ?? DBNull.Value),
+                new OracleParameter("p_numero_pasajeros", DBNull.Value /* NumeroPasajeros */),
+                new OracleParameter("p_numero_incidencias", m.NumeroIncidencias),
+                new OracleParameter("p_supervisor", (object?)m.Supervisor ?? DBNull.Value),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar SeguridadControlesModel: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_seguridad_controles.delete_control(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar SeguridadControlesModel: {ex.Message}"); return false; }
         }
     }
 }

@@ -4,52 +4,33 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class VehiculoTransporteController : ControllerBase
     {
         private readonly IVehiculoTransporteService _service;
+        public VehiculoTransporteController(IVehiculoTransporteService service) => _service = service;
 
-        public VehiculoTransporteController(IVehiculoTransporteService service)
+        [HttpGet]
+        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            _service = service;
+            var item = await _service.ObtenerPorId(id);
+            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] VehiculosTransporte modelo)
-        {
-            if (modelo == null) return BadRequest("Datos inválidos");
-            try {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "VehiculoTransporte insertado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        public async Task<IActionResult> Post([FromBody] VehiculosTransporte m)
+            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
 
-        [HttpPut]
-        public async Task<IActionResult> Actualizar([FromBody] VehiculosTransporte modelo)
-        {
-            try {
-                await _service.Actualizar(modelo.IdVehiculoTransporte, modelo);
-                return Ok(new { mensaje = "VehiculoTransporte actualizado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] VehiculosTransporte m)
+            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
-        {
-            try {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = "VehiculoTransporte eliminado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        public async Task<IActionResult> Delete(int id)
+            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
     }
 }

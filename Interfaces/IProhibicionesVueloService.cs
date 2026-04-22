@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IProhibicionesVueloService
     {
+        Task<List<ProhibicionesVueloModel>> ListarTodo();
+        Task<ProhibicionesVueloModel?> ObtenerPorId(int id);
         Task<bool> Insertar(ProhibicionesVueloModel modelo);
-        Task<bool> EsPasajeroProhibido(int idPasajero);
-        Task<List<ProhibicionesVueloModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> DesactivarProhibicion(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<bool> Actualizar(int id, ProhibicionesVueloModel modelo);
+        Task<bool> Eliminar(int id);
     }
 }

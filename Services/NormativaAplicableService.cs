@@ -1,8 +1,9 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
@@ -11,9 +12,24 @@ namespace Aeropuerto.Backend.Services
         private readonly DBContext _context;
         public NormativaAplicableService(DBContext context) => _context = context;
 
+        public async Task<List<NormativasAplicables>> ListarTodo()
+        {
+            try { return await _context.NormativasAplicables.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo NormativasAplicables: {ex.Message}"); return new List<NormativasAplicables>(); }
+        }
+
+        public async Task<NormativasAplicables?> ObtenerPorId(int id)
+        {
+            try { return await _context.NormativasAplicables.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId NormativasAplicables: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(NormativasAplicables m)
         {
-            var p = new[] {
+            try
+            {
+                string sql = "BEGIN pkg_normativas_aplicables.insert_normativa(:p_codigo_normativa, :p_titulo_normativa, :p_descripcion, :p_entidad_emisora, :p_pais_origen, :p_ambito_aplicacion, :p_fecha_publicacion, :p_fecha_vigencia, :p_fecha_ultima_actualizacion, :p_version, :p_documento_oficial, :p_url_referencia, :p_obligatoria, :p_activa); END;";
+                var p = new OracleParameter[] {
                 new OracleParameter("p_codigo_normativa", (object?)m.CodigoNormativa ?? DBNull.Value),
                 new OracleParameter("p_titulo_normativa", (object?)m.TituloNormativa ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
@@ -24,21 +40,24 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_fecha_vigencia", (object?)m.FechaVigencia ?? DBNull.Value),
                 new OracleParameter("p_fecha_ultima_actualizacion", (object?)m.FechaUltimaActualizacion ?? DBNull.Value),
                 new OracleParameter("p_version", (object?)m.Version ?? DBNull.Value),
-                new OracleParameter("p_documento_oficial", (object?)m.DocumentoOficial ?? DBNull.Value),
+                new OracleParameter("p_documento_oficial", OracleDbType.Blob) { Value = (object?)m.DocumentoOficial ?? DBNull.Value },
                 new OracleParameter("p_url_referencia", (object?)m.UrlReferencia ?? DBNull.Value),
                 new OracleParameter("p_obligatoria", (object?)m.Obligatoria ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            };
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_normativas_aplicables.insert_normativa(:p_codigo_normativa, :p_titulo_normativa, :p_descripcion, :p_entidad_emisora, :p_pais_origen, :p_ambito_aplicacion, :p_fecha_publicacion, :p_fecha_vigencia, :p_fecha_ultima_actualizacion, :p_version, :p_documento_oficial, :p_url_referencia, :p_obligatoria, :p_activa); END;", p);
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar NormativasAplicables: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Actualizar(int id, NormativasAplicables m)
         {
-            var p = new List<OracleParameter> {
-                new OracleParameter("p_id_normativa", m.IdNormativa)
-            };
-            p.AddRange(new[] {
+            try
+            {
+                string sql = "BEGIN pkg_normativas_aplicables.update_normativa(:p_id_normativa, :p_codigo_normativa, :p_titulo_normativa, :p_descripcion, :p_entidad_emisora, :p_pais_origen, :p_ambito_aplicacion, :p_fecha_publicacion, :p_fecha_vigencia, :p_fecha_ultima_actualizacion, :p_version, :p_documento_oficial, :p_url_referencia, :p_obligatoria, :p_activa); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_normativa", id),
                 new OracleParameter("p_codigo_normativa", (object?)m.CodigoNormativa ?? DBNull.Value),
                 new OracleParameter("p_titulo_normativa", (object?)m.TituloNormativa ?? DBNull.Value),
                 new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
@@ -49,25 +68,26 @@ namespace Aeropuerto.Backend.Services
                 new OracleParameter("p_fecha_vigencia", (object?)m.FechaVigencia ?? DBNull.Value),
                 new OracleParameter("p_fecha_ultima_actualizacion", (object?)m.FechaUltimaActualizacion ?? DBNull.Value),
                 new OracleParameter("p_version", (object?)m.Version ?? DBNull.Value),
-                new OracleParameter("p_documento_oficial", (object?)m.DocumentoOficial ?? DBNull.Value),
+                new OracleParameter("p_documento_oficial", OracleDbType.Blob) { Value = (object?)m.DocumentoOficial ?? DBNull.Value },
                 new OracleParameter("p_url_referencia", (object?)m.UrlReferencia ?? DBNull.Value),
                 new OracleParameter("p_obligatoria", (object?)m.Obligatoria ?? DBNull.Value),
-                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value),
-            });
-
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_normativas_aplicables.update_normativa(:p_id_normativa, :p_codigo_normativa, :p_titulo_normativa, :p_descripcion, :p_entidad_emisora, :p_pais_origen, :p_ambito_aplicacion, :p_fecha_publicacion, :p_fecha_vigencia, :p_fecha_ultima_actualizacion, :p_version, :p_documento_oficial, :p_url_referencia, :p_obligatoria, :p_activa); END;", p.ToArray());
-            return true;
+                new OracleParameter("p_activa", (object?)m.Activa ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar NormativasAplicables: {ex.Message}"); return false; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            await _context.Database.ExecuteSqlRawAsync("BEGIN pkg_normativas_aplicables.delete_normativa(:p_id_normativa); END;", 
-                new OracleParameter("p_id_normativa", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_normativas_aplicables.delete_normativa(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar NormativasAplicables: {ex.Message}"); return false; }
         }
-
-        public async Task<List<NormativasAplicables>> ListarTodo() => await _context.Set<NormativasAplicables>().ToListAsync();
-
-        public async Task<NormativasAplicables?> ObtenerPorId(int id) => await _context.Set<NormativasAplicables>().FindAsync(id);
     }
 }

@@ -1,73 +1,83 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
+using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class FacturasService : IFacturasService
     {
         private readonly DBContext _context;
-
         public FacturasService(DBContext context) => _context = context;
-
-        public async Task<bool> Insertar(FacturasModel f)
-        {
-            var sql = @"INSERT INTO facturas 
-                        (id_reserva, numero_factura, fecha_emision, subtotal, impuestos, total, moneda, datos_fiscales, pdf_factura) 
-                        VALUES (:p_reserva, :p_num, SYSDATE, :p_sub, :p_imp, :p_total, :p_moneda, :p_datos, :p_pdf)";
-
-            var parametros = new[] {
-                new OracleParameter("p_reserva", f.IdReserva),
-                new OracleParameter("p_num", (object?)f.NumeroFactura ?? DBNull.Value),
-                new OracleParameter("p_sub", f.Subtotal),
-                new OracleParameter("p_imp", f.Impuestos),
-                new OracleParameter("p_total", f.Total),
-                new OracleParameter("p_moneda", f.Moneda),
-                new OracleParameter("p_datos", (object?)f.DatosFiscales ?? DBNull.Value),
-                new OracleParameter("p_pdf", (object?)f.PdfFactura ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
-        }
-
-        public async Task<FacturasModel?> ObtenerPorReserva(int idReserva)
-        {
-            return await _context.Facturas.FirstOrDefaultAsync(f => f.IdReserva == idReserva);
-        }
 
         public async Task<List<FacturasModel>> ListarTodo()
         {
-            return await _context.Facturas.ToListAsync();
+            try { return await _context.Facturas.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo FacturasModel: {ex.Message}"); return new List<FacturasModel>(); }
         }
 
-        public async Task<bool> Actualizar(int id, FacturasModel f)
+        public async Task<FacturasModel?> ObtenerPorId(int id)
         {
-            var sql = @"UPDATE facturas 
-                        SET numero_factura = :p_num, subtotal = :p_sub, impuestos = :p_imp, 
-                            total = :p_total, datos_fiscales = :p_datos 
-                        WHERE id_factura = :p_id";
-
-            var parametros = new[] {
-                new OracleParameter("p_num", f.NumeroFactura),
-                new OracleParameter("p_sub", f.Subtotal),
-                new OracleParameter("p_imp", f.Impuestos),
-                new OracleParameter("p_total", f.Total),
-                new OracleParameter("p_datos", f.DatosFiscales),
-                new OracleParameter("p_id", id)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-            return true;
+            try { return await _context.Facturas.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId FacturasModel: {ex.Message}"); return null; }
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Insertar(FacturasModel m)
         {
-            var sql = "DELETE FROM facturas WHERE id_factura = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
-            return true;
+            try
+            {
+                string sql = "BEGIN pkg_facturas.insert_factura(:p_id_reserva, :p_numero_factura, :p_fecha_emision, :p_subtotal, :p_impuestos, :p_total, :p_moneda, :p_datos_fiscales, :p_pdf_factura); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_numero_factura", (object?)m.NumeroFactura ?? DBNull.Value),
+                new OracleParameter("p_fecha_emision", (object?)m.FechaEmision ?? DBNull.Value),
+                new OracleParameter("p_subtotal", m.Subtotal),
+                new OracleParameter("p_impuestos", m.Impuestos),
+                new OracleParameter("p_total", m.Total),
+                new OracleParameter("p_moneda", (object?)m.Moneda ?? DBNull.Value),
+                new OracleParameter("p_datos_fiscales", (object?)m.DatosFiscales ?? DBNull.Value),
+                new OracleParameter("p_pdf_factura", (object?)m.PdfFactura ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar FacturasModel: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Actualizar(int id, FacturasModel m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_facturas.update_factura(:p_id_factura, :p_id_reserva, :p_numero_factura, :p_fecha_emision, :p_subtotal, :p_impuestos, :p_total, :p_moneda, :p_datos_fiscales, :p_pdf_factura); END;";
+                var p = new OracleParameter[] {
+                new OracleParameter("p_id_factura", id),
+                new OracleParameter("p_id_reserva", m.IdReserva),
+                new OracleParameter("p_numero_factura", (object?)m.NumeroFactura ?? DBNull.Value),
+                new OracleParameter("p_fecha_emision", (object?)m.FechaEmision ?? DBNull.Value),
+                new OracleParameter("p_subtotal", m.Subtotal),
+                new OracleParameter("p_impuestos", m.Impuestos),
+                new OracleParameter("p_total", m.Total),
+                new OracleParameter("p_moneda", (object?)m.Moneda ?? DBNull.Value),
+                new OracleParameter("p_datos_fiscales", (object?)m.DatosFiscales ?? DBNull.Value),
+                new OracleParameter("p_pdf_factura", (object?)m.PdfFactura ?? DBNull.Value)
+                };
+                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar FacturasModel: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_facturas.delete_factura(:); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar FacturasModel: {ex.Message}"); return false; }
         }
     }
 }
