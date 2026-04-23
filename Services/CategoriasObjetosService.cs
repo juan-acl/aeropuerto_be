@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,17 +14,15 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> RegistrarCategoria(CategoriasObjetosModel m)
         {
-            var sql = @"INSERT INTO categorias_objetos 
-                        (nombre_categoria, descripcion, activo) 
-                        VALUES (:p_nom, :p_desc, :p_act)";
+            var sql = "pkg_categorias_objetos.insert_categoria";
 
             var parametros = new[] {
-                new OracleParameter("p_nom", m.NombreCategoria),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_act", m.Activo)
+                new OracleParameter("p_nombre_categoria", m.NombreCategoria),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_activo", m.Activo)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_nombre_categoria, :p_descripcion, :p_activo); END;", parametros);
             return true;
         }
 
@@ -47,15 +45,15 @@ namespace Aeropuerto.Backend.Services
         public async Task<bool> DesactivarCategoria(int id)
         {
             // Soft delete: Ideal para no romper la integridad referencial histórica
-            var sql = "UPDATE categorias_objetos SET activo = 0 WHERE id_categoria = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_categorias_objetos.desactivar_categoria";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_categoria); END;", new OracleParameter("p_id_categoria", id));
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM categorias_objetos WHERE id_categoria = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_categorias_objetos.delete_categoria";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_categoria); END;", new OracleParameter("p_id_categoria", id));
             return true;
         }
     }

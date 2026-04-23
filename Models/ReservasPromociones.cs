@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
@@ -6,10 +6,12 @@ namespace Aeropuerto.Backend.Models
     [Table("RESERVAS_PROMOCIONES")]
     public class ReservasPromocionesModel
     {
-        [Column("ID_RESERVA")]
+        [Key]
+        [Column("ID_RESERVA", Order = 0)]
         public int IdReserva { get; set; }
 
-        [Column("ID_PROMOCION")]
+        [Key]
+        [Column("ID_PROMOCION", Order = 1)]
         public int IdPromocion { get; set; }
 
         [Column("DESCUENTO_APLICADO")]

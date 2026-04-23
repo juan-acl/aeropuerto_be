@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +14,15 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> AsignarPasajero(GruposPasajerosModel m)
         {
-            var sql = @"INSERT INTO grupos_pasajeros (id_grupo, id_pasajero, fecha_asignacion, rol_en_grupo) 
-                        VALUES (:p_grupo, :p_pas, SYSDATE, :p_rol)";
+            var sql = "pkg_grupos_pasajeros.insert_grupo_pasajero";
 
             var parametros = new[] {
-                new OracleParameter("p_grupo", m.IdGrupo),
-                new OracleParameter("p_pas", m.IdPasajero),
-                new OracleParameter("p_rol", (object?)m.RolEnGrupo ?? "MIEMBRO")
+                new OracleParameter("p_id_grupo", m.IdGrupo),
+                new OracleParameter("p_id_pasajero", m.IdPasajero),
+                new OracleParameter("p_rol_en_grupo", (object?)m.RolEnGrupo ?? "MIEMBRO")
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_grupo, :p_id_pasajero, :p_rol_en_grupo); END;", parametros);
             return true;
         }
 
@@ -36,10 +35,10 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> EliminarRelacion(int idGrupo, int idPasajero)
         {
-            var sql = "DELETE FROM grupos_pasajeros WHERE id_grupo = :p_grupo AND id_pasajero = :p_pas";
-            await _context.Database.ExecuteSqlRawAsync(sql,
-                new OracleParameter("p_grupo", idGrupo),
-                new OracleParameter("p_pas", idPasajero));
+            var sql = "pkg_grupos_pasajeros.delete_grupo_pasajero";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_grupo, :p_id_pasajero); END;",
+                new OracleParameter("p_id_grupo", idGrupo),
+                new OracleParameter("p_id_pasajero", idPasajero));
             return true;
         }
     }

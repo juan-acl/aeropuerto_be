@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,20 +14,18 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Insertar(HistorialComunicacionModel m)
         {
-            var sql = @"INSERT INTO historial_comunicaciones 
-                (id_pasajero, tipo_comunicacion, fecha_envio, asunto, contenido, estado, respuesta_recibida) 
-                VALUES (:p_id, :p_tipo, SYSTIMESTAMP, :p_asunto, :p_cont, :p_est, :p_resp)";
+            var sql = "pkg_historial_comunicaciones.insert_comunicacion";
 
             var parametros = new[] {
-        new OracleParameter("p_id", m.IdPasajero),
-        new OracleParameter("p_tipo", m.TipoComunicacion),
-        new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
-        new OracleParameter("p_cont", (object?)m.Contenido ?? DBNull.Value),
-        new OracleParameter("p_est", m.Estado ?? "ENVIADO"),
-        new OracleParameter("p_resp", m.RespuestaRecibida)
+                new OracleParameter("p_id_pasajero", m.IdPasajero),
+                new OracleParameter("p_tipo_comunicacion", m.TipoComunicacion),
+                new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
+                new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
+                new OracleParameter("p_estado", m.Estado ?? "ENVIADO"),
+                new OracleParameter("p_respuesta_recibida", m.RespuestaRecibida)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero, :p_tipo_comunicacion, :p_asunto, :p_contenido, :p_estado, :p_respuesta_recibida); END;", parametros);
             return true;
         }
 
@@ -41,32 +39,25 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Actualizar(int id, HistorialComunicacionModel m)
         {
-         
-            var sql = @"UPDATE historial_comunicaciones 
-                SET tipo_comunicacion = :p_tipo, 
-                    asunto = :p_asunto, 
-                    contenido = :p_cont, 
-                    estado = :p_est, 
-                    respuesta_recibida = :p_resp 
-                WHERE id_comunicacion = :p_id";
+            var sql = "pkg_historial_comunicaciones.update_comunicacion";
 
             var parametros = new[] {
-        new OracleParameter("p_tipo", m.TipoComunicacion),
-        new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
-        new OracleParameter("p_cont", (object?)m.Contenido ?? DBNull.Value),
-        new OracleParameter("p_est", m.Estado),
-        new OracleParameter("p_resp", m.RespuestaRecibida),
-        new OracleParameter("p_id", id)
-    };
+                new OracleParameter("p_id_comunicacion", id),
+                new OracleParameter("p_tipo_comunicacion", m.TipoComunicacion),
+                new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
+                new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
+                new OracleParameter("p_estado", m.Estado),
+                new OracleParameter("p_respuesta_recibida", m.RespuestaRecibida)
+            };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_comunicacion, :p_tipo_comunicacion, :p_asunto, :p_contenido, :p_estado, :p_respuesta_recibida); END;", parametros);
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM historial_comunicaciones WHERE id_comunicacion = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_historial_comunicaciones.delete_comunicacion";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_comunicacion); END;", new OracleParameter("p_id_comunicacion", id));
             return true;
         }
     }

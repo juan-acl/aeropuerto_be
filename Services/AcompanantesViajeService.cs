@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,19 +14,17 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Insertar(AcompanantesViajeModel m)
         {
-            var sql = @"INSERT INTO acompanantes_viaje 
-                        (id_pasajero_principal, id_pasajero_acompanante, frecuencia, relacion, ultimo_viaje_juntos) 
-                        VALUES (:p_principal, :p_acompanante, :p_frec, :p_rel, :p_fecha)";
+            var sql = "pkg_acompanantes_viaje.insert_acompanante";
 
             var parametros = new[] {
-                new OracleParameter("p_principal", m.IdPasajeroPrincipal),
-                new OracleParameter("p_acompanante", m.IdPasajeroAcompanante),
-                new OracleParameter("p_frec", m.Frecuencia),
-                new OracleParameter("p_rel", m.Relacion),
-                new OracleParameter("p_fecha", (object?)m.UltimoViajeJuntos ?? DBNull.Value)
+                new OracleParameter("p_id_pasajero_principal", m.IdPasajeroPrincipal),
+                new OracleParameter("p_id_pasajero_acompanante", m.IdPasajeroAcompanante),
+                new OracleParameter("p_frecuencia", m.Frecuencia),
+                new OracleParameter("p_relacion", m.Relacion),
+                new OracleParameter("p_ultimo_viaje_juntos", (object?)m.UltimoViajeJuntos ?? DBNull.Value)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero_principal, :p_id_pasajero_acompanante, :p_frecuencia, :p_relacion, :p_ultimo_viaje_juntos); END;", parametros);
             return true;
         }
 
@@ -39,29 +37,24 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Actualizar(int id, AcompanantesViajeModel m)
         {
-            var sql = @"UPDATE acompanantes_viaje 
-                        SET id_pasajero_acompanante = :p_acompanante, 
-                            frecuencia = :p_frec, 
-                            relacion = :p_rel, 
-                            ultimo_viaje_juntos = :p_fecha 
-                        WHERE id_acompanante = :p_id";
+            var sql = "pkg_acompanantes_viaje.update_acompanante";
 
             var parametros = new[] {
-                new OracleParameter("p_acompanante", m.IdPasajeroAcompanante),
-                new OracleParameter("p_frec", m.Frecuencia),
-                new OracleParameter("p_rel", m.Relacion),
-                new OracleParameter("p_fecha", (object?)m.UltimoViajeJuntos ?? DBNull.Value),
-                new OracleParameter("p_id", id)
+                new OracleParameter("p_id_acompanante", id),
+                new OracleParameter("p_id_pasajero_acompanante", m.IdPasajeroAcompanante),
+                new OracleParameter("p_frecuencia", m.Frecuencia),
+                new OracleParameter("p_relacion", m.Relacion),
+                new OracleParameter("p_ultimo_viaje_juntos", (object?)m.UltimoViajeJuntos ?? DBNull.Value)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_acompanante, :p_id_pasajero_acompanante, :p_frecuencia, :p_relacion, :p_ultimo_viaje_juntos); END;", parametros);
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM acompanantes_viaje WHERE id_acompanante = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_acompanantes_viaje.delete_acompanante";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_acompanante); END;", new OracleParameter("p_id_acompanante", id));
             return true;
         }
     }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
@@ -6,6 +6,7 @@ namespace Aeropuerto.Backend.Models
     [Table("GRUPOS_PASAJEROS")]
     public class GruposPasajerosModel
     {
+        [Key]
         [Column("ID_GRUPO")]
         public int IdGrupo { get; set; }
 

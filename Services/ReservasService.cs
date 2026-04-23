@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,21 +14,20 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Insertar(ReservasModel m)
         {
-            var sql = @"INSERT INTO reservas (id_vuelo, id_pasajero, codigo_reserva, tipo_tarifa, precio_pagado, moneda, numero_asiento, clase_servicio) 
-                        VALUES (:p_vuelo, :p_pasajero, :p_codigo, :p_tarifa, :p_precio, :p_moneda, :p_asiento, :p_clase)";
+            var sql = "pkg_reservas.insert_reserva";
 
             var parametros = new[] {
-                new OracleParameter("p_vuelo", m.IdVuelo),
-                new OracleParameter("p_pasajero", m.IdPasajero),
-                new OracleParameter("p_codigo", m.CodigoReserva),
-                new OracleParameter("p_tarifa", (object?)m.TipoTarifa ?? DBNull.Value),
-                new OracleParameter("p_precio", m.PrecioPagado),
+                new OracleParameter("p_id_vuelo", m.IdVuelo),
+                new OracleParameter("p_id_pasajero", m.IdPasajero),
+                new OracleParameter("p_codigo_reserva", m.CodigoReserva),
+                new OracleParameter("p_tipo_tarifa", (object?)m.TipoTarifa ?? DBNull.Value),
+                new OracleParameter("p_precio_pagado", m.PrecioPagado),
                 new OracleParameter("p_moneda", (object?)m.Moneda ?? "USD"),
-                new OracleParameter("p_asiento", (object?)m.NumeroAsiento ?? DBNull.Value),
-                new OracleParameter("p_clase", (object?)m.ClaseServicio ?? DBNull.Value)
+                new OracleParameter("p_numero_asiento", (object?)m.NumeroAsiento ?? DBNull.Value),
+                new OracleParameter("p_clase_servicio", (object?)m.ClaseServicio ?? DBNull.Value)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_vuelo, :p_id_pasajero, :p_codigo_reserva, :p_tipo_tarifa, :p_precio_pagado, :p_moneda, :p_numero_asiento, :p_clase_servicio); END;", parametros);
             return true;
         }
 
@@ -47,28 +46,24 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Actualizar(int id, ReservasModel m)
         {
-            var sql = @"UPDATE reservas SET 
-                        estado_reserva = :p_estado, numero_asiento = :p_asiento, 
-                        puerta_embarque_asignada = :p_puerta, checkin_realizado = :p_checkin,
-                        fecha_modificacion = SYSDATE 
-                        WHERE id_reserva = :p_id";
+            var sql = "pkg_reservas.update_reserva";
 
             var parametros = new[] {
-                new OracleParameter("p_estado", m.EstadoReserva),
-                new OracleParameter("p_asiento", (object?)m.NumeroAsiento ?? DBNull.Value),
-                new OracleParameter("p_puerta", (object?)m.PuertaEmbarqueAsignada ?? DBNull.Value),
-                new OracleParameter("p_checkin", m.CheckinRealizado),
-                new OracleParameter("p_id", id)
+                new OracleParameter("p_id_reserva", id),
+                new OracleParameter("p_estado_reserva", m.EstadoReserva),
+                new OracleParameter("p_numero_asiento", (object?)m.NumeroAsiento ?? DBNull.Value),
+                new OracleParameter("p_puerta_embarque_asignada", (object?)m.PuertaEmbarqueAsignada ?? DBNull.Value),
+                new OracleParameter("p_checkin_realizado", m.CheckinRealizado)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva, :p_estado_reserva, :p_numero_asiento, :p_puerta_embarque_asignada, :p_checkin_realizado); END;", parametros);
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM reservas WHERE id_reserva = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_reservas.delete_reserva";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva); END;", new OracleParameter("p_id_reserva", id));
             return true;
         }
     }

@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,19 +14,17 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> CargarEvidencia(IncidentesEvidenciaModel m)
         {
-            var sql = @"INSERT INTO incidentes_evidencia 
-                        (id_incidente, tipo_evidencia, descripcion, archivo_evidencia, fecha_registro, registrado_por) 
-                        VALUES (:p_inc, :p_tipo, :p_desc, :p_file, SYSTIMESTAMP, :p_user)";
+            var sql = "pkg_incidentes_evidencia.insert_evidencia";
 
             var parametros = new[] {
-                new OracleParameter("p_inc", m.IdIncidente),
-                new OracleParameter("p_tipo", m.TipoEvidencia),
-                new OracleParameter("p_desc", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_file", (object?)m.ArchivoEvidencia ?? DBNull.Value),
-                new OracleParameter("p_user", (object?)m.RegistradoPor ?? DBNull.Value)
+                new OracleParameter("p_id_incidente", m.IdIncidente),
+                new OracleParameter("p_tipo_evidencia", m.TipoEvidencia),
+                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                new OracleParameter("p_archivo_evidencia", (object?)m.ArchivoEvidencia ?? DBNull.Value),
+                new OracleParameter("p_registrado_por", (object?)m.RegistradoPor ?? DBNull.Value)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_incidente, :p_tipo_evidencia, :p_descripcion, :p_archivo_evidencia, :p_registrado_por); END;", parametros);
             return true;
         }
 
@@ -55,8 +53,8 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM incidentes_evidencia WHERE id_evidencia = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_incidentes_evidencia.delete_evidencia";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_evidencia); END;", new OracleParameter("p_id_evidencia", id));
             return true;
         }
     }

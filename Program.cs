@@ -71,6 +71,7 @@ builder.Services.AddScoped<IIncidenteVueloService, IncidenteVueloService>();
 builder.Services.AddScoped<IRetrasoVueloService, RetrasoVueloService>();
 builder.Services.AddScoped<ITripulacionVueloService, TripulacionVueloService>();
 builder.Services.AddScoped<ICompensacionVueloService, CompensacionVueloService>();
+builder.Services.AddScoped<IEscalasTecnicasService, EscalasTecnicasService>();
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MÓDULO 6 ─ Tripulación

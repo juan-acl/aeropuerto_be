@@ -53,6 +53,7 @@ namespace Aeropuerto.Backend.Data
         public DbSet<IncidenteVueloModel>        IncidentesVuelo       { get; set; } = null!;
         public DbSet<RetrasoVueloModel>          RetrasosVuelo         { get; set; } = null!;
         public DbSet<TripulacionVueloModel>      TripulacionVuelo      { get; set; } = null!;
+        public DbSet<EscalasTecnicasModel>       EscalasTecnicas       { get; set; } = null!;
 
         // ══════════════════════════════════════════════════════════════════════
         // Módulo 6: Tripulación

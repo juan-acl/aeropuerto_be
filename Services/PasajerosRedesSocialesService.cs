@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +14,17 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Insertar(PasajerosRedesSocialesModel m)
         {
-            var sql = @"INSERT INTO pasajeros_redes_sociales (id_pasajero, red_social, usuario, url_perfil, publico) 
-                        VALUES (:p_id, :p_red, :p_user, :p_url, :p_pub)";
+            var sql = "pkg_pasajeros_redes_sociales.insert_red_social";
 
             var parametros = new[] {
-                new OracleParameter("p_id", m.IdPasajero),
-                new OracleParameter("p_red", m.RedSocial),
-                new OracleParameter("p_user", (object?)m.Usuario ?? DBNull.Value),
-                new OracleParameter("p_url", (object?)m.UrlPerfil ?? DBNull.Value),
-                new OracleParameter("p_pub", m.Publico)
+                new OracleParameter("p_id_pasajero", m.IdPasajero),
+                new OracleParameter("p_red_social", m.RedSocial),
+                new OracleParameter("p_usuario", (object?)m.Usuario ?? DBNull.Value),
+                new OracleParameter("p_url_perfil", (object?)m.UrlPerfil ?? DBNull.Value),
+                new OracleParameter("p_publico", m.Publico)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero, :p_red_social, :p_usuario, :p_url_perfil, :p_publico); END;", parametros);
             return true;
         }
 
@@ -38,26 +37,24 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Actualizar(int id, PasajerosRedesSocialesModel m)
         {
-            var sql = @"UPDATE pasajeros_redes_sociales 
-                        SET red_social = :p_red, usuario = :p_user, url_perfil = :p_url, publico = :p_pub 
-                        WHERE id_red_social = :p_id";
+            var sql = "pkg_pasajeros_redes_sociales.update_red_social";
 
             var parametros = new[] {
-                new OracleParameter("p_red", m.RedSocial),
-                new OracleParameter("p_user", (object?)m.Usuario ?? DBNull.Value),
-                new OracleParameter("p_url", (object?)m.UrlPerfil ?? DBNull.Value),
-                new OracleParameter("p_pub", m.Publico),
-                new OracleParameter("p_id", id)
+                new OracleParameter("p_id_red_social", id),
+                new OracleParameter("p_red_social", m.RedSocial),
+                new OracleParameter("p_usuario", (object?)m.Usuario ?? DBNull.Value),
+                new OracleParameter("p_url_perfil", (object?)m.UrlPerfil ?? DBNull.Value),
+                new OracleParameter("p_publico", m.Publico)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_red_social, :p_red_social, :p_usuario, :p_url_perfil, :p_publico); END;", parametros);
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM pasajeros_redes_sociales WHERE id_red_social = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_pasajeros_redes_sociales.delete_red_social";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_red_social); END;", new OracleParameter("p_id_red_social", id));
             return true;
         }
     }

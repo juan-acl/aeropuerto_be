@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,22 +14,18 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> RegistrarAcceso(AccesosAreasRestringidasModel m)
         {
-            var sql = @"INSERT INTO accesos_areas_restringidas 
-                        (id_empleado, area_acceso, fecha_hora_acceso, tipo_acceso, 
-                         metodo_autenticacion, autorizado, observaciones) 
-                        VALUES (:p_emp, :p_area, SYSTIMESTAMP, :p_tipo, 
-                                :p_metodo, :p_aut, :p_obs)";
+            var sql = "pkg_accesos_areas_restringidas.insert_acceso";
 
             var parametros = new[] {
-                new OracleParameter("p_emp", (object?)m.IdEmpleado ?? DBNull.Value),
-                new OracleParameter("p_area", (object?)m.AreaAcceso ?? DBNull.Value),
-                new OracleParameter("p_tipo", m.TipoAcceso),
-                new OracleParameter("p_metodo", (object?)m.MetodoAutenticacion ?? DBNull.Value),
-                new OracleParameter("p_aut", m.Autorizado),
-                new OracleParameter("p_obs", (object?)m.Observaciones ?? DBNull.Value)
+                new OracleParameter("p_id_empleado", (object?)m.IdEmpleado ?? DBNull.Value),
+                new OracleParameter("p_area_acceso", (object?)m.AreaAcceso ?? DBNull.Value),
+                new OracleParameter("p_tipo_acceso", m.TipoAcceso),
+                new OracleParameter("p_metodo_autenticacion", (object?)m.MetodoAutenticacion ?? DBNull.Value),
+                new OracleParameter("p_autorizado", m.Autorizado),
+                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_empleado, :p_area_acceso, :p_tipo_acceso, :p_metodo_autenticacion, :p_autorizado, :p_observaciones); END;", parametros);
             return true;
         }
 
@@ -51,8 +47,8 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM accesos_areas_restringidas WHERE id_acceso = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_accesos_areas_restringidas.delete_acceso";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_acceso); END;", new OracleParameter("p_id_acceso", id));
             return true;
         }
     }

@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +56,7 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Eliminar(int id)
         {
-            var sql = "DELETE FROM pasajeros WHERE id_pasajero = :p_id";
+            var sql = "BEGIN pkg_pasajeros.delete_pasajero(:p_id); END;";
             await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
             return true;
         }

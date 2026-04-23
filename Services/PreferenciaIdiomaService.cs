@@ -1,4 +1,4 @@
-﻿using Aeropuerto.Backend.Data;
+using Aeropuerto.Backend.Data;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,17 +14,16 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Insertar(PreferenciaIdiomaModel m)
         {
-            var sql = @"INSERT INTO preferencias_idiomas (id_pasajero, idioma, nivel, preferido) 
-                        VALUES (:p_id, :p_idioma, :p_nivel, :p_pref)";
+            var sql = "pkg_preferencias_idiomas.insert_idioma";
 
             var parametros = new[] {
-                new OracleParameter("p_id", m.IdPasajero),
+                new OracleParameter("p_id_pasajero", m.IdPasajero),
                 new OracleParameter("p_idioma", m.Idioma),
                 new OracleParameter("p_nivel", m.Nivel),
-                new OracleParameter("p_pref", m.Preferido)
+                new OracleParameter("p_preferido", m.Preferido)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero, :p_idioma, :p_nivel, :p_preferido); END;", parametros);
             return true;
         }
 
@@ -37,25 +36,23 @@ namespace Aeropuerto.Backend.Services
 
         public async Task<bool> Actualizar(int id, PreferenciaIdiomaModel m)
         {
-            var sql = @"UPDATE preferencias_idiomas 
-                        SET idioma = :p_idioma, nivel = :p_nivel, preferido = :p_pref 
-                        WHERE id_preferencia_idioma = :p_id";
+            var sql = "pkg_preferencias_idiomas.update_idioma";
 
             var parametros = new[] {
+                new OracleParameter("p_id_preferencia_idioma", id),
                 new OracleParameter("p_idioma", m.Idioma),
                 new OracleParameter("p_nivel", m.Nivel),
-                new OracleParameter("p_pref", m.Preferido),
-                new OracleParameter("p_id", id)
+                new OracleParameter("p_preferido", m.Preferido)
             };
 
-            await _context.Database.ExecuteSqlRawAsync(sql, parametros);
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_preferencia_idioma, :p_idioma, :p_nivel, :p_preferido); END;", parametros);
             return true;
         }
 
         public async Task<bool> EliminarFisico(int id)
         {
-            var sql = "DELETE FROM preferencias_idiomas WHERE id_preferencia_idioma = :p_id";
-            await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+            var sql = "pkg_preferencias_idiomas.delete_idioma";
+            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_preferencia_idioma); END;", new OracleParameter("p_id_preferencia_idioma", id));
             return true;
         }
     }
