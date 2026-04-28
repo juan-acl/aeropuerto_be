@@ -9,5 +9,9 @@ namespace Aeropuerto.Backend.Interfaces
         Task<ReservasModel?> ObtenerPorCodigo(string codigo);
         Task<bool> Actualizar(int id, ReservasModel modelo);
         Task<bool> EliminarFisico(int id);
+        Task<bool> RegistrarAbordaje(EmbarqueRequest m);
+        Task<bool> RealizarCheckIn(CheckInRequest request);
+        Task<bool> RealizarCheckInMostrador(CheckInMostradorRequest request);
+        Task<bool> CrearReserva(CrearReservaRequest request);
     }
 }

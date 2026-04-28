@@ -106,5 +106,58 @@ namespace Aeropuerto.Backend.Services
             );
             return true;
         }
+
+        public async Task<bool> AsignarPuerta(AsignarPuertaRequest m)
+        {
+            var sql = "sp_asignar_puerta_embarque";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = m.IdVuelo },
+        new OracleParameter("p_id_puerta", OracleDbType.Int32) { Value = m.IdPuerta },
+        new OracleParameter("p_tipo_vuelo", OracleDbType.Varchar2) { Value = m.TipoVuelo }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_vuelo, :p_id_puerta, :p_tipo_vuelo); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> CancelarVuelo(CancelarVueloRequest m)
+        {
+            var sql = "sp_cancelar_vuelo";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = m.IdVuelo },
+        new OracleParameter("p_motivo_cancelacion", OracleDbType.Varchar2) { Value = m.MotivoCancelacion }
+    };
+
+            // Ejecutamos el bloque anónimo de PL/SQL
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_vuelo, :p_motivo_cancelacion); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> CerrarEmbarque(int idVuelo)
+        {
+            var sql = "sp_cierre_embarque";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = idVuelo }
+    };
+
+            // Ejecución del procedimiento que actualiza vuelo y pasajeros (NO_SHOW)
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_vuelo); END;",
+                parametros
+            );
+
+            return true;
+        }
     }
 }

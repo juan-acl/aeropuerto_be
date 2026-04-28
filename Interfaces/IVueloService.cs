@@ -12,5 +12,8 @@ namespace Aeropuerto.Backend.Interfaces
         Task<bool> ActualizarEstado(int id, string estado, string? motivo);
         Task<bool> ActualizarHoraReal(int id, DateTime? horaSalidaReal, DateTime? horaLlegadaReal);
         Task<bool> Eliminar(int id);
+        Task<bool> AsignarPuerta(AsignarPuertaRequest request);
+        Task<bool> CancelarVuelo(CancelarVueloRequest request);
+        Task<bool> CerrarEmbarque(int idVuelo);
     }
 }

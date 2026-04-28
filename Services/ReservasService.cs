@@ -66,5 +66,90 @@ namespace Aeropuerto.Backend.Services
             await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva); END;", new OracleParameter("p_id_reserva", id));
             return true;
         }
+
+        public async Task<bool> RegistrarAbordaje(EmbarqueRequest m)
+        {
+            // El nombre del procedimiento fuera de un paquete según tu SQL original
+            var sql = "sp_apertura_embarque";
+
+            var parametros = new[] {
+        new OracleParameter("p_codigo_reserva", OracleDbType.Varchar2) { Value = m.CodigoReserva },
+        new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
+        new OracleParameter("p_puerta_embarque", OracleDbType.Varchar2) { Value = m.PuertaEmbarque }
+    };
+
+            // Ejecutamos el SP dentro de un bloque BEGIN...END;
+            // Nota: Si el SP lanza un RAISE_APPLICATION_ERROR, Entity Framework lo capturará como una Exception
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_codigo_reserva, :p_numero_documento, :p_puerta_embarque); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> RealizarCheckIn(CheckInRequest m)
+        {
+            var sql = "sp_checkin_en_linea";
+
+            var parametros = new[] {
+        new OracleParameter("p_codigo_reserva", OracleDbType.Varchar2) { Value = m.CodigoReserva },
+        new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
+        new OracleParameter("p_numero_asiento", OracleDbType.Varchar2) { Value = m.NumeroAsiento }
+    };
+
+            // Ejecución del procedimiento
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_codigo_reserva, :p_numero_documento, :p_numero_asiento); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> RealizarCheckInMostrador(CheckInMostradorRequest m)
+        {
+            var sql = "sp_checkin_mostrador";
+
+            var parametros = new[] {
+        new OracleParameter("p_codigo_reserva", OracleDbType.Varchar2) { Value = m.CodigoReserva },
+        new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
+        new OracleParameter("p_numero_asiento", OracleDbType.Varchar2) { Value = m.NumeroAsiento },
+        new OracleParameter("p_equipaje_facturado", OracleDbType.Decimal) { Value = m.EquipajeFacturado },
+        new OracleParameter("p_equipaje_mano", OracleDbType.Decimal) { Value = m.EquipajeMano },
+        new OracleParameter("p_tipo_vuelo", OracleDbType.Varchar2) { Value = m.TipoVuelo },
+        new OracleParameter("p_visa_valida", OracleDbType.Int32) { Value = m.VisaValida }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_codigo_reserva, :p_numero_documento, :p_numero_asiento, :p_equipaje_facturado, :p_equipaje_mano, :p_tipo_vuelo, :p_visa_valida); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> CrearReserva(CrearReservaRequest m)
+        {
+            var sql = "sp_crear_reserva";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = m.IdVuelo },
+        new OracleParameter("p_id_pasajero", OracleDbType.Int32) { Value = m.IdPasajero },
+        new OracleParameter("p_clase_servicio", OracleDbType.Varchar2) { Value = m.ClaseServicio },
+        new OracleParameter("p_numero_asiento", OracleDbType.Varchar2) { Value = m.NumeroAsiento },
+        new OracleParameter("p_tipo_tarifa", OracleDbType.Varchar2) { Value = m.TipoTarifa },
+        new OracleParameter("p_precio", OracleDbType.Decimal) { Value = m.Precio },
+        new OracleParameter("p_moneda", OracleDbType.Varchar2) { Value = m.Moneda }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_vuelo, :p_id_pasajero, :p_clase_servicio, :p_numero_asiento, :p_tipo_tarifa, :p_precio, :p_moneda); END;",
+                parametros
+            );
+
+            return true;
+        }
+
     }
 }

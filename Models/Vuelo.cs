@@ -72,4 +72,5 @@ namespace Aeropuerto.Backend.Models
         [StringLength(1000)]
         public string? ObservacionesOperativas { get; set; }
     }
+
 }

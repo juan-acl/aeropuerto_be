@@ -130,5 +130,68 @@ namespace Aeropuerto.Backend.Controllers
                 return StatusCode(500, $"Error al eliminar vuelo: {ex.Message}");
             }
         }
+
+        [HttpPost("asignar-puerta")]
+        public async Task<IActionResult> AsignarPuerta([FromBody] AsignarPuertaRequest modelo)
+        {
+            try
+            {
+                await _service.AsignarPuerta(modelo);
+                return Ok(new { mensaje = $"Puerta {modelo.IdPuerta} asignada con éxito al vuelo {modelo.IdVuelo}." });
+            }
+            catch (Exception ex)
+            {
+                // Captura errores de negocio de Oracle (Ej: -37502 traslape de horario)
+                return BadRequest(new
+                {
+                    error = "No se pudo asignar la puerta",
+                    detalle = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("cancelar")]
+        public async Task<IActionResult> CancelarVuelo([FromBody] CancelarVueloRequest modelo)
+        {
+            if (string.IsNullOrEmpty(modelo.MotivoCancelacion))
+                return BadRequest(new { mensaje = "El motivo de cancelación es obligatorio." });
+
+            try
+            {
+                await _service.CancelarVuelo(modelo);
+                return Ok(new { mensaje = $"El vuelo {modelo.IdVuelo} ha sido cancelado exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                // Captura errores como el -37401 (vuelo ya finalizado) o -37402 (no existe)
+                return BadRequest(new
+                {
+                    error = "No se pudo procesar la cancelación",
+                    detalle = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("{id}/cerrar-embarque")]
+        public async Task<IActionResult> CerrarEmbarque(int id)
+        {
+            try
+            {
+                await _service.CerrarEmbarque(id);
+                return Ok(new
+                {
+                    mensaje = $"Embarque cerrado para el vuelo {id}. Los pasajeros restantes se marcaron como NO_SHOW."
+                });
+            }
+            catch (Exception ex)
+            {
+                // Captura errores como el -39101 (Cierre antes de los 15 min permitidos)
+                return BadRequest(new
+                {
+                    error = "No se pudo cerrar el embarque",
+                    detalle = ex.Message
+                });
+            }
+        }
     }
 }
