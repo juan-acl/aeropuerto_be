@@ -193,5 +193,53 @@ namespace Aeropuerto.Backend.Controllers
                 });
             }
         }
+
+        [HttpPost("crear-vuelo")]
+        public async Task<IActionResult> CrearVuelo([FromBody] CrearVueloRequest modelo)
+        {
+            if (modelo == null) return BadRequest("Los datos del vuelo son obligatorios.");
+
+            try
+            {
+                await _service.CrearVuelo(modelo);
+                return Ok(new { mensaje = "Vuelo creado correctamente en estado PROGRAMADO." });
+            }
+            catch (Exception ex)
+            {
+                // Captura errores específicos de Oracle:
+                // -37302: Avión ocupado (Traslape)
+                // -37303: Hora llegada < Hora salida
+                // -37306: Avión no pertenece a la aerolínea
+                return BadRequest(new
+                {
+                    error = "Error al programar el vuelo",
+                    detalle = ex.Message
+                });
+            }
+        }
+
+        [HttpPut("reprogramar")]
+        public async Task<IActionResult> ReprogramarVuelo([FromBody] ReprogramarVueloRequest modelo)
+        {
+            if (modelo == null) return BadRequest("Datos de reprogramación insuficientes.");
+
+            try
+            {
+                await _service.ReprogramarVuelo(modelo);
+                return Ok(new { mensaje = $"El vuelo {modelo.IdVuelo} ha sido reprogramado con éxito." });
+            }
+            catch (Exception ex)
+            {
+                // Errores de negocio de Oracle:
+                // -37601: Vuelo ya cancelado o aterrizado
+                // -37602: Fecha pasada
+                // -37603: Hora llegada <= Hora salida
+                return BadRequest(new
+                {
+                    error = "No se pudo reprogramar el vuelo",
+                    detalle = ex.Message
+                });
+            }
+        }
     }
 }

@@ -71,5 +71,30 @@ namespace Aeropuerto.Backend.Controllers
                 return StatusCode(500, $"Error al listar: {ex.Message}");
             }
         }
+
+
+            [HttpPost("registrar")]
+            public async Task<IActionResult> Registrar([FromBody] RegistrarPasajeroRequest modelo)
+            {
+                if (modelo == null) return BadRequest("Datos del pasajero requeridos.");
+
+                try
+                {
+                    await _service.RegistrarPasajero(modelo);
+                    return Ok(new { mensaje = $"Pasajero {modelo.Nombre} {modelo.Apellidos} registrado con éxito." });
+                }
+                catch (Exception ex)
+                {
+                    // Captura errores de Oracle:
+                    // -40302: Documento duplicado
+                    // -40303: Email inválido (Regexp)
+                    // -40304: Fecha futura
+                    return BadRequest(new
+                    {
+                        error = "No se pudo registrar al pasajero",
+                        detalle = ex.Message
+                    });
+                }
+            }
+        }
     }
-}

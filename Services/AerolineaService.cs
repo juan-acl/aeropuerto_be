@@ -79,6 +79,48 @@ namespace Aeropuerto.Backend.Services
         {
             return await _context.Aerolineas.FirstOrDefaultAsync(x => x.IdAerolinea == id);
         }
+
+        public async Task<bool> RegistrarAerolinea(RegistrarAerolineaRequest m)
+        {
+            var sql = "sp_registrar_aerolinea";
+
+            var parametros = new[] {
+                new OracleParameter("p_nombre", OracleDbType.Varchar2) { Value = m.Nombre },
+                new OracleParameter("p_codigo_iata", OracleDbType.Varchar2) { Value = m.CodigoIata },
+                new OracleParameter("p_codigo_oaci", OracleDbType.Varchar2) { Value = m.CodigoOaci },
+                new OracleParameter("p_pais_origen", OracleDbType.Varchar2) { Value = m.PaisOrigen },
+                new OracleParameter("p_contacto", OracleDbType.Varchar2) { Value = m.Contacto }
+            };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_nombre, :p_codigo_iata, :p_codigo_oaci, :p_pais_origen, :p_contacto); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> RegistrarAeronave(RegistrarAeronaveRequest m)
+        {
+            var sql = "sp_registrar_aeronave";
+
+            var parametros = new[] {
+                new OracleParameter("p_matricula", OracleDbType.Varchar2) { Value = m.Matricula },
+                new OracleParameter("p_codigo_icao_tipo", OracleDbType.Char) { Value = m.CodigoIcaoTipo },
+                new OracleParameter("p_id_aerolinea", OracleDbType.Int32) { Value = m.IdAerolinea },
+                new OracleParameter("p_nombre_aeronave", OracleDbType.Varchar2) { Value = (object)m.NombreAeronave ?? DBNull.Value },
+                new OracleParameter("p_configuracion", OracleDbType.Clob) { Value = m.Configuracion },
+                new OracleParameter("p_numero_motores", OracleDbType.Int32) { Value = m.NumeroMotores },
+                new OracleParameter("p_anio_fabricacion", OracleDbType.Int32) { Value = m.AnioFabricacion }
+            };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_matricula, :p_codigo_icao_tipo, :p_id_aerolinea, :p_nombre_aeronave, :p_configuracion, :p_numero_motores, :p_anio_fabricacion); END;",
+                parametros
+            );
+
+            return true;
+        }
     }
 }
 

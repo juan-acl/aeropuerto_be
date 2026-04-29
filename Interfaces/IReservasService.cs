@@ -13,5 +13,6 @@ namespace Aeropuerto.Backend.Interfaces
         Task<bool> RealizarCheckIn(CheckInRequest request);
         Task<bool> RealizarCheckInMostrador(CheckInMostradorRequest request);
         Task<bool> CrearReserva(CrearReservaRequest request);
+        Task<bool> PagarBoleto(PagoBoletoRequest request);
     }
 }

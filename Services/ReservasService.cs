@@ -73,10 +73,10 @@ namespace Aeropuerto.Backend.Services
             var sql = "sp_apertura_embarque";
 
             var parametros = new[] {
-        new OracleParameter("p_codigo_reserva", OracleDbType.Varchar2) { Value = m.CodigoReserva },
-        new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
-        new OracleParameter("p_puerta_embarque", OracleDbType.Varchar2) { Value = m.PuertaEmbarque }
-    };
+                new OracleParameter("p_codigo_reserva", OracleDbType.Varchar2) { Value = m.CodigoReserva },
+                new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
+                new OracleParameter("p_puerta_embarque", OracleDbType.Varchar2) { Value = m.PuertaEmbarque }
+            };
 
             // Ejecutamos el SP dentro de un bloque BEGIN...END;
             // Nota: Si el SP lanza un RAISE_APPLICATION_ERROR, Entity Framework lo capturará como una Exception
@@ -145,6 +145,27 @@ namespace Aeropuerto.Backend.Services
 
             await _context.Database.ExecuteSqlRawAsync(
                 $"BEGIN {sql}(:p_id_vuelo, :p_id_pasajero, :p_clase_servicio, :p_numero_asiento, :p_tipo_tarifa, :p_precio, :p_moneda); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> PagarBoleto(PagoBoletoRequest m)
+        {
+            var sql = "sp_pagar_boleto";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_reserva", OracleDbType.Int32) { Value = m.IdReserva },
+        new OracleParameter("p_id_metodo_pago", OracleDbType.Int32) { Value = m.IdMetodoPago },
+        new OracleParameter("p_monto", OracleDbType.Decimal) { Value = m.Monto },
+        new OracleParameter("p_moneda", OracleDbType.Varchar2) { Value = m.Moneda },
+        new OracleParameter("p_codigo_transaccion", OracleDbType.Varchar2) { Value = m.CodigoTransaccion },
+        new OracleParameter("p_comprobante", OracleDbType.Blob) { Value = m.Comprobante }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_reserva, :p_id_metodo_pago, :p_monto, :p_moneda, :p_codigo_transaccion, :p_comprobante); END;",
                 parametros
             );
 

@@ -94,5 +94,52 @@ namespace Aeropuerto.Backend.Controllers
                 return StatusCode(500, $"Error al eliminar aerolínea: {ex.Message}");
             }
         }
+
+        [HttpPost("registrar")]
+        public async Task<IActionResult> Registrar([FromBody] RegistrarAerolineaRequest modelo)
+        {
+            if (modelo == null) return BadRequest("Datos de aerolínea requeridos.");
+
+            try
+            {
+                await _service.RegistrarAerolinea(modelo);
+                return Ok(new { mensaje = $"Aerolínea '{modelo.Nombre}' registrada exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                // Manejo de errores específicos del SP:
+                // -39502: Longitud IATA incorrecta
+                // -39504: IATA ya existe
+                // -39505: OACI ya existe
+                return BadRequest(new
+                {
+                    error = "Error al registrar aerolínea",
+                    detalle = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("registrar_aeronave")]
+        public async Task<IActionResult> Registrar([FromBody] RegistrarAeronaveRequest modelo)
+        {
+            if (modelo == null) return BadRequest("Datos de aeronave requeridos.");
+
+            try
+            {
+                await _service.RegistrarAeronave(modelo);
+                return Ok(new { mensaje = $"Aeronave {modelo.Matricula} registrada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                // Errores específicos del SP:
+                // -40002: Matrícula duplicada
+                // -40003: Suma de asientos JSON no coincide con capacidad máxima
+                return BadRequest(new
+                {
+                    error = "Error al registrar la aeronave",
+                    detalle = ex.Message
+                });
+            }
+        }
     }
 }

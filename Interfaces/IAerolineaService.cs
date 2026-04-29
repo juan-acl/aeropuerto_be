@@ -16,6 +16,10 @@ namespace Aeropuerto.Backend.Interfaces
 
         // Opcional: Buscar por ID específico
         Task<AerolineaModel?> ObtenerPorId(int id);
+
+        Task<bool> RegistrarAerolinea(RegistrarAerolineaRequest request);
+
+        Task<bool> RegistrarAeronave(RegistrarAeronaveRequest request);
     }
 }
 

@@ -65,5 +65,26 @@ namespace Aeropuerto.Backend.Services
         {
             return await _context.Pasajeros.ToListAsync();
         }
+
+        public async Task<bool> RegistrarPasajero(RegistrarPasajeroRequest m)
+        {
+            var sql = "sp_registrar_pasajero";
+
+            var parametros = new[] {
+        new OracleParameter("p_nombre", OracleDbType.Varchar2) { Value = m.Nombre },
+        new OracleParameter("p_apellidos", OracleDbType.Varchar2) { Value = m.Apellidos },
+        new OracleParameter("p_numero_documento", OracleDbType.Varchar2) { Value = m.NumeroDocumento },
+        new OracleParameter("p_nacionalidad", OracleDbType.Varchar2) { Value = m.Nacionalidad },
+        new OracleParameter("p_fecha_nacimiento", OracleDbType.Date) { Value = m.FechaNacimiento },
+        new OracleParameter("p_email", OracleDbType.Varchar2) { Value = (object)m.Email ?? DBNull.Value }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_nombre, :p_apellidos, :p_numero_documento, :p_nacionalidad, :p_fecha_nacimiento, :p_email); END;",
+                parametros
+            );
+
+            return true;
+        }
     }
 }

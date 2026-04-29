@@ -148,12 +148,52 @@ namespace Aeropuerto.Backend.Services
             var sql = "sp_cierre_embarque";
 
             var parametros = new[] {
-        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = idVuelo }
-    };
+                new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = idVuelo }
+                };
 
             // Ejecución del procedimiento que actualiza vuelo y pasajeros (NO_SHOW)
             await _context.Database.ExecuteSqlRawAsync(
                 $"BEGIN {sql}(:p_id_vuelo); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> CrearVuelo(CrearVueloRequest m)
+        {
+            var sql = "sp_crear_vuelo";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_programa", OracleDbType.Int32) { Value = m.IdPrograma },
+        new OracleParameter("p_fecha_vuelo", OracleDbType.Date) { Value = m.FechaVuelo },
+        new OracleParameter("p_hora_salida", OracleDbType.TimeStamp) { Value = m.HoraSalida },
+        new OracleParameter("p_hora_llegada", OracleDbType.TimeStamp) { Value = m.HoraLlegada },
+        new OracleParameter("p_id_modelo_avion", OracleDbType.Int32) { Value = m.IdModeloAvion },
+        new OracleParameter("p_matricula_avion", OracleDbType.Varchar2) { Value = m.MatriculaAvion }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_programa, :p_fecha_vuelo, :p_hora_salida, :p_hora_llegada, :p_id_modelo_avion, :p_matricula_avion); END;",
+                parametros
+            );
+
+            return true;
+        }
+
+        public async Task<bool> ReprogramarVuelo(ReprogramarVueloRequest m)
+        {
+            var sql = "sp_reprogramar_vuelo";
+
+            var parametros = new[] {
+        new OracleParameter("p_id_vuelo", OracleDbType.Int32) { Value = m.IdVuelo },
+        new OracleParameter("p_nueva_fecha", OracleDbType.Date) { Value = m.NuevaFecha },
+        new OracleParameter("p_nueva_hora_salida", OracleDbType.TimeStamp) { Value = m.NuevaHoraSalida },
+        new OracleParameter("p_nueva_hora_llegada", OracleDbType.TimeStamp) { Value = m.NuevaHoraLlegada }
+    };
+
+            await _context.Database.ExecuteSqlRawAsync(
+                $"BEGIN {sql}(:p_id_vuelo, :p_nueva_fecha, :p_nueva_hora_salida, :p_nueva_hora_llegada); END;",
                 parametros
             );
 

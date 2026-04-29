@@ -15,5 +15,7 @@ namespace Aeropuerto.Backend.Interfaces
         Task<bool> AsignarPuerta(AsignarPuertaRequest request);
         Task<bool> CancelarVuelo(CancelarVueloRequest request);
         Task<bool> CerrarEmbarque(int idVuelo);
+        Task<bool> CrearVuelo(CrearVueloRequest request);
+        Task<bool> ReprogramarVuelo(ReprogramarVueloRequest request);
     }
 }

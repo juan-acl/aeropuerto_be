@@ -8,5 +8,7 @@ namespace Aeropuerto.Backend.Interfaces
         Task<bool> ActualizarContacto(int id, string telefono, string email, string direccion);
         Task<bool> Eliminar(int id);
         Task<List<PasajeroModel>> ListarTodo();
+
+        Task<bool> RegistrarPasajero(RegistrarPasajeroRequest request);
     }
 }

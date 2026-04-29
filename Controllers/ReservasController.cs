@@ -154,5 +154,28 @@ namespace Aeropuerto.Backend.Controllers
                 });
             }
         }
+
+        [HttpPost("pagar")]
+        public async Task<IActionResult> PagarBoleto([FromBody] PagoBoletoRequest modelo)
+        {
+            if (modelo == null) return BadRequest("Datos de pago incompletos.");
+
+            try
+            {
+                await _service.PagarBoleto(modelo);
+                return Ok(new { mensaje = "Pago procesado con éxito. Su reserva ha sido CONFIRMADA." });
+            }
+            catch (Exception ex)
+            {
+                // Captura errores:
+                // -38001: La reserva no está PENDIENTE
+                // -38002: La reserva no existe
+                return BadRequest(new
+                {
+                    error = "Error al procesar el pago",
+                    detalle = ex.Message
+                });
+            }
+        }
     }
 }
