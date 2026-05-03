@@ -6,5 +6,8 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<SeguimientoCarga>> ListarTodo();
         Task<bool> Insertar(SeguimientoCarga modelo);
+        Task<SeguimientoCarga?> ObtenerPorId(int id);
+        Task<bool> Actualizar(SeguimientoCarga modelo);
+        Task<bool> Eliminar(int id);
     }
 }

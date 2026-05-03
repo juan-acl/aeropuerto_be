@@ -6,5 +6,8 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<OrdenDetalle>> ListarTodo();
         Task<bool> Insertar(OrdenDetalle modelo);
+        Task<OrdenDetalle?> ObtenerPorId(int id);
+        Task<bool> Actualizar(OrdenDetalle modelo);
+        Task<bool> Eliminar(int id);
     }
 }

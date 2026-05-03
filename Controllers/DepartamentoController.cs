@@ -32,5 +32,14 @@ namespace Aeropuerto.Backend.Controllers
                 return Ok(lista);
             } catch (Exception ex) { return StatusCode(500, ex.Message); }
         }
+        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id) => Ok(await _service.ObtenerPorId(id));
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Departamento m) => Ok(await _service.Actualizar(m));
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id) => Ok(await _service.Eliminar(id));
     }
 }

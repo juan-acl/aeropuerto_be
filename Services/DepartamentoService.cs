@@ -3,65 +3,59 @@ using Aeropuerto.Backend.Models;
 using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Oracle.ManagedDataAccess.Client;
-using System.Data;
 
 namespace Aeropuerto.Backend.Services
 {
     public class DepartamentoService : IDepartamentoService
     {
         private readonly DBContext _context;
+        public DepartamentoService(DBContext context) => _context = context;
 
-        public DepartamentoService(DBContext context)
-        {
-            _context = context;
-        }
+        public async Task<List<Departamento>> ListarTodo() => await _context.DEPARTAMENTOS.ToListAsync();
+        public async Task<Departamento?> ObtenerPorId(int id) => await _context.DEPARTAMENTOS.FindAsync(id);
 
-        public async Task<bool> Insertar(Departamento modelo)
+        public async Task<bool> Insertar(Departamento m)
         {
             try
             {
-                // 1. Definimos la llamada al procedimiento dentro del paquete
-                // Nota: Asegúrate que el procedimiento se llame PRC_INSERTAR_DEPARTAMENTO
-                string sql = "BEGIN PKG_DEPARTAMENTOS.PRC_INSERTAR_DEPARTAMENTO(:nom, :desc, :ubica, :presu, :gerente, :activo); END;";
-
-                // 2. Mapeamos los parámetros con los tipos de datos de Oracle
-                var parametros = new OracleParameter[]
-                {
-                    new OracleParameter("nom", OracleDbType.Varchar2) { Value = modelo.Nombre },
-                    new OracleParameter("desc", OracleDbType.Varchar2) { Value = modelo.Descripcion },
-                    new OracleParameter("ubica", OracleDbType.Varchar2) { Value = modelo.Ubicacion ?? (object)DBNull.Value },
-                    new OracleParameter("presu", OracleDbType.Decimal) { Value = modelo.PresupuestoAnual ?? (object)DBNull.Value },
-                    new OracleParameter("gerente", OracleDbType.Int32) { Value = modelo.GerenteId ?? (object)DBNull.Value },
-                    new OracleParameter("activo", OracleDbType.Int32) { Value = modelo.Activo }
-                };
-
-                // 3. Ejecutamos el SP
-                Console.WriteLine("--> Intentando llamar al SP: PKG_DEPARTAMENTOS.PRC_INSERTAR_DEPARTAMENTO");
-                await _context.Database.ExecuteSqlRawAsync(sql, parametros);
-                
-                Console.WriteLine("--> ¡Éxito! Registro insertado correctamente.");
+                string sql = "BEGIN pkg_departamentos.insert_departamento(:p1, :p2, :p3, :p4, :p5, :p6, :p7); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, CrearParametros(m));
                 return true;
             }
-            catch (Exception ex)
-            {
-                // Esto imprimirá el error exacto de Oracle en tu terminal de VS Code
-                Console.WriteLine($"--> ERROR EN EL SP: {ex.Message}");
-                return false;
-            }
+            catch (Exception ex) { Console.WriteLine($"ERROR INSERT DEPARTAMENTO: {ex.Message}"); return false; }
         }
 
-        public async Task<List<Departamento>> ListarTodo()
+        public async Task<bool> Actualizar(Departamento m)
         {
-            try 
+            try
             {
-                // Usamos EF Core para leer la tabla y mostrarla en el GET de Swagger
-                return await _context.DEPARTAMENTOS.ToListAsync();
+                string sql = "BEGIN pkg_departamentos.update_departamento(:p1, :p2, :p3, :p4, :p5, :p6, :p7); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, CrearParametros(m));
+                return true;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"--> ERROR AL LISTAR: {ex.Message}");
-                return new List<Departamento>();
-            }
+            catch (Exception ex) { Console.WriteLine($"ERROR UPDATE DEPARTAMENTO: {ex.Message}"); return false; }
         }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_departamentos.delete_departamento(:p1); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p1", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR DELETE DEPARTAMENTO: {ex.Message}"); return false; }
+        }
+
+        private OracleParameter[] CrearParametros(Departamento m) => new OracleParameter[]
+        {
+            new OracleParameter("p1", m.id_departamento),
+            new OracleParameter("p2", m.nombre_departamento),
+            new OracleParameter("p3", m.descripcion),
+            new OracleParameter("p4", m.ubicacion),
+            new OracleParameter("p5", m.presupuesto_anual),
+            new OracleParameter("p6", m.gerente_id),
+            new OracleParameter("p7", m.activo)
+        };
     }
 }

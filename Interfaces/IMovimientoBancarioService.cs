@@ -6,5 +6,8 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<MovimientoBancario>> ListarTodo();
         Task<bool> Insertar(MovimientoBancario modelo);
+        Task<MovimientoBancario?> ObtenerPorId(int id);
+        Task<bool> Actualizar(MovimientoBancario modelo);
+        Task<bool> Eliminar(int id);
     }
 }

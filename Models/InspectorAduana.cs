@@ -1,14 +1,34 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
 {
-    public class InspectorAduana
+    [Table("INSPECTORES_ADUANAS")]
+    public class InspectorAduanas
     {
         [Key]
-        public int IdInspector { get; set; }
-        public string Nombre { get; set; } = null!;
-        public string Credencial { get; set; } = null!;
-        public string Turno { get; set; } = null!;
-        public int Activo { get; set; } = 1;
+        [Column("ID_INSPECTOR")]
+        public int id_inspector { get; set; }
+
+        [Column("ID_EMPLEADO")]
+        public int? id_empleado { get; set; }
+
+        [Column("NUMERO_LICENCIA")]
+        public string? numero_licencia { get; set; }
+
+        [Column("NIVEL_AUTORIZACION")]
+        public int? nivel_autorizacion { get; set; }
+
+        [Column("FECHA_CERTIFICACION")]
+        public DateTime? fecha_certificacion { get; set; }
+
+        [Column("FECHA_VENCIMIENTO_CERTIFICACION")]
+        public DateTime? fecha_vencimiento_certificacion { get; set; }
+
+        [Column("ESPECIALIDAD")]
+        public string? especialidad { get; set; }
+
+        [Column("ACTIVO")]
+        public int? activo { get; set; }
     }
 }

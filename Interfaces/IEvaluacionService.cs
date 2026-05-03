@@ -6,5 +6,8 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<EvaluacionDesempeno>> ListarTodo();
         Task<bool> Insertar(EvaluacionDesempeno modelo);
+        Task<EvaluacionDesempeno?> ObtenerPorId(int id);
+        Task<bool> Actualizar(EvaluacionDesempeno modelo);
+        Task<bool> Eliminar(int id);
     }
 }

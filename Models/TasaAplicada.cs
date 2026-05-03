@@ -1,16 +1,34 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
 {
+    [Table("TASAS_APLICADAS")]
     public class TasaAplicada
     {
         [Key]
-        public int IdAplicacion { get; set; }
-        public int IdTasa { get; set; }
-        public int IdPasajero { get; set; }
-        public int IdVuelo { get; set; }
-        public DateTime FechaCobro { get; set; }
-        public decimal MontoCobrado { get; set; }
-        public string Estado { get; set; } = "PAGADO";
+        [Column("ID_APLICACION")]
+        public int id_aplicacion { get; set; }
+
+        [Column("ID_TASA")]
+        public int? id_tasa { get; set; }
+
+        [Column("ID_VUELO")]
+        public int? id_vuelo { get; set; }
+
+        [Column("ID_RESERVA")]
+        public int? id_reserva { get; set; }
+
+        [Column("FECHA_APLICACION")]
+        public DateTime? fecha_aplicacion { get; set; }
+
+        [Column("MONTO_APLICADO")]
+        public decimal? monto_aplicado { get; set; }
+
+        [Column("FACTURADO")]
+        public int? facturado { get; set; }
+
+        [Column("FECHA_FACTURA")]
+        public DateTime? fecha_factura { get; set; }
     }
 }

@@ -15,6 +15,20 @@ namespace Aeropuerto.Backend.Controllers
         public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Ingreso m) => Ok(await _service.Insertar(m));
+        public async Task<IActionResult> Post([FromBody] Ingreso m) 
+        {
+            if (m == null) return BadRequest("Datos de ingreso no válidos.");
+            
+            var res = await _service.Insertar(m);
+            return res ? Ok(new { m = "Ingreso registrado" }) : BadRequest("No se pudo registrar el ingreso.");
+        }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id) => Ok(await _service.ObtenerPorId(id));
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] Ingreso m) => Ok(await _service.Actualizar(m));
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id) => Ok(await _service.Eliminar(id));
     }
 }

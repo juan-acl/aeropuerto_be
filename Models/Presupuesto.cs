@@ -1,17 +1,40 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
 {
+    [Table("PRESUPUESTOS")]
     public class Presupuesto
     {
         [Key]
-        public int IdPresupuesto { get; set; }
-        public int IdDepartamento { get; set; }
-        public decimal MontoAsignado { get; set; }
-        public decimal MontoEjecutado { get; set; } = 0;
-        public int AnioPresupuestario { get; set; }
-        public DateTime FechaAprobacion { get; set; }
-        public string Estado { get; set; } = "PENDIENTE"; // PENDIENTE, APROBADO, AGOTADO
-        public string? Notas { get; set; }
+        [Column("ID_PRESUPUESTO")]
+        public int id_presupuesto { get; set; }
+
+        [Column("ANIO_FISCAL")]
+        public int anio_fiscal { get; set; }
+
+        [Column("MES")]
+        public int mes { get; set; }
+
+        [Column("CONCEPTO")]
+        public string? concepto { get; set; }
+
+        [Column("ID_DEPARTAMENTO")]
+        public int? id_departamento { get; set; }
+
+        [Column("MONTO_ASIGNADO")]
+        public decimal? monto_asignado { get; set; }
+
+        [Column("MONTO_EJECUTADO")]
+        public decimal? monto_ejecutado { get; set; }
+
+        [Column("TIPO_GASTO")]
+        public string? tipo_gasto { get; set; } // OPERATIVO, INVERSION, MANTENIMIENTO, PERSONAL
+
+        [Column("OBSERVACIONES")]
+        public string? observaciones { get; set; }
+
+        [Column("FECHA_ACTUALIZACION")]
+        public DateTime? fecha_actualizacion { get; set; }
     }
 }

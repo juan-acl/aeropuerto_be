@@ -6,5 +6,8 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<UniformeEquipamiento>> ListarTodo();
         Task<bool> Insertar(UniformeEquipamiento modelo);
+        Task<UniformeEquipamiento?> ObtenerPorId(int id);
+        Task<bool> Actualizar(UniformeEquipamiento modelo);
+        Task<bool> Eliminar(int id);
     }
 }

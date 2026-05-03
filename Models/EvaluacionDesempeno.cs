@@ -1,21 +1,46 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
 {
+    [Table("EVALUACIONES_DESEMPENO")]
     public class EvaluacionDesempeno
     {
         [Key]
-        public int IdEvaluacion { get; set; }
-        public int IdEmpleado { get; set; }
-        public DateTime FechaEvaluacion { get; set; }
-        public int EvaluadorId { get; set; }
-        public string PeriodoEvaluado { get; set; } = null!;
-        public decimal PuntuacionTotal { get; set; }
-        public decimal PuntuacionProductividad { get; set; }
-        public decimal PuntuacionCalidad { get; set; }
-        public decimal PuntuacionAsistencia { get; set; }
-        public decimal PuntuacionTrabajoEquipo { get; set; }
-        public string Comentarios { get; set; } = null!;
-        public string MetasFuturas { get; set; } = null!;
+        [Column("ID_EVALUACION")]
+        public int id_evaluacion { get; set; }
+
+        [Column("ID_EMPLEADO")]
+        public int? id_empleado { get; set; }
+
+        [Column("FECHA_EVALUACION")]
+        public DateTime? fecha_evaluacion { get; set; }
+
+        [Column("EVALUADOR_ID")]
+        public int? evaluador_id { get; set; }
+
+        [Column("PERIODO_EVALUADO")]
+        public string? periodo_evaluado { get; set; }
+
+        [Column("PUNTUACION_TOTAL")]
+        public decimal? puntuacion_total { get; set; }
+
+        [Column("PUNTUACION_PRODUCTIVIDAD")]
+        public decimal? puntuacion_productividad { get; set; }
+
+        [Column("PUNTUACION_CALIDAD")]
+        public decimal? puntuacion_calidad { get; set; }
+
+        [Column("PUNTUACION_ASISTENCIA")]
+        public decimal? puntuacion_asistencia { get; set; }
+
+        [Column("PUNTUACION_TRABAJO_EQUIPO")]
+        public decimal? puntuacion_trabajo_equipo { get; set; }
+
+        [Column("COMENTARIOS")]
+        public string? comentarios { get; set; }
+
+        [Column("METAS_FUTURAS")]
+        public string? metas_futuras { get; set; }
     }
 }

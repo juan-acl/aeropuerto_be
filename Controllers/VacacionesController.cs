@@ -15,6 +15,14 @@ namespace Aeropuerto.Backend.Controllers
         public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] VacacionesPermiso m) => Ok(await _service.Insertar(m));
+        public async Task<IActionResult> Post([FromBody] VacacionPermiso m) => Ok(await _service.Insertar(m));
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id) => Ok(await _service.ObtenerPorId(id));
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] VacacionPermiso m) => Ok(await _service.Actualizar(m));
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id) => Ok(await _service.Eliminar(id));
     }
 }

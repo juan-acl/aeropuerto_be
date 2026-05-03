@@ -6,5 +6,9 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<Asistencia>> ListarTodo();
         Task<bool> Insertar(Asistencia modelo);
+        Task<Asistencia?> ObtenerPorId(int id);
+        Task<bool> Actualizar(Asistencia modelo);
+        Task<bool> Eliminar(int id);
+ 
     }
 }

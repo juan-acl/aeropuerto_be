@@ -12,27 +12,53 @@ namespace Aeropuerto.Backend.Services
         public GastoService(DBContext context) => _context = context;
 
         public async Task<List<Gasto>> ListarTodo() => await _context.GASTOS.ToListAsync();
+        public async Task<Gasto?> ObtenerPorId(int id) => await _context.GASTOS.FindAsync(id);
 
         public async Task<bool> Insertar(Gasto m)
         {
             try
             {
-                string sql = "BEGIN pkg_gastos.insert_gasto(:p_fec, :p_desc, :p_monto, :p_cat, :p_cta, :p_pres); END;";
-                var p = new OracleParameter[] {
-                    new OracleParameter("p_fec", m.Fecha),
-                    new OracleParameter("p_desc", m.Descripcion),
-                    new OracleParameter("p_monto", m.Monto),
-                    new OracleParameter("p_cat", m.Categoria),
-                    new OracleParameter("p_cta", m.IdCuentaContable),
-                    new OracleParameter("p_pres", m.IdPresupuesto ?? (object)DBNull.Value)
-                };
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                string sql = "BEGIN pkg_gastos.insert_gasto(:p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, CrearParametros(m));
                 return true;
             }
-            catch (Exception ex) {
-                Console.WriteLine($"ERROR GASTO: {ex.Message}");
-                return false;
-            }
+            catch (Exception ex) { Console.WriteLine($"ERROR INSERT GASTO: {ex.Message}"); return false; }
         }
+
+        public async Task<bool> Actualizar(Gasto m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_gastos.update_gasto(:p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, CrearParametros(m));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR UPDATE GASTO: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_gastos.delete_gasto(:p1); END;";
+                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p1", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR DELETE GASTO: {ex.Message}"); return false; }
+        }
+
+        private OracleParameter[] CrearParametros(Gasto m) => new OracleParameter[]
+        {
+            new OracleParameter("p1",  m.id_gasto),
+            new OracleParameter("p2",  m.fecha),
+            new OracleParameter("p3",  m.concepto),
+            new OracleParameter("p4",  m.tipo_gasto),
+            new OracleParameter("p5",  m.id_departamento),
+            new OracleParameter("p6",  m.proveedor),
+            new OracleParameter("p7",  m.monto),
+            new OracleParameter("p8",  m.moneda),
+            new OracleParameter("p9",  m.factura),
+            new OracleParameter("p10", m.autorizado_por)
+        };
     }
 }

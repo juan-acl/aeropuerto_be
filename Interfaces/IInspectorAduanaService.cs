@@ -4,7 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IInspectorAduanaService
     {
-        Task<List<InspectorAduana>> ListarTodo();
-        Task<bool> Insertar(InspectorAduana modelo);
+        Task<List<InspectorAduanas>> ListarTodo();
+        Task<bool> Insertar(InspectorAduanas modelo);
+        Task<InspectorAduanas?> ObtenerPorId(int id);
+        Task<bool> Actualizar(InspectorAduanas modelo);
+        Task<bool> Eliminar(int id);
     }
 }

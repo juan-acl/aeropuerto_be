@@ -14,7 +14,7 @@ namespace Aeropuerto.Backend.Data
         public DbSet<Empleado> EMPLEADOS { get; set; } = null!;
         public DbSet<PuestoTrabajo> PUESTOS_TRABAJO { get; set; } = null!;
         public DbSet<Asistencia> ASISTENCIAS { get; set; } = null!;
-        public DbSet<VacacionesPermiso> VACACIONES_PERMISOS { get; set; } = null!;
+        public DbSet<VacacionPermiso> VACACIONES_PERMISOS { get; set; } = null!;
         public DbSet<EvaluacionDesempeno> EVALUACIONES_DESEMPENO { get; set; } = null!;
         public DbSet<Capacitacion> CAPACITACIONES { get; set; } = null!;
         public DbSet<EmpleadoCapacitacion> EMPLEADOS_CAPACITACION { get; set; } = null!;
@@ -22,13 +22,13 @@ namespace Aeropuerto.Backend.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // CORRECCIÓN: Usa Mayúsculas para que coincida con tu clase EmpleadoCapacitacion
             modelBuilder.Entity<EmpleadoCapacitacion>()
-                .HasKey(ec => new { ec.IdEmpleado, ec.IdCapacitacion });
+                .HasKey(ec => new { ec.id_empleado, ec.id_capacitacion });
 
             base.OnModelCreating(modelBuilder);
         }
-        // --- modulo 16 Finanzas y Contabilidad
+
+        // --- Modulo 16 Finanzas y Contabilidad
         public DbSet<Presupuesto> PRESUPUESTOS { get; set; } = null!;
         public DbSet<Ingreso> INGRESOS { get; set; } = null!;
         public DbSet<Gasto> GASTOS { get; set; } = null!;
@@ -39,8 +39,8 @@ namespace Aeropuerto.Backend.Data
         public DbSet<TasaAplicada> TASAS_APLICADAS { get; set; } = null!;
         public DbSet<CuentaBancaria> CUENTAS_BANCARIAS { get; set; } = null!;
         public DbSet<MovimientoBancario> MOVIMIENTOS_BANCARIOS { get; set; } = null!;
-        
-        // --- Modulo 18 pasajeros menores y grupos especiales
+
+        // --- Modulo 18 Pasajeros menores y grupos especiales
         public DbSet<PasajeroMenor> PASAJEROS_MENORES { get; set; } = null!;
         public DbSet<AutorizacionMenor> AUTORIZACIONES_MENORES { get; set; } = null!;
         public DbSet<MenorNoAcompanado> MENORES_NO_ACOMPANADOS { get; set; } = null!;
@@ -52,13 +52,13 @@ namespace Aeropuerto.Backend.Data
         public DbSet<ManifiestoDetalle> MANIFIESTOS_DETALLE { get; set; } = null!;
         public DbSet<SeguimientoCarga> SEGUIMIENTO_CARGA { get; set; } = null!;
         public DbSet<AduanaCarga> ADUANAS_CARGA { get; set; } = null!;
-        public DbSet<InspectorAduana> INSPECTORES_ADUANAS { get; set; } = null!;
+        public DbSet<InspectorAduanas> INSPECTORES_ADUANAS { get; set; } = null!;
         public DbSet<BodegaCarga> BODEGAS_CARGA { get; set; } = null!;
         public DbSet<CargaUbicacion> CARGA_UBICACION { get; set; } = null!;
 
-        // --- Modulo 20 Mantenimineto Predictivo
+        // --- Modulo 20 Mantenimiento Predictivo
         public DbSet<PiezaReemplazo> PIEZAS_REEMPLAZO { get; set; } = null!;
-        public DbSet<OrdenMantenimientoPredictivo> ORDENES_MANTENIMIENTO_PRED { get; set; } = null!;
+        public DbSet<OrdenMantenimientoPredictivo> ORDENES_MANTENIMIENTO_PREDICTIVO { get; set; } = null!;
         public DbSet<ChecklistMantenimiento> CHECKLISTS_MANTENIMIENTO { get; set; } = null!;
         public DbSet<ChecklistEjecucion> CHECKLIST_EJECUCION { get; set; } = null!;
         public DbSet<TareaEjecutada> TAREAS_EJECUTADAS { get; set; } = null!;
