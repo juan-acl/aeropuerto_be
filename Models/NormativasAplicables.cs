@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -8,6 +8,7 @@ namespace Aeropuerto.Backend.Models
     {
         
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_NORMATIVA")]
         public int IdNormativa { get; set; }
         

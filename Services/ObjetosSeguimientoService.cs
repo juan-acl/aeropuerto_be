@@ -1,45 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ObjetosSeguimientoService : IObjetosSeguimientoService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public ObjetosSeguimientoService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public ObjetosSeguimientoService(DBContext context) => _context = context;
-
-        public async Task<bool> RegistrarMovimiento(ObjetosSeguimientoModel m)
+        public async Task<List<ObjetosSeguimientoModel>> ListarTodo()
         {
-            var sql = "pkg_objetos_seguimiento.insert_seguimiento";
+            try { return await _replica.ObjetosSeguimiento.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ObjetosSeguimientoModel: {ex.Message}"); return new List<ObjetosSeguimientoModel>(); }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_id_objeto", (object?)m.IdObjeto ?? DBNull.Value),
-                new OracleParameter("p_ubicacion", (object?)m.Ubicacion ?? DBNull.Value),
-                new OracleParameter("p_responsable", (object?)m.Responsable ?? DBNull.Value),
-                new OracleParameter("p_accion", (object?)m.Accion ?? DBNull.Value),
-                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
-            };
+        public async Task<ObjetosSeguimientoModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.ObjetosSeguimiento.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ObjetosSeguimientoModel: {ex.Message}"); return null; }
+        }
 
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_objeto, :p_ubicacion, :p_responsable, :p_accion, :p_observaciones); END;", parametros);
+        public async Task<bool> Insertar(ObjetosSeguimientoModel m)
+        {
+            _primary.ObjetosSeguimiento.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<ObjetosSeguimientoModel>> ListarHistorialPorObjeto(int idObjeto)
+        public async Task<bool> Actualizar(int id, ObjetosSeguimientoModel m)
         {
-            return await _context.ObjetosSeguimiento
-                .Where(s => s.IdObjeto == idObjeto)
-                .OrderByDescending(s => s.FechaMovimiento)
-                .ToListAsync();
+            _primary.ObjetosSeguimiento.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_objetos_seguimiento.delete_seguimiento";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_seguimiento); END;", new OracleParameter("p_id_seguimiento", id));
+            var e = await _primary.ObjetosSeguimiento.FindAsync(id);
+            if (e == null) return false;
+            _primary.ObjetosSeguimiento.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

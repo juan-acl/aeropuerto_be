@@ -11,8 +11,8 @@
 
 $ErrorActionPreference = "Continue"
 
-$spRoot  = "C:\Users\joseb\Desktop\aeropuerto_be-SP\aeropuerto_be-SP"
-$beRoot  = "C:\Users\joseb\Downloads\AeroLaAurora\AeroLaAurora\aeropuerto_be-develop"
+$spRoot  = "c:\Users\joseb\Downloads\aero\aeropuerto_be-SP\aeropuerto_be-SP"
+$beRoot  = "c:\Users\joseb\Downloads\aero\aeropuerto_be"
 $logFile = "$beRoot\generator\generation_log.txt"
 
 "" | Out-File $logFile
@@ -128,6 +128,8 @@ foreach ($sqlFile in $sqlFiles) {
     $specMatch = [regex]::Match($sql, 'CREATE\s+OR\s+REPLACE\s+PACKAGE\s+\w+\s+AS(.*?)END\s+\w+;', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
     $specContent = if ($specMatch.Success) { $specMatch.Groups[1].Value } else { "" }
     
+    if (-not $specContent) { Log "  WARN: Spec content not found for $($sqlFile.Name)" }
+
     # Parse insert procedure from spec
     $insertProcMatch = [regex]::Match($specContent, 'PROCEDURE\s+(insert_\w+)\s*\((.*?)\)\s*;', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
     $insertProc = if ($insertProcMatch.Success) { $insertProcMatch.Groups[1].Value } else { "" }
@@ -142,6 +144,9 @@ foreach ($sqlFile in $sqlFiles) {
     $deleteProcMatch = [regex]::Match($specContent, 'PROCEDURE\s+(delete_\w+)\s*\((.*?)\)\s*;', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
     $deleteProc = if ($deleteProcMatch.Success) { $deleteProcMatch.Groups[1].Value } else { "" }
     $deleteParamsRaw = if ($deleteProcMatch.Success) { $deleteProcMatch.Groups[2].Value } else { "" }
+
+    if (-not $deleteProc) { Log "  WARN: Delete procedure not found in spec for $($sqlFile.Name)" }
+
     
     # Parse parameter names from raw parameter string
     function Parse-Params($raw) {
@@ -151,8 +156,8 @@ foreach ($sqlFile in $sqlFiles) {
         $parts = $raw -split ','
         foreach ($part in $parts) {
             $part = $part.Trim()
-            # Match: p_name IN type or p_name IN table.col%TYPE
-            if ($part -match '(p_\w+)\s+IN\s+(.+?)(?:\s+DEFAULT\s+.*)?$') {
+            # Match: p_name [IN|OUT|IN OUT] type
+            if ($part -match '(p_\w+)\s+(?:IN|OUT|IN\s+OUT)?\s*(.+?)(?:\s+DEFAULT\s+.*)?$') {
                 $pName = $matches[1].ToLower()
                 $pTypeRaw = $matches[2].Trim()
                 
@@ -188,7 +193,7 @@ foreach ($sqlFile in $sqlFiles) {
         DeleteParams = $deleteParams
     }
     
-    Log "  SP: $pkgName -> Table: $tableName | insert=$insertProc($(($insertParams | ForEach-Object {$_.ParamName}) -join ',')) | update=$updateProc | delete=$deleteProc"
+    Log "  SP: $pkgName -> Table: $tableName | insert=$insertProc($(($insertParams | ForEach-Object {$_.ParamName}) -join ',')) | update=$updateProc | delete=$deleteProc($(($deleteParams | ForEach-Object {$_.ParamName}) -join ','))"
 }
 
 Log "`n  Total SPs parsed: $($spInfos.Count)"
@@ -325,8 +330,13 @@ foreach ($sp in $spInfos) {
     $updateSql = "BEGIN $($sp.Package).$($sp.UpdateProc)($($updateParamNames -join ', ')); END;"
     
     # ─── Build DELETE ───────────────────────────────────────────────────────
+    if ($sp.Package -eq "pkg_usuarios_sistema") { 
+        Log "  DEBUG: pkg_usuarios_sistema DeleteParams count=$($sp.DeleteParams.Count)"
+        foreach ($dp in $sp.DeleteParams) { Log "  DEBUG: ParamName='$($dp.ParamName)'" }
+    }
     $deletePkParam = if ($sp.DeleteParams.Count -gt 0) { $sp.DeleteParams[0].ParamName } else { "p_id" }
     $deleteSql = "BEGIN $($sp.Package).$($sp.DeleteProc)(:$deletePkParam); END;"
+
     
     # ─── Derive controller name ─────────────────────────────────────────────
     $controllerClass = $serviceClass -replace 'Service$', 'Controller'
@@ -378,83 +388,78 @@ namespace Aeropuerto.Backend.Interfaces
     $insertParamBlock = $insertParamBindings -join ",`n"
     $updateParamBlock = $updateParamBindings -join ",`n"
     
-    $catchListar     = 'catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ' + $modelClass + ': {ex.Message}"); return new List<' + $modelClass + '>(); }'
-    $catchObtener    = 'catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ' + $modelClass + ': {ex.Message}"); return null; }'
-    $catchInsertar   = 'catch (Exception ex) { Console.WriteLine($"ERROR Insertar ' + $modelClass + ': {ex.Message}"); return false; }'
-    $catchActualizar = 'catch (Exception ex) { Console.WriteLine($"ERROR Actualizar ' + $modelClass + ': {ex.Message}"); return false; }'
-    $catchEliminar   = 'catch (Exception ex) { Console.WriteLine($"ERROR Eliminar ' + $modelClass + ': {ex.Message}"); return false; }'
-    
-    $serviceLines = @()
-    $serviceLines += 'using Aeropuerto.Backend.Interfaces;'
-    $serviceLines += 'using Aeropuerto.Backend.Models;'
-    $serviceLines += 'using Aeropuerto.Backend.Data;'
-    $serviceLines += 'using Microsoft.EntityFrameworkCore;'
-    $serviceLines += 'using Oracle.ManagedDataAccess.Client;'
-    $serviceLines += 'using System.Data;'
-    $serviceLines += ''
-    $serviceLines += 'namespace Aeropuerto.Backend.Services'
-    $serviceLines += '{'
-    $serviceLines += "    public class $serviceClass : $interfaceName"
-    $serviceLines += '    {'
-    $serviceLines += '        private readonly DBContext _context;'
-    $serviceLines += "        public ${serviceClass}(DBContext context) => _context = context;"
-    $serviceLines += ''
-    $serviceLines += "        public async Task<List<$modelClass>> ListarTodo()"
-    $serviceLines += '        {'
-    $serviceLines += "            try { return await _context.$dbSetProp.ToListAsync(); }"
-    $serviceLines += "            $catchListar"
-    $serviceLines += '        }'
-    $serviceLines += ''
-    $serviceLines += "        public async Task<${modelClass}?> ObtenerPorId($pkType id)"
-    $serviceLines += '        {'
-    $serviceLines += "            try { return await _context.$dbSetProp.FindAsync(id); }"
-    $serviceLines += "            $catchObtener"
-    $serviceLines += '        }'
-    $serviceLines += ''
-    $serviceLines += "        public async Task<bool> Insertar($modelClass m)"
-    $serviceLines += '        {'
-    $serviceLines += '            try'
-    $serviceLines += '            {'
-    $serviceLines += "                string sql = `"$insertSql`";"
-    $serviceLines += '                var p = new OracleParameter[] {'
-    $serviceLines += $insertParamBlock
-    $serviceLines += '                };'
-    $serviceLines += '                await _context.Database.ExecuteSqlRawAsync(sql, p);'
-    $serviceLines += '                return true;'
-    $serviceLines += '            }'
-    $serviceLines += "            $catchInsertar"
-    $serviceLines += '        }'
-    $serviceLines += ''
-    $serviceLines += "        public async Task<bool> Actualizar($pkType id, $modelClass m)"
-    $serviceLines += '        {'
-    $serviceLines += '            try'
-    $serviceLines += '            {'
-    $serviceLines += "                string sql = `"$updateSql`";"
-    $serviceLines += '                var p = new OracleParameter[] {'
-    $serviceLines += $updateParamBlock
-    $serviceLines += '                };'
-    $serviceLines += '                await _context.Database.ExecuteSqlRawAsync(sql, p);'
-    $serviceLines += '                return true;'
-    $serviceLines += '            }'
-    $serviceLines += "            $catchActualizar"
-    $serviceLines += '        }'
-    $serviceLines += ''
-    $serviceLines += "        public async Task<bool> Eliminar($pkType id)"
-    $serviceLines += '        {'
-    $serviceLines += '            try'
-    $serviceLines += '            {'
-    $serviceLines += "                string sql = `"$deleteSql`";"
-    $serviceLines += "                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter(`"$deletePkParam`", id));"
-    $serviceLines += '                return true;'
-    $serviceLines += '            }'
-    $serviceLines += "            $catchEliminar"
-    $serviceLines += '        }'
-    $serviceLines += '    }'
-    $serviceLines += '}'
-    
-    $serviceCode = $serviceLines -join "`r`n"
+    $serviceCode = @"
+using Aeropuerto.Backend.Interfaces;
+using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
+using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
+using System.Data;
+
+namespace Aeropuerto.Backend.Services
+{
+    public class $serviceClass : $interfaceName
+    {
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public ${serviceClass}(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
+
+        public async Task<List<$modelClass>> ListarTodo()
+        {
+            try { return await _replica.$dbSetProp.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine(`$"ERROR ListarTodo ${modelClass}: {ex.Message}"); return new List<${modelClass}>(); }
+        }
+
+        public async Task<${modelClass}?> ObtenerPorId($pkType id)
+        {
+            try { return await _replica.$dbSetProp.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine(`$"ERROR ObtenerPorId ${modelClass}: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar($modelClass m)
+        {
+            try
+            {
+                string sql = "$insertSql";
+                var p = new OracleParameter[] {
+$insertParamBlock
+                };
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine(`$"ERROR Insertar ${modelClass}: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Actualizar($pkType id, $modelClass m)
+        {
+            try
+            {
+                string sql = "$updateSql";
+                var p = new OracleParameter[] {
+$updateParamBlock
+                };
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine(`$"ERROR Actualizar ${modelClass}: {ex.Message}"); return false; }
+        }
+
+        public async Task<bool> Eliminar($pkType id)
+        {
+            try
+            {
+                string sql = "$deleteSql";
+                await _primary.Database.ExecuteSqlRawAsync(sql, new OracleParameter("$deletePkParam", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine(`$"ERROR Eliminar ${modelClass}: {ex.Message}"); return false; }
+        }
+    }
+}
+"@
     
     Set-Content -Path $svcInfo.ServiceFile -Value $serviceCode -Encoding UTF8
+
     
     # ═══════════════════════════════════════════════════════════════════════════
     # GENERATE CONTROLLER

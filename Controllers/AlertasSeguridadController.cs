@@ -8,51 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class AlertasSeguridadController : ControllerBase
     {
-        private readonly IAlertasSeguridadService _service;
+        private readonly IAlertasSeguridadService _svc;
+        public AlertasSeguridadController(IAlertasSeguridadService svc) { _svc = svc; }
 
-        public AlertasSeguridadController(IAlertasSeguridadService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost("emitir")]
-        public async Task<IActionResult> Post([FromBody] AlertasSeguridadModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.EmitirAlerta(modelo);
-                return Ok(new { mensaje = $"Alerta {modelo.NivelAlerta} emitida exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("aeropuerto/{codigo}/historial")]
-        public async Task<IActionResult> GetHistorial(string codigo)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] AlertasSeguridadModel m)
         {
-            var result = await _service.ListarHistorial(codigo);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpGet("aeropuerto/{codigo}/activa")]
-        public async Task<IActionResult> GetActiva(string codigo)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] AlertasSeguridadModel m)
         {
-            var result = await _service.ObtenerAlertaActiva(codigo);
-            if (result == null) return Ok(new { mensaje = "No hay alertas de seguridad activas en este momento." });
-            return Ok(result);
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpPatch("{id}/desactivar")]
-        public async Task<IActionResult> PatchDesactivar(int id)
-        {
-            await _service.DesactivarAlerta(id);
-            return Ok(new { mensaje = "Alerta de seguridad desactivada. Nivel restablecido." });
-        }
-
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de alerta eliminado del historial." });
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

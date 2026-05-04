@@ -9,18 +9,19 @@ namespace Aeropuerto.Backend.Services
 {
     public class GestionResiduosService : IGestionResiduosService
     {
-        private readonly DBContext _context;
-        public GestionResiduosService(DBContext context) => _context = context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public GestionResiduosService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
         public async Task<List<GestionResiduos>> ListarTodo()
         {
-            try { return await _context.GestionResiduos.ToListAsync(); }
+            try { return await _replica.GestionResiduos.ToListAsync(); }
             catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo GestionResiduos: {ex.Message}"); return new List<GestionResiduos>(); }
         }
 
-        public async Task<GestionResiduos?> ObtenerPorId(int id)
+        public async Task<GestionResiduos ?> ObtenerPorId(int id)
         {
-            try { return await _context.GestionResiduos.FindAsync(id); }
+            try { return await _replica.GestionResiduos.FindAsync(id); }
             catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId GestionResiduos: {ex.Message}"); return null; }
         }
 
@@ -30,20 +31,20 @@ namespace Aeropuerto.Backend.Services
             {
                 string sql = "BEGIN pkg_gestion_residuos.insert_residuo(:p_fecha_recoleccion, :p_tipo_residuo, :p_cantidad_kg, :p_origen, :p_empresa_recolectora, :p_tratamiento, :p_certificado_tratamiento, :p_costo_tratamiento, :p_observaciones); END;";
                 var p = new OracleParameter[] {
-                new OracleParameter("p_fecha_recoleccion", m.FechaRecoleccion),
-                new OracleParameter("p_tipo_residuo", (object?)m.TipoResiduo ?? DBNull.Value),
-                new OracleParameter("p_cantidad_kg", (object?)m.CantidadKg ?? DBNull.Value),
-                new OracleParameter("p_origen", (object?)m.Origen ?? DBNull.Value),
-                new OracleParameter("p_empresa_recolectora", (object?)m.EmpresaRecolectora ?? DBNull.Value),
-                new OracleParameter("p_tratamiento", (object?)m.Tratamiento ?? DBNull.Value),
-                new OracleParameter("p_certificado_tratamiento", (object?)m.CertificadoTratamiento ?? DBNull.Value),
-                new OracleParameter("p_costo_tratamiento", (object?)m.CostoTratamiento ?? DBNull.Value),
-                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                    new OracleParameter("p_fecha_recoleccion", m.FechaRecoleccion),
+                    new OracleParameter("p_tipo_residuo", (object?)m.TipoResiduo ?? DBNull.Value),
+                    new OracleParameter("p_cantidad_kg", (object?)m.CantidadKg ?? DBNull.Value),
+                    new OracleParameter("p_origen", (object?)m.Origen ?? DBNull.Value),
+                    new OracleParameter("p_empresa_recolectora", (object?)m.EmpresaRecolectora ?? DBNull.Value),
+                    new OracleParameter("p_tratamiento", (object?)m.Tratamiento ?? DBNull.Value),
+                    new OracleParameter("p_certificado_tratamiento", (object?)m.CertificadoTratamiento ?? DBNull.Value),
+                    new OracleParameter("p_costo_tratamiento", (object?)m.CostoTratamiento ?? DBNull.Value),
+                    new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
                 };
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Insertar GestionResiduos: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar GestionResiduos: {ex.Message}"); throw; }
         }
 
         public async Task<bool> Actualizar(int id, GestionResiduos m)
@@ -52,32 +53,32 @@ namespace Aeropuerto.Backend.Services
             {
                 string sql = "BEGIN pkg_gestion_residuos.update_residuo(:p_id_residuo, :p_fecha_recoleccion, :p_tipo_residuo, :p_cantidad_kg, :p_origen, :p_empresa_recolectora, :p_tratamiento, :p_certificado_tratamiento, :p_costo_tratamiento, :p_observaciones); END;";
                 var p = new OracleParameter[] {
-                new OracleParameter("p_id_residuo", id),
-                new OracleParameter("p_fecha_recoleccion", m.FechaRecoleccion),
-                new OracleParameter("p_tipo_residuo", (object?)m.TipoResiduo ?? DBNull.Value),
-                new OracleParameter("p_cantidad_kg", (object?)m.CantidadKg ?? DBNull.Value),
-                new OracleParameter("p_origen", (object?)m.Origen ?? DBNull.Value),
-                new OracleParameter("p_empresa_recolectora", (object?)m.EmpresaRecolectora ?? DBNull.Value),
-                new OracleParameter("p_tratamiento", (object?)m.Tratamiento ?? DBNull.Value),
-                new OracleParameter("p_certificado_tratamiento", (object?)m.CertificadoTratamiento ?? DBNull.Value),
-                new OracleParameter("p_costo_tratamiento", (object?)m.CostoTratamiento ?? DBNull.Value),
-                new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
+                    new OracleParameter("p_id_residuo", id),
+                    new OracleParameter("p_fecha_recoleccion", m.FechaRecoleccion),
+                    new OracleParameter("p_tipo_residuo", (object?)m.TipoResiduo ?? DBNull.Value),
+                    new OracleParameter("p_cantidad_kg", (object?)m.CantidadKg ?? DBNull.Value),
+                    new OracleParameter("p_origen", (object?)m.Origen ?? DBNull.Value),
+                    new OracleParameter("p_empresa_recolectora", (object?)m.EmpresaRecolectora ?? DBNull.Value),
+                    new OracleParameter("p_tratamiento", (object?)m.Tratamiento ?? DBNull.Value),
+                    new OracleParameter("p_certificado_tratamiento", (object?)m.CertificadoTratamiento ?? DBNull.Value),
+                    new OracleParameter("p_costo_tratamiento", (object?)m.CostoTratamiento ?? DBNull.Value),
+                    new OracleParameter("p_observaciones", (object?)m.Observaciones ?? DBNull.Value)
                 };
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar GestionResiduos: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar GestionResiduos: {ex.Message}"); throw; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
             try
             {
-                string sql = "BEGIN pkg_gestion_residuos.delete_residuo(:); END;";
-                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                string sql = "BEGIN pkg_gestion_residuos.delete_residuo(:p_id); END;";
+                await _primary.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar GestionResiduos: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar GestionResiduos: {ex.Message}"); throw; }
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -8,6 +8,7 @@ namespace Aeropuerto.Backend.Models
     {
         
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_ANALISIS_COMPORTAMIENTO")]
         public decimal IdAnalisisComportamiento { get; set; }
         
@@ -58,8 +59,6 @@ namespace Aeropuerto.Backend.Models
         
         [Column("ULTIMA_ACTUALIZACION")]
         public DateTime? UltimaActualizacion { get; set; }
-        
-        [Column("FOREIGN")]
-        public decimal? Foreign { get; set; }
     }
 }
+

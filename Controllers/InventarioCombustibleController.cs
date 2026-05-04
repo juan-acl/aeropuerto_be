@@ -4,33 +4,42 @@ using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class InventarioCombustibleController : ControllerBase
     {
-        private readonly IInventarioCombustibleService _service;
-        public InventarioCombustibleController(IInventarioCombustibleService service) => _service = service;
+        private readonly IInventarioCombustibleService _svc;
+        public InventarioCombustibleController(IInventarioCombustibleService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _service.ObtenerPorId(id);
-            return item != null ? Ok(item) : NotFound(new { mensaje = "No encontrado" });
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] InventarioCombustible m)
-            => await _service.Insertar(m) ? Ok(new { mensaje = "Creado" }) : BadRequest(new { mensaje = "Error al crear" });
+        public async Task<IActionResult> Create([FromBody] InventarioCombustible m)
+        {
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
+        }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] InventarioCombustible m)
-            => await _service.Actualizar(id, m) ? Ok(new { mensaje = "Actualizado" }) : BadRequest(new { mensaje = "Error al actualizar" });
+        public async Task<IActionResult> Update(int id, [FromBody] InventarioCombustible m)
+        {
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
-            => await _service.Eliminar(id) ? Ok(new { mensaje = "Eliminado" }) : BadRequest(new { mensaje = "Error al eliminar" });
+        {
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
+        }
     }
 }

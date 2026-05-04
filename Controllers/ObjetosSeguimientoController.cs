@@ -8,36 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class ObjetosSeguimientoController : ControllerBase
     {
-        private readonly IObjetosSeguimientoService _service;
+        private readonly IObjetosSeguimientoService _svc;
+        public ObjetosSeguimientoController(IObjetosSeguimientoService svc) { _svc = svc; }
 
-        public ObjetosSeguimientoController(IObjetosSeguimientoService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ObjetosSeguimientoModel modelo)
+        public async Task<IActionResult> Create([FromBody] ObjetosSeguimientoModel m)
         {
-            try
-            {
-                await _service.RegistrarMovimiento(modelo);
-                return Ok(new { mensaje = "Movimiento del objeto registrado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpGet("objeto/{idObjeto}")]
-        public async Task<IActionResult> GetByObjeto(int idObjeto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] ObjetosSeguimientoModel m)
         {
-            var result = await _service.ListarHistorialPorObjeto(idObjeto);
-            return Ok(result);
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro de seguimiento eliminado." });
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

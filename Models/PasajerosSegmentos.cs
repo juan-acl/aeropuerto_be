@@ -1,9 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aeropuerto.Backend.Models
 {
     [Table("PASAJEROS_SEGMENTOS")]
+    [PrimaryKey(nameof(IdPasajero), nameof(IdSegmentoCliente))]
     public class PasajerosSegmentos
     {
         
@@ -22,10 +24,5 @@ namespace Aeropuerto.Backend.Models
         [Column("ACTIVO")]
         public decimal? Activo { get; set; }
         
-        [Key]
-        [Column("ID_PASAJERO_SEGMENTO")]
-        public int IdPasajeroSegmento { get; set; }
-        
-
     }
 }

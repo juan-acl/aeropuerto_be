@@ -5,9 +5,9 @@ namespace Aeropuerto.Backend.Interfaces
     public interface IIncidentesService
     {
         Task<List<IncidentesModel>> ListarTodo();
-        Task<IncidentesModel?> ObtenerPorId(int id);
-        Task<bool> Insertar(IncidentesModel modelo);
-        Task<bool> Actualizar(int id, IncidentesModel modelo);
+        Task<IncidentesModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(IncidentesModel m);
+        Task<bool> Actualizar(int id, IncidentesModel m);
         Task<bool> Eliminar(int id);
     }
 }

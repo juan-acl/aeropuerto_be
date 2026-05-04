@@ -8,91 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class TripulacionController : ControllerBase
     {
-        private readonly ITripulacionService _service;
+        private readonly ITripulacionService _svc;
+        public TripulacionController(ITripulacionService svc) { _svc = svc; }
 
-        public TripulacionController(ITripulacionService service)
-        {
-            _service = service;
-        }
-
-        // 1. LISTAR TODO (GET)
         [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try
-            {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener la tripulación: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        // 2. OBTENER POR ID (GET)
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var tripulante = await _service.ObtenerPorId(id);
-                if (tripulante == null) return NotFound($"Tripulante con ID {id} no encontrado.");
-                return Ok(tripulante);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al buscar tripulante: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        // 3. INSERTAR (POST) - Llama a pkg_tripulacion.insert_tripulante
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] TripulacionModel modelo)
+        public async Task<IActionResult> Create([FromBody] TripulacionModel m)
         {
-            if (modelo == null) return BadRequest("Datos del tripulante no válidos.");
-
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = $"Tripulante {modelo.Nombres} {modelo.Apellidos} registrado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al insertar tripulante: {ex.Message}");
-            }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        // 4. ACTUALIZAR (PUT) - Llama a pkg_tripulacion.update_tripulante
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, string tipoTripulante, string licencia, DateTime vencimientoLicencia, decimal horasVuelo, int activo)
+        public async Task<IActionResult> Update(int id, [FromBody] TripulacionModel m)
         {
-            try
-            {
-                var resultado = await _service.Actualizar(id, tipoTripulante, licencia, vencimientoLicencia, horasVuelo, activo);
-                if (!resultado) return NotFound($"No se pudo actualizar: El tripulante con ID {id} no existe.");
-
-                return Ok(new { mensaje = $"Datos operativos del tripulante con ID {id} actualizados correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar tripulante: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        // 5. ELIMINAR (DELETE) - Llama a pkg_tripulacion.delete_tripulante
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = $"Tripulante con ID {id} eliminado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar tripulante: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

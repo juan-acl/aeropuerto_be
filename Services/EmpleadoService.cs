@@ -1,4 +1,4 @@
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
@@ -9,45 +9,94 @@ namespace Aeropuerto.Backend.Services
 {
     public class EmpleadoService : IEmpleadoService
     {
-        private readonly DBContext _context;
-        public EmpleadoService(DBContext context) => _context = context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public EmpleadoService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public async Task<List<Empleado>> ListarTodo() => await _context.EMPLEADOS.ToListAsync();
+        public async Task<List<Empleado>> ListarTodo()
+        {
+            try { return await _replica.EMPLEADOS.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo Empleado: {ex.Message}"); return new List<Empleado>(); }
+        }
+
+        public async Task<Empleado ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.EMPLEADOS.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId Empleado: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(Empleado m)
         {
             try
             {
-                string sql = "BEGIN pkg_empleados.insert_empleado(:cod, :nom, :ape, :tdoc, :ndoc, :fnac, :nac, :gen, :dir, :tel, :mail, :fcon, :dep, :car, :sal, :tcon, :act, :foto); END;";
-                
+                string sql = "BEGIN pkg_empleados.insert_empleado(:p_codigo_empleado, :p_nombres, :p_apellidos, :p_tipo_documento, :p_numero_documento, :p_fecha_nacimiento, :p_nacionalidad, :p_genero, :p_direccion, :p_telefono, :p_email, :p_fecha_contratacion, :p_departamento, :p_cargo, :p_salario_base, :p_tipo_contrato, :p_activo, :p_foto_empleado); END;";
                 var p = new OracleParameter[] {
-                    new OracleParameter("cod", m.CodigoEmpleado),
-                    new OracleParameter("nom", m.Nombres),
-                    new OracleParameter("ape", m.Apellidos),
-                    new OracleParameter("tdoc", m.TipoDocumento),
-                    new OracleParameter("ndoc", m.NumeroDocumento),
-                    new OracleParameter("fnac", m.FechaNacimiento),
-                    new OracleParameter("nac", m.Nacionalidad),
-                    new OracleParameter("gen", m.Genero),
-                    new OracleParameter("dir", m.Direccion),
-                    new OracleParameter("tel", m.Telefono),
-                    new OracleParameter("mail", m.Email),
-                    new OracleParameter("fcon", m.FechaContratacion),
-                    new OracleParameter("dep", m.Departamento),
-                    new OracleParameter("car", m.Cargo),
-                    new OracleParameter("sal", m.SalarioBase),
-                    new OracleParameter("tcon", m.TipoContrato),
-                    new OracleParameter("act", m.Activo),
-                    new OracleParameter("foto", OracleDbType.Blob) { Value = (object?)m.FotoEmpleado ?? DBNull.Value }
+                    new OracleParameter("p_codigo_empleado", (object?)m.CodigoEmpleado ?? DBNull.Value),
+                    new OracleParameter("p_nombres", (object?)m.Nombres ?? DBNull.Value),
+                    new OracleParameter("p_apellidos", (object?)m.Apellidos ?? DBNull.Value),
+                    new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                    new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                    new OracleParameter("p_fecha_nacimiento", m.FechaNacimiento),
+                    new OracleParameter("p_nacionalidad", (object?)m.Nacionalidad ?? DBNull.Value),
+                    new OracleParameter("p_genero", (object?)m.Genero ?? DBNull.Value),
+                    new OracleParameter("p_direccion", (object?)m.Direccion ?? DBNull.Value),
+                    new OracleParameter("p_telefono", (object?)m.Telefono ?? DBNull.Value),
+                    new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
+                    new OracleParameter("p_fecha_contratacion", m.FechaContratacion),
+                    new OracleParameter("p_departamento", (object?)m.Departamento ?? DBNull.Value),
+                    new OracleParameter("p_cargo", (object?)m.Cargo ?? DBNull.Value),
+                    new OracleParameter("p_salario_base", m.SalarioBase),
+                    new OracleParameter("p_tipo_contrato", (object?)m.TipoContrato ?? DBNull.Value),
+                    new OracleParameter("p_activo", m.Activo),
+                    new OracleParameter("p_foto_empleado", (object?)m.FotoEmpleado ?? DBNull.Value)
                 };
-
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch (Exception ex) {
-                Console.WriteLine($"ERROR EMPLEADO: {ex.Message}");
-                return false;
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar Empleado: {ex.Message}"); throw; }
+        }
+
+        public async Task<bool> Actualizar(int id, Empleado m)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_empleados.update_empleado(:p_id_empleado, :p_codigo_empleado, :p_nombres, :p_apellidos, :p_tipo_documento, :p_numero_documento, :p_fecha_nacimiento, :p_nacionalidad, :p_genero, :p_direccion, :p_telefono, :p_email, :p_fecha_contratacion, :p_departamento, :p_cargo, :p_salario_base, :p_tipo_contrato, :p_activo, :p_foto_empleado); END;";
+                var p = new OracleParameter[] {
+                    new OracleParameter("p_id_empleado", id),
+                    new OracleParameter("p_codigo_empleado", (object?)m.CodigoEmpleado ?? DBNull.Value),
+                    new OracleParameter("p_nombres", (object?)m.Nombres ?? DBNull.Value),
+                    new OracleParameter("p_apellidos", (object?)m.Apellidos ?? DBNull.Value),
+                    new OracleParameter("p_tipo_documento", (object?)m.TipoDocumento ?? DBNull.Value),
+                    new OracleParameter("p_numero_documento", (object?)m.NumeroDocumento ?? DBNull.Value),
+                    new OracleParameter("p_fecha_nacimiento", m.FechaNacimiento),
+                    new OracleParameter("p_nacionalidad", (object?)m.Nacionalidad ?? DBNull.Value),
+                    new OracleParameter("p_genero", (object?)m.Genero ?? DBNull.Value),
+                    new OracleParameter("p_direccion", (object?)m.Direccion ?? DBNull.Value),
+                    new OracleParameter("p_telefono", (object?)m.Telefono ?? DBNull.Value),
+                    new OracleParameter("p_email", (object?)m.Email ?? DBNull.Value),
+                    new OracleParameter("p_fecha_contratacion", m.FechaContratacion),
+                    new OracleParameter("p_departamento", (object?)m.Departamento ?? DBNull.Value),
+                    new OracleParameter("p_cargo", (object?)m.Cargo ?? DBNull.Value),
+                    new OracleParameter("p_salario_base", m.SalarioBase),
+                    new OracleParameter("p_tipo_contrato", (object?)m.TipoContrato ?? DBNull.Value),
+                    new OracleParameter("p_activo", m.Activo),
+                    new OracleParameter("p_foto_empleado", (object?)m.FotoEmpleado ?? DBNull.Value)
+                };
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
+                return true;
             }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar Empleado: {ex.Message}"); throw; }
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            try
+            {
+                string sql = "BEGIN pkg_empleados.delete_empleado(:p_id); END;";
+                await _primary.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
+                return true;
+            }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar Empleado: {ex.Message}"); throw; }
         }
     }
 }

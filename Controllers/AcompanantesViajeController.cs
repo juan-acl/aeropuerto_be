@@ -8,57 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class AcompanantesViajeController : ControllerBase
     {
-        private readonly IAcompanantesViajeService _service;
+        private readonly IAcompanantesViajeService _svc;
+        public AcompanantesViajeController(IAcompanantesViajeService svc) { _svc = svc; }
 
-        public AcompanantesViajeController(IAcompanantesViajeService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] AcompanantesViajeModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Acompañante registrado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("principal/{idPasajeroPrincipal}")]
-        public async Task<IActionResult> Get(int idPasajeroPrincipal)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] AcompanantesViajeModel m)
         {
-            var result = await _service.ListarPorPasajeroPrincipal(idPasajeroPrincipal);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] AcompanantesViajeModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] AcompanantesViajeModel m)
         {
-            try
-            {
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = "Datos del acompañante actualizados." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.EliminarFisico(id);
-                return Ok(new { mensaje = "Registro eliminado físicamente de la base de datos." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

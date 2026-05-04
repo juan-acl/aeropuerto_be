@@ -1,49 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class ReservasPromocionesService : IReservasPromocionesService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public ReservasPromocionesService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public ReservasPromocionesService(DBContext context) => _context = context;
-
-        public async Task<bool> AplicarPromocion(ReservasPromocionesModel m)
+        public async Task<List<ReservasPromocionesModel>> ListarTodo()
         {
-            // Usamos SYSTIMESTAMP para la fecha de aplicación automática
-            var sql = "pkg_reservas_promociones.insert_promocion";
+            try { return await _replica.ReservasPromociones.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo ReservasPromocionesModel: {ex.Message}"); return new List<ReservasPromocionesModel>(); }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_id_reserva", m.IdReserva),
-                new OracleParameter("p_id_promocion", m.IdPromocion),
-                new OracleParameter("p_descuento_aplicado", m.DescuentoAplicado)
-            };
+        public async Task<ReservasPromocionesModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.ReservasPromociones.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ReservasPromocionesModel: {ex.Message}"); return null; }
+        }
 
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva, :p_id_promocion, :p_descuento_aplicado); END;", parametros);
-
-            // Opcional: Aquí podrías disparar un UPDATE a la tabla PROMOCIONES 
-            // para incrementar el campo USOS_ACTUALES.
-
+        public async Task<bool> Insertar(ReservasPromocionesModel m)
+        {
+            _primary.ReservasPromociones.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<ReservasPromocionesModel>> ListarPorReserva(int idReserva)
+        public async Task<bool> Actualizar(int id, ReservasPromocionesModel m)
         {
-            return await _context.ReservasPromociones
-                .Where(rp => rp.IdReserva == idReserva)
-                .ToListAsync();
+            _primary.ReservasPromociones.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<bool> EliminarRelacion(int idReserva, int idPromocion)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_reservas_promociones.delete_promocion";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva, :p_id_promocion); END;",
-                new OracleParameter("p_id_reserva", idReserva),
-                new OracleParameter("p_id_promocion", idPromocion));
+            var e = await _primary.ReservasPromociones.FindAsync(id);
+            if (e == null) return false;
+            _primary.ReservasPromociones.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

@@ -1,26 +1,49 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace Aeropuerto.Backend.Services
 {
     public class AnalisisComportamientoService : IAnalisisComportamientoService
     {
-        private readonly DBContext _ctx;
-        public AnalisisComportamientoService(DBContext ctx) => _ctx = ctx;
-        public async Task<List<AnalisisComportamiento>> ListarTodo() => await _ctx.Set<AnalisisComportamiento>().ToListAsync();
-        public async Task<AnalisisComportamiento?> ObtenerPorId(int id) => await _ctx.Set<AnalisisComportamiento>().FindAsync(id);
-        public async Task<bool> Insertar(AnalisisComportamiento m) { _ctx.Set<AnalisisComportamiento>().Add(m); await _ctx.SaveChangesAsync(); return true; }
-        public async Task<bool> Actualizar(int id, AnalisisComportamiento m) {
-            var e = await _ctx.Set<AnalisisComportamiento>().FindAsync(id);
-            if (e == null) return false;
-            _ctx.Entry(e).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync(); return true;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public AnalisisComportamientoService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
+
+        public async Task<List<AnalisisComportamiento>> ListarTodo()
+        {
+            try { return await _replica.AnalisisComportamiento.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo AnalisisComportamiento: {ex.Message}"); return new List<AnalisisComportamiento>(); }
         }
-        public async Task<bool> Eliminar(int id) {
-            var e = await _ctx.Set<AnalisisComportamiento>().FindAsync(id);
+
+        public async Task<AnalisisComportamiento ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.AnalisisComportamiento.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId AnalisisComportamiento: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(AnalisisComportamiento m)
+        {
+            _primary.AnalisisComportamiento.Add(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Actualizar(int id, AnalisisComportamiento m)
+        {
+            _primary.AnalisisComportamiento.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            var e = await _primary.AnalisisComportamiento.FindAsync(id);
             if (e == null) return false;
-            _ctx.Set<AnalisisComportamiento>().Remove(e); await _ctx.SaveChangesAsync(); return true;
+            _primary.AnalisisComportamiento.Remove(e);
+            await _primary.SaveChangesAsync();
+            return true;
         }
     }
 }

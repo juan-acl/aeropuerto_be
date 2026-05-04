@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface ICategoriasObjetosService
     {
-        Task<bool> RegistrarCategoria(CategoriasObjetosModel modelo);
-        Task<List<CategoriasObjetosModel>> ListarTodas();
-        Task<List<CategoriasObjetosModel>> ListarActivas();
-        Task<bool> DesactivarCategoria(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<List<CategoriasObjetosModel>> ListarTodo();
+        Task<CategoriasObjetosModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(CategoriasObjetosModel m);
+        Task<bool> Actualizar(int id, CategoriasObjetosModel m);
+        Task<bool> Eliminar(int id);
     }
 }

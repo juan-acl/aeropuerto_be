@@ -1,63 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class HistorialComunicacionService : IHistorialComunicacionService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public HistorialComunicacionService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public HistorialComunicacionService(DBContext context) => _context = context;
+        public async Task<List<HistorialComunicacionModel>> ListarTodo()
+        {
+            try { return await _replica.HistorialComunicacion.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HistorialComunicacionModel: {ex.Message}"); return new List<HistorialComunicacionModel>(); }
+        }
+
+        public async Task<HistorialComunicacionModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.HistorialComunicacion.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId HistorialComunicacionModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(HistorialComunicacionModel m)
         {
-            var sql = "pkg_historial_comunicaciones.insert_comunicacion";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_pasajero", m.IdPasajero),
-                new OracleParameter("p_tipo_comunicacion", m.TipoComunicacion),
-                new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
-                new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
-                new OracleParameter("p_estado", m.Estado ?? "ENVIADO"),
-                new OracleParameter("p_respuesta_recibida", m.RespuestaRecibida)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero, :p_tipo_comunicacion, :p_asunto, :p_contenido, :p_estado, :p_respuesta_recibida); END;", parametros);
+            _primary.HistorialComunicacion.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<List<HistorialComunicacionModel>> ListarPorPasajero(int idPasajero)
-        {
-            return await _context.HistorialComunicacion
-                .Where(c => c.IdPasajero == idPasajero)
-                .OrderByDescending(c => c.FechaEnvio)
-                .ToListAsync();
         }
 
         public async Task<bool> Actualizar(int id, HistorialComunicacionModel m)
         {
-            var sql = "pkg_historial_comunicaciones.update_comunicacion";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_comunicacion", id),
-                new OracleParameter("p_tipo_comunicacion", m.TipoComunicacion),
-                new OracleParameter("p_asunto", (object?)m.Asunto ?? DBNull.Value),
-                new OracleParameter("p_contenido", (object?)m.Contenido ?? DBNull.Value),
-                new OracleParameter("p_estado", m.Estado),
-                new OracleParameter("p_respuesta_recibida", m.RespuestaRecibida)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_comunicacion, :p_tipo_comunicacion, :p_asunto, :p_contenido, :p_estado, :p_respuesta_recibida); END;", parametros);
+            _primary.HistorialComunicacion.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_historial_comunicaciones.delete_comunicacion";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_comunicacion); END;", new OracleParameter("p_id_comunicacion", id));
+            var e = await _primary.HistorialComunicacion.FindAsync(id);
+            if (e == null) return false;
+            _primary.HistorialComunicacion.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

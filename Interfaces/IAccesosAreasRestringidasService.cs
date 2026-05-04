@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IAccesosAreasRestringidasService
     {
-        Task<bool> RegistrarAcceso(AccesosAreasRestringidasModel modelo);
-        Task<List<AccesosAreasRestringidasModel>> ListarPorEmpleado(int idEmpleado);
-        Task<List<AccesosAreasRestringidasModel>> ListarAccesosDenegados();
-        Task<bool> EliminarFisico(int id);
+        Task<List<AccesosAreasRestringidasModel>> ListarTodo();
+        Task<AccesosAreasRestringidasModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(AccesosAreasRestringidasModel m);
+        Task<bool> Actualizar(int id, AccesosAreasRestringidasModel m);
+        Task<bool> Eliminar(int id);
     }
 }

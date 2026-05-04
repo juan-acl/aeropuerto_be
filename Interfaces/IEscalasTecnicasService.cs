@@ -1,13 +1,13 @@
-using Aeropuerto.Backend.Models;
+﻿using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Interfaces
 {
     public interface IEscalasTecnicasService
     {
-        Task<List<EscalasTecnicasModel>> ListarPorVuelo(int idVuelo);
-        Task<EscalasTecnicasModel?> ObtenerPorId(int idEscala);
+        Task<List<EscalasTecnicasModel>> ListarTodo();
+        Task<EscalasTecnicasModel ?> ObtenerPorId(int id);
         Task<bool> Insertar(EscalasTecnicasModel m);
-        Task<bool> Actualizar(EscalasTecnicasModel m);
-        Task<bool> Eliminar(int idEscala);
+        Task<bool> Actualizar(int id, EscalasTecnicasModel m);
+        Task<bool> Eliminar(int id);
     }
 }

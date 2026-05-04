@@ -8,57 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class HistorialReservasController : ControllerBase
     {
-        private readonly IHistorialReservasService _service;
+        private readonly IHistorialReservasService _svc;
+        public HistorialReservasController(IHistorialReservasService svc) { _svc = svc; }
 
-        public HistorialReservasController(IHistorialReservasService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] HistorialReservasModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Registro de historial creado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("reserva/{idReserva}")]
-        public async Task<IActionResult> GetByReserva(int idReserva)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] HistorialReservasModel m)
         {
-            var result = await _service.ListarPorReserva(idReserva);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] HistorialReservasModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] HistorialReservasModel m)
         {
-            try
-            {
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = "Historial actualizado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.EliminarFisico(id);
-                return Ok(new { mensaje = "Registro de historial eliminado permanentemente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

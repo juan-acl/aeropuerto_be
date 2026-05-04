@@ -8,57 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class PasajerosRedesSocialesController : ControllerBase
     {
-        private readonly IPasajerosRedesSocialesService _service;
+        private readonly IPasajerosRedesSocialesService _svc;
+        public PasajerosRedesSocialesController(IPasajerosRedesSocialesService svc) { _svc = svc; }
 
-        public PasajerosRedesSocialesController(IPasajerosRedesSocialesService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PasajerosRedesSocialesModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Red social vinculada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> Get(int idPasajero)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PasajerosRedesSocialesModel m)
         {
-            var result = await _service.ListarPorPasajero(idPasajero);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PasajerosRedesSocialesModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] PasajerosRedesSocialesModel m)
         {
-            try
-            {
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = "Información de red social actualizada." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.EliminarFisico(id);
-                return Ok(new { mensaje = "Vínculo de red social eliminado permanentemente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

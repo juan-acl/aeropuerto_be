@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -7,6 +7,7 @@ namespace Aeropuerto.Backend.Models
     public class ProveedorRepuesto
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_PROVEEDOR_REP")]
         public int IdProveedorRep { get; set; }
         [Column("NOMBRE_PROVEEDOR")]

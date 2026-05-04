@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -7,6 +7,7 @@ namespace Aeropuerto.Backend.Models
     public class EncuestasSatisfaccionModel
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_ENCUESTA")]
         public int IdEncuesta { get; set; }
 
@@ -44,6 +45,6 @@ namespace Aeropuerto.Backend.Models
         public string? Comentarios { get; set; }
 
         [Column("RECOMIENDA")]
-        public int Recomienda { get; set; } = 1; // 1 = Sí, 0 = No
+        public int Recomienda { get; set; } = 1; // 1 = S�, 0 = No
     }
 }

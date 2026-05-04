@@ -1,25 +1,32 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
-    [Table("GASTO")]
+    [Table("GASTOS")]
     public class Gasto
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_GASTO")]
         public int IdGasto { get; set; }
         [Column("FECHA")]
         public DateTime Fecha { get; set; }
-        [Column("DESCRIPCION")]
+        [Column("CONCEPTO")]
         public string Descripcion { get; set; } = null!;
         [Column("MONTO")]
         public decimal Monto { get; set; }
-        [Column("CATEGORIA")]
-        public string Categoria { get; set; } = null!;
-        [Column("ID_CUENTA_CONTABLE")]
-        public int IdCuentaContable { get; set; }
-        [Column("ID_PRESUPUESTO")]
-        public int? IdPresupuesto { get; set; }
+        [Column("TIPO_GASTO")]
+        public string? Categoria { get; set; }
+        [Column("ID_DEPARTAMENTO")]
+        public int? IdDepartamento { get; set; }
+        [Column("PROVEEDOR")]
+        public string? Proveedor { get; set; }
+        [Column("MONEDA")]
+        public string? Moneda { get; set; }
+        [Column("FACTURA")]
+        public string? Factura { get; set; }
+        [Column("AUTORIZADO_POR")]
+        public int? AutorizadoPor { get; set; }
     }
 }

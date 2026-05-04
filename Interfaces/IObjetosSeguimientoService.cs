@@ -4,8 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IObjetosSeguimientoService
     {
-        Task<bool> RegistrarMovimiento(ObjetosSeguimientoModel modelo);
-        Task<List<ObjetosSeguimientoModel>> ListarHistorialPorObjeto(int idObjeto);
-        Task<bool> EliminarFisico(int id);
+        Task<List<ObjetosSeguimientoModel>> ListarTodo();
+        Task<ObjetosSeguimientoModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(ObjetosSeguimientoModel m);
+        Task<bool> Actualizar(int id, ObjetosSeguimientoModel m);
+        Task<bool> Eliminar(int id);
     }
 }

@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace Aeropuerto.Backend.Models
 {
     [Table("PISTAS_ATERRIZAJE")]
@@ -13,20 +13,14 @@ namespace Aeropuerto.Backend.Models
         public string? NumeroPista { get; set; }
         [Column("LONGITUD_METROS")]
         public decimal? LongitudMetros { get; set; }
-        [Column("ANCHO_METROS")]
+        [Column("ANCHURA_METROS")]
         public decimal? AnchoMetros { get; set; }
         [Column("SUPERFICIE")][StringLength(30)]
         public string? Superficie { get; set; }
-        [Column("RESISTENCIA_PCN")][StringLength(20)]
-        public string? ResistenciaPcn { get; set; }
         [Column("ILUMINACION_NOCTURNA")]
         public int IluminacionNocturna { get; set; } = 0;
         [Column("SISTEMA_ILS")]
         public int SistemaIls { get; set; } = 0;
-        [Column("CATEGORIA_ILS")][StringLength(5)]
-        public string? CategoriaIls { get; set; }
-        [Column("ESTADO_OPERACIONAL")][StringLength(20)]
-        public string EstadoOperacional { get; set; } = "OPERATIVA";
         [Column("ACTIVO")]
         public int Activo { get; set; } = 1;
     }

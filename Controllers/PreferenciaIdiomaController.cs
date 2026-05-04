@@ -6,59 +6,40 @@ namespace Aeropuerto.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PreferenciasIdiomasController : ControllerBase
+    public class PreferenciaIdiomaController : ControllerBase
     {
-        private readonly IPreferenciaIdiomaService _service;
+        private readonly IPreferenciaIdiomaService _svc;
+        public PreferenciaIdiomaController(IPreferenciaIdiomaService svc) { _svc = svc; }
 
-        public PreferenciasIdiomasController(IPreferenciaIdiomaService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PreferenciaIdiomaModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Idioma registrado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> Get(int idPasajero)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] PreferenciaIdiomaModel m)
         {
-            var result = await _service.ListarPorPasajero(idPasajero);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PreferenciaIdiomaModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] PreferenciaIdiomaModel m)
         {
-            try
-            {
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = "Preferencia de idioma actualizada." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.EliminarFisico(id);
-                return Ok(new { mensaje = "Idioma eliminado permanentemente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

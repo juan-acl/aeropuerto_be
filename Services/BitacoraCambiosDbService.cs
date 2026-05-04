@@ -1,26 +1,49 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace Aeropuerto.Backend.Services
 {
     public class BitacoraCambiosDbService : IBitacoraCambiosDbService
     {
-        private readonly DBContext _ctx;
-        public BitacoraCambiosDbService(DBContext ctx) => _ctx = ctx;
-        public async Task<List<BitacoraCambiosDb>> ListarTodo() => await _ctx.Set<BitacoraCambiosDb>().ToListAsync();
-        public async Task<BitacoraCambiosDb?> ObtenerPorId(int id) => await _ctx.Set<BitacoraCambiosDb>().FindAsync(id);
-        public async Task<bool> Insertar(BitacoraCambiosDb m) { _ctx.Set<BitacoraCambiosDb>().Add(m); await _ctx.SaveChangesAsync(); return true; }
-        public async Task<bool> Actualizar(int id, BitacoraCambiosDb m) {
-            var e = await _ctx.Set<BitacoraCambiosDb>().FindAsync(id);
-            if (e == null) return false;
-            _ctx.Entry(e).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync(); return true;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public BitacoraCambiosDbService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
+
+        public async Task<List<BitacoraCambiosDb>> ListarTodo()
+        {
+            try { return await _replica.BitacoraCambios.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo BitacoraCambiosDb: {ex.Message}"); return new List<BitacoraCambiosDb>(); }
         }
-        public async Task<bool> Eliminar(int id) {
-            var e = await _ctx.Set<BitacoraCambiosDb>().FindAsync(id);
+
+        public async Task<BitacoraCambiosDb ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.BitacoraCambios.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId BitacoraCambiosDb: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(BitacoraCambiosDb m)
+        {
+            _primary.BitacoraCambios.Add(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Actualizar(int id, BitacoraCambiosDb m)
+        {
+            _primary.BitacoraCambios.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            var e = await _primary.BitacoraCambios.FindAsync(id);
             if (e == null) return false;
-            _ctx.Set<BitacoraCambiosDb>().Remove(e); await _ctx.SaveChangesAsync(); return true;
+            _primary.BitacoraCambios.Remove(e);
+            await _primary.SaveChangesAsync();
+            return true;
         }
     }
 }

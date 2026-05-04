@@ -1,43 +1,48 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
+
 namespace Aeropuerto.Backend.Services
 {
     public class CondicionMeteorologicaService : ICondicionMeteorologicaService
     {
-        private readonly DBContext _ctx;
-        public CondicionMeteorologicaService(DBContext ctx) => _ctx = ctx;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public CondicionMeteorologicaService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
         public async Task<List<CondicionMeteorologicaModel>> ListarTodo()
-            => await _ctx.Set<CondicionMeteorologicaModel>().ToListAsync();
+        {
+            try { return await _replica.CondicionesMeteorologicas.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo CondicionMeteorologicaModel: {ex.Message}"); return new List<CondicionMeteorologicaModel>(); }
+        }
 
-        public async Task<CondicionMeteorologicaModel?> ObtenerPorId(int id)
-            => await _ctx.Set<CondicionMeteorologicaModel>().FirstOrDefaultAsync(x => x.IdCondicion == id);
+        public async Task<CondicionMeteorologicaModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.CondicionesMeteorologicas.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId CondicionMeteorologicaModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(CondicionMeteorologicaModel m)
         {
-            _ctx.Set<CondicionMeteorologicaModel>().Add(m);
-            await _ctx.SaveChangesAsync();
+            _primary.CondicionesMeteorologicas.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Actualizar(int id, CondicionMeteorologicaModel m)
         {
-            var existing = await _ctx.Set<CondicionMeteorologicaModel>().FindAsync(id);
-            if (existing == null) return false;
-            _ctx.Entry(existing).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync();
+            _primary.CondicionesMeteorologicas.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            var item = await _ctx.Set<CondicionMeteorologicaModel>().FindAsync(id);
-            if (item == null) return false;
-            _ctx.Set<CondicionMeteorologicaModel>().Remove(item);
-            await _ctx.SaveChangesAsync();
+            var e = await _primary.CondicionesMeteorologicas.FindAsync(id);
+            if (e == null) return false;
+            _primary.CondicionesMeteorologicas.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -8,6 +8,7 @@ namespace Aeropuerto.Backend.Models
     {
         
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_SIMULACRO")]
         public int IdSimulacro { get; set; }
         
@@ -46,8 +47,6 @@ namespace Aeropuerto.Backend.Models
         
         [Column("FECHA_PROXIMO_SIMULACRO")]
         public DateTime? FechaProximoSimulacro { get; set; }
-        
-        [Column("FOREIGN")]
-        public decimal? Foreign { get; set; }
     }
 }
+

@@ -6,140 +6,40 @@ namespace Aeropuerto.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AerolineasController : ControllerBase
+    public class AerolineaController : ControllerBase
     {
-        private readonly IAerolineaService _service;
+        private readonly IAerolineaService _svc;
+        public AerolineaController(IAerolineaService svc) { _svc = svc; }
 
-        public AerolineasController(IAerolineaService service)
-        {
-            _service = service;
-        }
-
-        // 1. LISTAR TODO (GET)
         [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try
-            {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al listar aerolíneas: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        // 2. OBTENER POR ID (GET)
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var aerolinea = await _service.ObtenerPorId(id);
-                if (aerolinea == null) return NotFound($"Aerolínea con ID {id} no encontrada.");
-                return Ok(aerolinea);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener aerolínea: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        // 3. INSERTAR (POST) - Llama a pkg_aerolineas.insert_aerolinea
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] AerolineaModel modelo)
+        public async Task<IActionResult> Create([FromBody] AerolineaModel m)
         {
-            if (modelo == null) return BadRequest("Datos de aerolínea inválidos");
-
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = $"Aerolínea '{modelo.NombreAerolinea}' insertada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al insertar aerolínea: {ex.Message}");
-            }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        // 4. ACTUALIZAR (PUT) - Llama a pkg_aerolineas.update_aerolinea
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, int flota, int destinos, string alianza, int activo)
+        public async Task<IActionResult> Update(int id, [FromBody] AerolineaModel m)
         {
-            try
-            {
-                var resultado = await _service.Actualizar(id, flota, destinos, alianza, activo);
-                if (!resultado) return NotFound($"No se pudo actualizar: Aerolínea con ID {id} no existe.");
-
-                return Ok(new { mensaje = $"Aerolínea con ID {id} actualizada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar aerolínea: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        // 5. ELIMINAR (DELETE) - Llama a pkg_aerolineas.delete_aerolinea
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = $"Aerolínea con ID {id} eliminada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar aerolínea: {ex.Message}");
-            }
-        }
-
-        [HttpPost("registrar")]
-        public async Task<IActionResult> Registrar([FromBody] RegistrarAerolineaRequest modelo)
-        {
-            if (modelo == null) return BadRequest("Datos de aerolínea requeridos.");
-
-            try
-            {
-                await _service.RegistrarAerolinea(modelo);
-                return Ok(new { mensaje = $"Aerolínea '{modelo.Nombre}' registrada exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                // Manejo de errores específicos del SP:
-                // -39502: Longitud IATA incorrecta
-                // -39504: IATA ya existe
-                // -39505: OACI ya existe
-                return BadRequest(new
-                {
-                    error = "Error al registrar aerolínea",
-                    detalle = ex.Message
-                });
-            }
-        }
-
-        [HttpPost("registrar_aeronave")]
-        public async Task<IActionResult> Registrar([FromBody] RegistrarAeronaveRequest modelo)
-        {
-            if (modelo == null) return BadRequest("Datos de aeronave requeridos.");
-
-            try
-            {
-                await _service.RegistrarAeronave(modelo);
-                return Ok(new { mensaje = $"Aeronave {modelo.Matricula} registrada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                // Errores específicos del SP:
-                // -40002: Matrícula duplicada
-                // -40003: Suma de asientos JSON no coincide con capacidad máxima
-                return BadRequest(new
-                {
-                    error = "Error al registrar la aeronave",
-                    detalle = ex.Message
-                });
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -8,6 +8,7 @@ namespace Aeropuerto.Backend.Models
     {
         
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_TOKEN")]
         public decimal IdToken { get; set; }
         
@@ -43,8 +44,6 @@ namespace Aeropuerto.Backend.Models
         
         [Column("MOTIVO_REVOCACION")]
         public string? MotivoRevocacion { get; set; }
-        
-        [Column("FOREIGN")]
-        public decimal? Foreign { get; set; }
     }
 }
+

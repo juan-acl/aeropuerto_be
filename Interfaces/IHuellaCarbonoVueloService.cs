@@ -5,9 +5,9 @@ namespace Aeropuerto.Backend.Interfaces
     public interface IHuellaCarbonoVueloService
     {
         Task<List<HuellaCarbonoVuelo>> ListarTodo();
-        Task<HuellaCarbonoVuelo?> ObtenerPorId(int id);
-        Task<bool> Insertar(HuellaCarbonoVuelo modelo);
-        Task<bool> Actualizar(int id, HuellaCarbonoVuelo modelo);
+        Task<HuellaCarbonoVuelo ?> ObtenerPorId(int id);
+        Task<bool> Insertar(HuellaCarbonoVuelo m);
+        Task<bool> Actualizar(int id, HuellaCarbonoVuelo m);
         Task<bool> Eliminar(int id);
     }
 }

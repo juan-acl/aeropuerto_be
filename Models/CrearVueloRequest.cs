@@ -1,4 +1,4 @@
-﻿namespace Aeropuerto.Backend.Models
+namespace Aeropuerto.Backend.Models
 {
     public class CrearVueloRequest
     {
@@ -7,6 +7,6 @@
         public DateTime HoraSalida { get; set; }
         public DateTime HoraLlegada { get; set; }
         public int IdModeloAvion { get; set; }
-        public string MatriculaAvion { get; set; }
+        public string MatriculaAvion { get; set; } = null!;
     }
 }

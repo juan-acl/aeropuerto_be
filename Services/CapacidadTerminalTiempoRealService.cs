@@ -1,26 +1,49 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace Aeropuerto.Backend.Services
 {
     public class CapacidadTerminalTiempoRealService : ICapacidadTerminalTiempoRealService
     {
-        private readonly DBContext _ctx;
-        public CapacidadTerminalTiempoRealService(DBContext ctx) => _ctx = ctx;
-        public async Task<List<CapacidadTerminalTiempoReal>> ListarTodo() => await _ctx.Set<CapacidadTerminalTiempoReal>().ToListAsync();
-        public async Task<CapacidadTerminalTiempoReal?> ObtenerPorId(int id) => await _ctx.Set<CapacidadTerminalTiempoReal>().FindAsync(id);
-        public async Task<bool> Insertar(CapacidadTerminalTiempoReal m) { _ctx.Set<CapacidadTerminalTiempoReal>().Add(m); await _ctx.SaveChangesAsync(); return true; }
-        public async Task<bool> Actualizar(int id, CapacidadTerminalTiempoReal m) {
-            var e = await _ctx.Set<CapacidadTerminalTiempoReal>().FindAsync(id);
-            if (e == null) return false;
-            _ctx.Entry(e).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync(); return true;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public CapacidadTerminalTiempoRealService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
+
+        public async Task<List<CapacidadTerminalTiempoReal>> ListarTodo()
+        {
+            try { return await _replica.CapacidadTerminal.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo CapacidadTerminalTiempoReal: {ex.Message}"); return new List<CapacidadTerminalTiempoReal>(); }
         }
-        public async Task<bool> Eliminar(int id) {
-            var e = await _ctx.Set<CapacidadTerminalTiempoReal>().FindAsync(id);
+
+        public async Task<CapacidadTerminalTiempoReal ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.CapacidadTerminal.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId CapacidadTerminalTiempoReal: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(CapacidadTerminalTiempoReal m)
+        {
+            _primary.CapacidadTerminal.Add(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Actualizar(int id, CapacidadTerminalTiempoReal m)
+        {
+            _primary.CapacidadTerminal.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            var e = await _primary.CapacidadTerminal.FindAsync(id);
             if (e == null) return false;
-            _ctx.Set<CapacidadTerminalTiempoReal>().Remove(e); await _ctx.SaveChangesAsync(); return true;
+            _primary.CapacidadTerminal.Remove(e);
+            await _primary.SaveChangesAsync();
+            return true;
         }
     }
 }

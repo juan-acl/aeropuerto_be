@@ -1,43 +1,48 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
+
 namespace Aeropuerto.Backend.Services
 {
     public class PistaAterrizajeService : IPistaAterrizajeService
     {
-        private readonly DBContext _ctx;
-        public PistaAterrizajeService(DBContext ctx) => _ctx = ctx;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public PistaAterrizajeService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
         public async Task<List<PistaAterrizajeModel>> ListarTodo()
-            => await _ctx.Set<PistaAterrizajeModel>().ToListAsync();
+        {
+            try { return await _replica.PistasAterrizaje.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo PistaAterrizajeModel: {ex.Message}"); return new List<PistaAterrizajeModel>(); }
+        }
 
-        public async Task<PistaAterrizajeModel?> ObtenerPorId(int id)
-            => await _ctx.Set<PistaAterrizajeModel>().FirstOrDefaultAsync(x => x.IdPista == id);
+        public async Task<PistaAterrizajeModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.PistasAterrizaje.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId PistaAterrizajeModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(PistaAterrizajeModel m)
         {
-            _ctx.Set<PistaAterrizajeModel>().Add(m);
-            await _ctx.SaveChangesAsync();
+            _primary.PistasAterrizaje.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Actualizar(int id, PistaAterrizajeModel m)
         {
-            var existing = await _ctx.Set<PistaAterrizajeModel>().FindAsync(id);
-            if (existing == null) return false;
-            _ctx.Entry(existing).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync();
+            _primary.PistasAterrizaje.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            var item = await _ctx.Set<PistaAterrizajeModel>().FindAsync(id);
-            if (item == null) return false;
-            _ctx.Set<PistaAterrizajeModel>().Remove(item);
-            await _ctx.SaveChangesAsync();
+            var e = await _primary.PistasAterrizaje.FindAsync(id);
+            if (e == null) return false;
+            _primary.PistasAterrizaje.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

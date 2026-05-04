@@ -8,50 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class MonitoreoAireController : ControllerBase
     {
-        private readonly IMonitoreoAireService _service;
-
-        public MonitoreoAireController(IMonitoreoAireService service)
-        {
-            _service = service;
-        }
+        private readonly IMonitoreoAireService _svc;
+        public MonitoreoAireController(IMonitoreoAireService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<ActionResult<List<MonitoreoAire>>> Get()
-        {
-            var lista = await _service.ListarTodo();
-            return Ok(lista);
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MonitoreoAire>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var item = await _service.ObtenerPorId(id);
-            if (item == null) return NotFound();
-            return Ok(item);
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> Post([FromBody] MonitoreoAire modelo)
+        public async Task<IActionResult> Create([FromBody] MonitoreoAire m)
         {
-            var resultado = await _service.Insertar(modelo);
-            if (!resultado) return BadRequest("No se pudo registrar la medición de aire.");
-            return Ok(resultado);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<bool>> Put(int id, [FromBody] MonitoreoAire modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] MonitoreoAire m)
         {
-            var resultado = await _service.Actualizar(id, modelo);
-            if (!resultado) return NotFound("No se encontró la medición o no se pudo actualizar.");
-            return Ok(resultado);
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var resultado = await _service.Eliminar(id);
-            if (!resultado) return NotFound("La medición no existe.");
-            return Ok(resultado);
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

@@ -8,36 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class GruposPasajerosController : ControllerBase
     {
-        private readonly IGruposPasajerosService _service;
+        private readonly IGruposPasajerosService _svc;
+        public GruposPasajerosController(IGruposPasajerosService svc) { _svc = svc; }
 
-        public GruposPasajerosController(IGruposPasajerosService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost("asignar")]
-        public async Task<IActionResult> Post([FromBody] GruposPasajerosModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.AsignarPasajero(modelo);
-                return Ok(new { mensaje = "Pasajero asignado al grupo correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("grupo/{idGrupo}")]
-        public async Task<IActionResult> Get(int idGrupo)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] GruposPasajerosModel m)
         {
-            var result = await _service.ListarPasajerosPorGrupo(idGrupo);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpDelete("quitar/{idGrupo}/{idPasajero}")]
-        public async Task<IActionResult> Delete(int idGrupo, int idPasajero)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] GruposPasajerosModel m)
         {
-            await _service.EliminarRelacion(idGrupo, idPasajero);
-            return Ok(new { mensaje = "Pasajero removido del grupo." });
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

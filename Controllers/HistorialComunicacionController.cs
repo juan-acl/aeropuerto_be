@@ -6,53 +6,40 @@ namespace Aeropuerto.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class HistorialComunicacionesController : ControllerBase
+    public class HistorialComunicacionController : ControllerBase
     {
-        private readonly IHistorialComunicacionService _service;
+        private readonly IHistorialComunicacionService _svc;
+        public HistorialComunicacionController(IHistorialComunicacionService svc) { _svc = svc; }
 
-        public HistorialComunicacionesController(IHistorialComunicacionService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] HistorialComunicacionModel modelo)
+        public async Task<IActionResult> Create([FromBody] HistorialComunicacionModel m)
         {
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Registro de comunicación guardado." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
-
-        [HttpGet("pasajero/{idPasajero}")]
-        public async Task<IActionResult> GetByPasajero(int idPasajero)
-        {
-            var lista = await _service.ListarPorPasajero(idPasajero);
-            return Ok(lista);
-        }
-
-        [HttpDelete("fisico/{id}")]
-        public async Task<IActionResult> DeleteFisico(int id)
-        {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Registro eliminado físicamente." });
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarHistorialComunicacion(int id, [FromBody] HistorialComunicacionModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] HistorialComunicacionModel m)
         {
-            try
-            {
-                // Validamos que el ID del cuerpo o de la URL coincidan 
-                await _service.Actualizar(id, modelo);
-                return Ok(new { mensaje = $"Comunicación con ID {id} actualizada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

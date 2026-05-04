@@ -1,60 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class AcompanantesViajeService : IAcompanantesViajeService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public AcompanantesViajeService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public AcompanantesViajeService(DBContext context) => _context = context;
+        public async Task<List<AcompanantesViajeModel>> ListarTodo()
+        {
+            try { return await _replica.AcompanantesViaje.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo AcompanantesViajeModel: {ex.Message}"); return new List<AcompanantesViajeModel>(); }
+        }
+
+        public async Task<AcompanantesViajeModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.AcompanantesViaje.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId AcompanantesViajeModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(AcompanantesViajeModel m)
         {
-            var sql = "pkg_acompanantes_viaje.insert_acompanante";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_pasajero_principal", m.IdPasajeroPrincipal),
-                new OracleParameter("p_id_pasajero_acompanante", m.IdPasajeroAcompanante),
-                new OracleParameter("p_frecuencia", m.Frecuencia),
-                new OracleParameter("p_relacion", m.Relacion),
-                new OracleParameter("p_ultimo_viaje_juntos", (object?)m.UltimoViajeJuntos ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_pasajero_principal, :p_id_pasajero_acompanante, :p_frecuencia, :p_relacion, :p_ultimo_viaje_juntos); END;", parametros);
+            _primary.AcompanantesViaje.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<List<AcompanantesViajeModel>> ListarPorPasajeroPrincipal(int idPasajeroPrincipal)
-        {
-            return await _context.AcompanantesViaje
-                .Where(a => a.IdPasajeroPrincipal == idPasajeroPrincipal)
-                .ToListAsync();
         }
 
         public async Task<bool> Actualizar(int id, AcompanantesViajeModel m)
         {
-            var sql = "pkg_acompanantes_viaje.update_acompanante";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_acompanante", id),
-                new OracleParameter("p_id_pasajero_acompanante", m.IdPasajeroAcompanante),
-                new OracleParameter("p_frecuencia", m.Frecuencia),
-                new OracleParameter("p_relacion", m.Relacion),
-                new OracleParameter("p_ultimo_viaje_juntos", (object?)m.UltimoViajeJuntos ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_acompanante, :p_id_pasajero_acompanante, :p_frecuencia, :p_relacion, :p_ultimo_viaje_juntos); END;", parametros);
+            _primary.AcompanantesViaje.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_acompanantes_viaje.delete_acompanante";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_acompanante); END;", new OracleParameter("p_id_acompanante", id));
+            var e = await _primary.AcompanantesViaje.FindAsync(id);
+            if (e == null) return false;
+            _primary.AcompanantesViaje.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

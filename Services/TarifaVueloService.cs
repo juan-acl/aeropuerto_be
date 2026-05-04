@@ -1,43 +1,48 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
+
 namespace Aeropuerto.Backend.Services
 {
     public class TarifaVueloService : ITarifaVueloService
     {
-        private readonly DBContext _ctx;
-        public TarifaVueloService(DBContext ctx) => _ctx = ctx;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public TarifaVueloService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
         public async Task<List<TarifaVueloModel>> ListarTodo()
-            => await _ctx.Set<TarifaVueloModel>().ToListAsync();
+        {
+            try { return await _replica.TarifasVuelo.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo TarifaVueloModel: {ex.Message}"); return new List<TarifaVueloModel>(); }
+        }
 
-        public async Task<TarifaVueloModel?> ObtenerPorId(int id)
-            => await _ctx.Set<TarifaVueloModel>().FirstOrDefaultAsync(x => x.IdTarifa == id);
+        public async Task<TarifaVueloModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.TarifasVuelo.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId TarifaVueloModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(TarifaVueloModel m)
         {
-            _ctx.Set<TarifaVueloModel>().Add(m);
-            await _ctx.SaveChangesAsync();
+            _primary.TarifasVuelo.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Actualizar(int id, TarifaVueloModel m)
         {
-            var existing = await _ctx.Set<TarifaVueloModel>().FindAsync(id);
-            if (existing == null) return false;
-            _ctx.Entry(existing).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync();
+            _primary.TarifasVuelo.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            var item = await _ctx.Set<TarifaVueloModel>().FindAsync(id);
-            if (item == null) return false;
-            _ctx.Set<TarifaVueloModel>().Remove(item);
-            await _ctx.SaveChangesAsync();
+            var e = await _primary.TarifasVuelo.FindAsync(id);
+            if (e == null) return false;
+            _primary.TarifasVuelo.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

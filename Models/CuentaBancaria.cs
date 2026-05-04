@@ -1,12 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
-    [Table("CUENTA_BANCARIA")]
+    [Table("CUENTAS_BANCARIAS")]
     public class CuentaBancaria
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_CUENTA_BANCO")]
         public int IdCuentaBanco { get; set; }
         [Column("BANCO")]

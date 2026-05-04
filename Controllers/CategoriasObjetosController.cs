@@ -8,51 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class CategoriasObjetosController : ControllerBase
     {
-        private readonly ICategoriasObjetosService _service;
-
-        public CategoriasObjetosController(ICategoriasObjetosService service) => _service = service;
-
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] CategoriasObjetosModel modelo)
-        {
-            try
-            {
-                await _service.RegistrarCategoria(modelo);
-                return Ok(new { mensaje = "Categoría registrada exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
-        }
+        private readonly ICategoriasObjetosService _svc;
+        public CategoriasObjetosController(ICategoriasObjetosService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var result = await _service.ListarTodas();
-            return Ok(result);
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("activas")]
-        public async Task<IActionResult> GetActivas()
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CategoriasObjetosModel m)
         {
-            // El frontend debe llamar a este endpoint para llenar sus listas desplegables
-            var result = await _service.ListarActivas();
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpPatch("{id}/desactivar")]
-        public async Task<IActionResult> PatchDesactivar(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoriasObjetosModel m)
         {
-            await _service.DesactivarCategoria(id);
-            return Ok(new { mensaje = "Categoría desactivada (Soft Delete)." });
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Categoría eliminada físicamente de la base de datos." });
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

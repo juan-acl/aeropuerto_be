@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -17,7 +17,7 @@ namespace Aeropuerto.Backend.Models
         public string NombreDia { get; set; } = null!;
 
         [Column("NUMERO_DIA")]
-        [Range(1, 7)] // Validación para el CHECK (BETWEEN 1 AND 7)
+        [Range(1, 7)] // Validaci�n para el CHECK (BETWEEN 1 AND 7)
         public int? NumeroDia { get; set; }
 
         [Column("ACTIVO")]

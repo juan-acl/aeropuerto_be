@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
@@ -43,8 +43,6 @@ namespace Aeropuerto.Backend.Models
         
         [Column("OBSERVACIONES")]
         public string? Observaciones { get; set; }
-        
-        [Column("FOREIGN")]
-        public decimal? Foreign { get; set; }
     }
 }
+

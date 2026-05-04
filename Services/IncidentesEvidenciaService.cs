@@ -1,60 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class IncidentesEvidenciaService : IIncidentesEvidenciaService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public IncidentesEvidenciaService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public IncidentesEvidenciaService(DBContext context) => _context = context;
-
-        public async Task<bool> CargarEvidencia(IncidentesEvidenciaModel m)
+        public async Task<List<IncidentesEvidenciaModel>> ListarTodo()
         {
-            var sql = "pkg_incidentes_evidencia.insert_evidencia";
+            try { return await _replica.IncidentesEvidencia.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo IncidentesEvidenciaModel: {ex.Message}"); return new List<IncidentesEvidenciaModel>(); }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_id_incidente", m.IdIncidente),
-                new OracleParameter("p_tipo_evidencia", m.TipoEvidencia),
-                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_archivo_evidencia", (object?)m.ArchivoEvidencia ?? DBNull.Value),
-                new OracleParameter("p_registrado_por", (object?)m.RegistradoPor ?? DBNull.Value)
-            };
+        public async Task<IncidentesEvidenciaModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.IncidentesEvidencia.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId IncidentesEvidenciaModel: {ex.Message}"); return null; }
+        }
 
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_incidente, :p_tipo_evidencia, :p_descripcion, :p_archivo_evidencia, :p_registrado_por); END;", parametros);
+        public async Task<bool> Insertar(IncidentesEvidenciaModel m)
+        {
+            _primary.IncidentesEvidencia.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<IncidentesEvidenciaModel>> ListarPorIncidente(int idIncidente)
+        public async Task<bool> Actualizar(int id, IncidentesEvidenciaModel m)
         {
-            return await _context.IncidentesEvidencia
-                .Where(e => e.IdIncidente == idIncidente)
-                .Select(e => new IncidentesEvidenciaModel
-                {
-                    IdEvidencia = e.IdEvidencia,
-                    IdIncidente = e.IdIncidente,
-                    TipoEvidencia = e.TipoEvidencia,
-                    Descripcion = e.Descripcion,
-                    FechaRegistro = e.FechaRegistro,
-                    RegistradoPor = e.RegistradoPor,
-                    // IMPORTANTE: No incluimos la propiedad ArchivoEvidencia aquí
-                    ArchivoEvidencia = null
-                })
-                .ToListAsync();
+            _primary.IncidentesEvidencia.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
         }
 
-        public async Task<IncidentesEvidenciaModel?> ObtenerPorId(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            return await _context.IncidentesEvidencia.FindAsync(id);
-        }
-
-        public async Task<bool> EliminarFisico(int id)
-        {
-            var sql = "pkg_incidentes_evidencia.delete_evidencia";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_evidencia); END;", new OracleParameter("p_id_evidencia", id));
+            var e = await _primary.IncidentesEvidencia.FindAsync(id);
+            if (e == null) return false;
+            _primary.IncidentesEvidencia.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

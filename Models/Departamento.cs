@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Aeropuerto.Backend.Models
@@ -8,6 +8,7 @@ namespace Aeropuerto.Backend.Models
     public class Departamento
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_DEPARTAMENTO")]
         [JsonPropertyName("ID_DEPARTAMENTO")]
         public int IdDepartamento { get; set; }

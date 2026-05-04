@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IHistorialReservasService
     {
-        Task<bool> Insertar(HistorialReservasModel modelo);
-        Task<List<HistorialReservasModel>> ListarPorReserva(int idReserva);
-        Task<bool> Actualizar(int id, HistorialReservasModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<List<HistorialReservasModel>> ListarTodo();
+        Task<HistorialReservasModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(HistorialReservasModel m);
+        Task<bool> Actualizar(int id, HistorialReservasModel m);
+        Task<bool> Eliminar(int id);
     }
 }

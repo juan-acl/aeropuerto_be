@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace Aeropuerto.Backend.Models
 {
     [Table("INCIDENTES_VUELO")]
@@ -22,7 +22,5 @@ namespace Aeropuerto.Backend.Models
         public string? AccionesTomadas { get; set; }
         [Column("REPORTADO_POR")][StringLength(100)]
         public string? ReportadoPor { get; set; }
-        [Column("ESTADO")][StringLength(20)]
-        public string Estado { get; set; } = "ABIERTO";
     }
 }

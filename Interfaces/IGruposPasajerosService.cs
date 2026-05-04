@@ -4,8 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IGruposPasajerosService
     {
-        Task<bool> AsignarPasajero(GruposPasajerosModel modelo);
-        Task<List<GruposPasajerosModel>> ListarPasajerosPorGrupo(int idGrupo);
-        Task<bool> EliminarRelacion(int idGrupo, int idPasajero);
+        Task<List<GruposPasajerosModel>> ListarTodo();
+        Task<GruposPasajerosModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(GruposPasajerosModel m);
+        Task<bool> Actualizar(int id, GruposPasajerosModel m);
+        Task<bool> Eliminar(int id);
     }
 }

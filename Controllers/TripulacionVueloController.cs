@@ -1,53 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+
 namespace Aeropuerto.Backend.Controllers
 {
     [ApiController]
-    [Route("api/tripulacionvuelo")]
+    [Route("api/[controller]")]
     public class TripulacionVueloController : ControllerBase
     {
-        private readonly ITripulacionVueloService _service;
-        public TripulacionVueloController(ITripulacionVueloService service) => _service = service;
+        private readonly ITripulacionVueloService _svc;
+        public TripulacionVueloController(ITripulacionVueloService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try { return Ok(await _service.ListarTodo()); }
-            catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try {
-                var item = await _service.ObtenerPorId(id);
-                return item == null ? NotFound() : Ok(item);
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] TripulacionVueloModel modelo)
+        public async Task<IActionResult> Create([FromBody] TripulacionVueloModel m)
         {
-            if (modelo == null) return BadRequest("Datos inválidos.");
-            try { await _service.Insertar(modelo); return Ok(new { mensaje = "Creado correctamente." }); }
-            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, [FromBody] TripulacionVueloModel modelo)
+        public async Task<IActionResult> Update(int id, [FromBody] TripulacionVueloModel m)
         {
-            try {
-                var ok = await _service.Actualizar(id, modelo);
-                return ok ? Ok(new { mensaje = "Actualizado." }) : NotFound();
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            try { await _service.Eliminar(id); return Ok(new { mensaje = "Eliminado." }); }
-            catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

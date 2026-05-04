@@ -4,10 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IAlertasSeguridadService
     {
-        Task<bool> EmitirAlerta(AlertasSeguridadModel modelo);
-        Task<List<AlertasSeguridadModel>> ListarHistorial(string codigoAeropuerto);
-        Task<AlertasSeguridadModel?> ObtenerAlertaActiva(string codigoAeropuerto);
-        Task<bool> DesactivarAlerta(int id);
-        Task<bool> EliminarFisico(int id);
+        Task<List<AlertasSeguridadModel>> ListarTodo();
+        Task<AlertasSeguridadModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(AlertasSeguridadModel m);
+        Task<bool> Actualizar(int id, AlertasSeguridadModel m);
+        Task<bool> Eliminar(int id);
     }
 }

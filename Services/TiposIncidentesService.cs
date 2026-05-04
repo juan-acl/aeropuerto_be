@@ -1,4 +1,4 @@
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
@@ -9,18 +9,19 @@ namespace Aeropuerto.Backend.Services
 {
     public class TiposIncidentesService : ITiposIncidentesService
     {
-        private readonly DBContext _context;
-        public TiposIncidentesService(DBContext context) => _context = context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public TiposIncidentesService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
         public async Task<List<TiposIncidentesModel>> ListarTodo()
         {
-            try { return await _context.TiposIncidentes.ToListAsync(); }
+            try { return await _replica.TiposIncidentes.ToListAsync(); }
             catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo TiposIncidentesModel: {ex.Message}"); return new List<TiposIncidentesModel>(); }
         }
 
-        public async Task<TiposIncidentesModel?> ObtenerPorId(int id)
+        public async Task<TiposIncidentesModel ?> ObtenerPorId(int id)
         {
-            try { return await _context.TiposIncidentes.FindAsync(id); }
+            try { return await _replica.TiposIncidentes.FindAsync(id); }
             catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId TiposIncidentesModel: {ex.Message}"); return null; }
         }
 
@@ -30,16 +31,16 @@ namespace Aeropuerto.Backend.Services
             {
                 string sql = "BEGIN pkg_tipos_incidentes.insert_tipo(:p_nombre_tipo, :p_descripcion, :p_protocolo_accion, :p_tiempo_respuesta, :p_activo); END;";
                 var p = new OracleParameter[] {
-                new OracleParameter("p_nombre_tipo", (object?)m.NombreTipo ?? DBNull.Value),
-                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_protocolo_accion", (object?)m.ProtocoloAccion ?? DBNull.Value),
-                new OracleParameter("p_tiempo_respuesta", DBNull.Value /* TiempoRespuesta */),
-                new OracleParameter("p_activo", m.Activo)
+                    new OracleParameter("p_nombre_tipo", (object?)m.NombreTipo ?? DBNull.Value),
+                    new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                    new OracleParameter("p_protocolo_accion", (object?)m.ProtocoloAccion ?? DBNull.Value),
+                    new OracleParameter("p_tiempo_respuesta", DBNull.Value),
+                    new OracleParameter("p_activo", m.Activo)
                 };
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Insertar TiposIncidentesModel: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Insertar TiposIncidentesModel: {ex.Message}"); throw; }
         }
 
         public async Task<bool> Actualizar(int id, TiposIncidentesModel m)
@@ -48,28 +49,28 @@ namespace Aeropuerto.Backend.Services
             {
                 string sql = "BEGIN pkg_tipos_incidentes.update_tipo(:p_id_tipo_incidente, :p_nombre_tipo, :p_descripcion, :p_protocolo_accion, :p_tiempo_respuesta, :p_activo); END;";
                 var p = new OracleParameter[] {
-                new OracleParameter("p_id_tipo_incidente", id),
-                new OracleParameter("p_nombre_tipo", (object?)m.NombreTipo ?? DBNull.Value),
-                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_protocolo_accion", (object?)m.ProtocoloAccion ?? DBNull.Value),
-                new OracleParameter("p_tiempo_respuesta", DBNull.Value /* TiempoRespuesta */),
-                new OracleParameter("p_activo", m.Activo)
+                    new OracleParameter("p_id_tipo_incidente", id),
+                    new OracleParameter("p_nombre_tipo", (object?)m.NombreTipo ?? DBNull.Value),
+                    new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
+                    new OracleParameter("p_protocolo_accion", (object?)m.ProtocoloAccion ?? DBNull.Value),
+                    new OracleParameter("p_tiempo_respuesta", DBNull.Value),
+                    new OracleParameter("p_activo", m.Activo)
                 };
-                await _context.Database.ExecuteSqlRawAsync(sql, p);
+                await _primary.Database.ExecuteSqlRawAsync(sql, p);
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar TiposIncidentesModel: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Actualizar TiposIncidentesModel: {ex.Message}"); throw; }
         }
 
         public async Task<bool> Eliminar(int id)
         {
             try
             {
-                string sql = "BEGIN pkg_tipos_incidentes.delete_tipo(:); END;";
-                await _context.Database.ExecuteSqlRawAsync(sql, new OracleParameter("", id));
+                string sql = "BEGIN pkg_tipos_incidentes.delete_tipo(:p_id); END;";
+                await _primary.Database.ExecuteSqlRawAsync(sql, new OracleParameter("p_id", id));
                 return true;
             }
-            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar TiposIncidentesModel: {ex.Message}"); return false; }
+            catch (Exception ex) { Console.WriteLine($"ERROR Eliminar TiposIncidentesModel: {ex.Message}"); throw; }
         }
     }
 }

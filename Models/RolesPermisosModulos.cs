@@ -1,9 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aeropuerto.Backend.Models
 {
     [Table("ROLES_PERMISOS_MODULOS")]
+    [PrimaryKey(nameof(IdRolSistema), nameof(IdModuloSistema))]
     public class RolesPermisosModulos
     {
         
@@ -25,9 +27,5 @@ namespace Aeropuerto.Backend.Models
         [Column("PERMISO_EJECUCION")]
         public decimal? PermisoEjecucion { get; set; }
         
-        [Key]
-        [Column("ID_ROL_PERMISO_MODULO")]
-        public int IdRolPermisoModulo { get; set; }
-
     }
 }

@@ -8,36 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class ReservasPromocionesController : ControllerBase
     {
-        private readonly IReservasPromocionesService _service;
+        private readonly IReservasPromocionesService _svc;
+        public ReservasPromocionesController(IReservasPromocionesService svc) { _svc = svc; }
 
-        public ReservasPromocionesController(IReservasPromocionesService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost("aplicar")]
-        public async Task<IActionResult> Aplicar([FromBody] ReservasPromocionesModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.AplicarPromocion(modelo);
-                return Ok(new { mensaje = "Promoción aplicada a la reserva exitosamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("reserva/{idReserva}")]
-        public async Task<IActionResult> Get(int idReserva)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] ReservasPromocionesModel m)
         {
-            var result = await _service.ListarPorReserva(idReserva);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpDelete("quitar/{idReserva}/{idPromocion}")]
-        public async Task<IActionResult> Delete(int idReserva, int idPromocion)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] ReservasPromocionesModel m)
         {
-            await _service.EliminarRelacion(idReserva, idPromocion);
-            return Ok(new { mensaje = "Promoción removida de la reserva." });
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -7,6 +7,7 @@ namespace Aeropuerto.Backend.Models
     public class AccesosAreasRestringidasModel
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_ACCESO")]
         public int IdAcceso { get; set; }
 
@@ -26,7 +27,7 @@ namespace Aeropuerto.Backend.Models
         public string? MetodoAutenticacion { get; set; } // HUELLA, TARJETA, CODIGO
 
         [Column("AUTORIZADO")]
-        public int Autorizado { get; set; } = 1; // 1 = Sí, 0 = No (Intento denegado)
+        public int Autorizado { get; set; } = 1; // 1 = S�, 0 = No (Intento denegado)
 
         [Column("OBSERVACIONES")]
         public string? Observaciones { get; set; }

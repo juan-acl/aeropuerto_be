@@ -1,20 +1,45 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
 
 namespace Aeropuerto.Backend.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AutorizacionMenorController : ControllerBase
     {
-        private readonly IAutorizacionMenorService _service;
-        public AutorizacionMenorController(IAutorizacionMenorService service) => _service = service;
+        private readonly IAutorizacionMenorService _svc;
+        public AutorizacionMenorController(IAutorizacionMenorService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<IActionResult> Get() => Ok(await _service.ListarTodo());
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] AutorizacionMenor m) => Ok(await _service.Insertar(m));
+        public async Task<IActionResult> Create([FromBody] AutorizacionMenor m)
+        {
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] AutorizacionMenor m)
+        {
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
+        }
     }
 }

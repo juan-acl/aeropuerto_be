@@ -8,92 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class MotorAvionController : ControllerBase
     {
-        private readonly IMotorAvionService _service;
+        private readonly IMotorAvionService _svc;
+        public MotorAvionController(IMotorAvionService svc) { _svc = svc; }
 
-        public MotorAvionController(IMotorAvionService service)
-        {
-            _service = service;
-        }
-
-        // 1. LISTAR TODO (GET)
         [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try
-            {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al obtener los motores: {ex.Message}");
-            }
-        }
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        // 2. OBTENER POR ID (GET)
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerPorId(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                var motor = await _service.ObtenerPorId(id);
-                if (motor == null) return NotFound($"Motor con ID {id} no encontrado.");
-                return Ok(motor);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al buscar el motor: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        // 3. INSERTAR (POST) - Llama a pkg_motores_aviones.insert_motor
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] MotorAvionModel modelo)
+        public async Task<IActionResult> Create([FromBody] MotorAvionModel m)
         {
-            if (modelo == null) return BadRequest("Datos del motor no válidos.");
-
-            try
-            {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = $"Motor '{modelo.NombreMotor}' registrado con éxito." });
-            }
-            catch (Exception ex)
-            {
-                // Captura errores de CHECK CONSTRAINT (TURBOFAN, JET, etc.) de Oracle
-                return StatusCode(500, $"Error al insertar el motor: {ex.Message}");
-            }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        // 4. ACTUALIZAR (PUT) - Llama a pkg_motores_aviones.update_motor
         [HttpPut("{id}")]
-        public async Task<IActionResult> Actualizar(int id, string nombre, string tipo, decimal empuje, int activo)
+        public async Task<IActionResult> Update(int id, [FromBody] MotorAvionModel m)
         {
-            try
-            {
-                var resultado = await _service.Actualizar(id, nombre, tipo, empuje, activo);
-                if (!resultado) return NotFound($"No se pudo actualizar: El motor con ID {id} no existe.");
-
-                return Ok(new { mensaje = $"Motor con ID {id} actualizado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar el motor: {ex.Message}");
-            }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        // 5. ELIMINAR (DELETE) - Llama a pkg_motores_aviones.delete_motor
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = $"Motor con ID {id} eliminado correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al eliminar el motor: {ex.Message}");
-            }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

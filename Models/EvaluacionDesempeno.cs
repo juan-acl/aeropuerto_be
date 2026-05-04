@@ -1,12 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
-    [Table("EVALUACION_DESEMPENO")]
+    [Table("EVALUACIONES_DESEMPENO")]
     public class EvaluacionDesempeno
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_EVALUACION")]
         public int IdEvaluacion { get; set; }
         [Column("ID_EMPLEADO")]

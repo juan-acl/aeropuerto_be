@@ -1,12 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 namespace Aeropuerto.Backend.Models
 {
     [Table("TRIPULACION_VUELO")]
+    [PrimaryKey(nameof(IdVuelo), nameof(IdTripulante))]
     public class TripulacionVueloModel
     {
-        [Key][Column("ID_ASIGNACION")][DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdAsignacion { get; set; }
+
         [Column("ID_VUELO")]
         public int IdVuelo { get; set; }
         [Column("ID_TRIPULANTE")]

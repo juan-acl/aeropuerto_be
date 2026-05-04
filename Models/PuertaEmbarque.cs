@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace Aeropuerto.Backend.Models
 {
     [Table("PUERTAS_EMBARQUE")]
@@ -19,8 +19,6 @@ namespace Aeropuerto.Backend.Models
         public int? CapacidadMaxima { get; set; }
         [Column("TIENE_PASARELA")]
         public int TienePasarela { get; set; } = 0;
-        [Column("ESTADO_OPERACIONAL")][StringLength(20)]
-        public string EstadoOperacional { get; set; } = "DISPONIBLE";
         [Column("ACTIVO")]
         public int Activo { get; set; } = 1;
     }

@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -10,7 +10,6 @@ namespace Aeropuerto.Backend.Models
         [Column("ID_EMPLEADO", Order = 0)]
         public int IdEmpleado { get; set; }
 
-        [Key]
         [Column("ID_CAPACITACION", Order = 1)]
         public int IdCapacitacion { get; set; }
 

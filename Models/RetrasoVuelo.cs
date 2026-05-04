@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 namespace Aeropuerto.Backend.Models
 {
     [Table("RETRASOS_VUELO")]
@@ -19,8 +19,6 @@ namespace Aeropuerto.Backend.Models
         [Column("RESPONSABLE")][StringLength(50)]
         public string? Responsable { get; set; }
         [Column("COMPENSACION_PASAJEROS")]
-        public decimal? CompensacionPasajeros { get; set; }
-        [Column("FECHA_REGISTRO")]
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public int? CompensacionPasajeros { get; set; }
     }
 }

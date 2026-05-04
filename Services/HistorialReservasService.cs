@@ -1,63 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class HistorialReservasService : IHistorialReservasService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public HistorialReservasService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public HistorialReservasService(DBContext context) => _context = context;
+        public async Task<List<HistorialReservasModel>> ListarTodo()
+        {
+            try { return await _replica.HistorialReservas.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HistorialReservasModel: {ex.Message}"); return new List<HistorialReservasModel>(); }
+        }
+
+        public async Task<HistorialReservasModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.HistorialReservas.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId HistorialReservasModel: {ex.Message}"); return null; }
+        }
 
         public async Task<bool> Insertar(HistorialReservasModel m)
         {
-            var sql = "pkg_historial_reservas.insert_historial";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_reserva", m.IdReserva),
-                new OracleParameter("p_campo_modificado", (object?)m.CampoModificado ?? DBNull.Value),
-                new OracleParameter("p_valor_anterior", (object?)m.ValorAnterior ?? DBNull.Value),
-                new OracleParameter("p_valor_nuevo", (object?)m.ValorNuevo ?? DBNull.Value),
-                new OracleParameter("p_usuario_modificacion", (object?)m.UsuarioModificacion ?? "SISTEMA"),
-                new OracleParameter("p_motivo_cambio", (object?)m.MotivoCambio ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_reserva, :p_campo_modificado, :p_valor_anterior, :p_valor_nuevo, :p_usuario_modificacion, :p_motivo_cambio); END;", parametros);
+            _primary.HistorialReservas.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<List<HistorialReservasModel>> ListarPorReserva(int idReserva)
-        {
-            return await _context.HistorialReservas
-                .Where(h => h.IdReserva == idReserva)
-                .OrderByDescending(h => h.FechaCambio)
-                .ToListAsync();
         }
 
         public async Task<bool> Actualizar(int id, HistorialReservasModel m)
         {
-            var sql = "pkg_historial_reservas.update_historial";
-
-            var parametros = new[] {
-                new OracleParameter("p_id_historial_reserva", id),
-                new OracleParameter("p_campo_modificado", m.CampoModificado),
-                new OracleParameter("p_valor_anterior", m.ValorAnterior),
-                new OracleParameter("p_valor_nuevo", m.ValorNuevo),
-                new OracleParameter("p_usuario_modificacion", m.UsuarioModificacion),
-                new OracleParameter("p_motivo_cambio", m.MotivoCambio)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_historial_reserva, :p_campo_modificado, :p_valor_anterior, :p_valor_nuevo, :p_usuario_modificacion, :p_motivo_cambio); END;", parametros);
+            _primary.HistorialReservas.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_historial_reservas.delete_historial";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_historial_reserva); END;", new OracleParameter("p_id_historial_reserva", id));
+            var e = await _primary.HistorialReservas.FindAsync(id);
+            if (e == null) return false;
+            _primary.HistorialReservas.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

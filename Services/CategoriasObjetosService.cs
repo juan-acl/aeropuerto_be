@@ -1,59 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class CategoriasObjetosService : ICategoriasObjetosService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public CategoriasObjetosService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public CategoriasObjetosService(DBContext context) => _context = context;
-
-        public async Task<bool> RegistrarCategoria(CategoriasObjetosModel m)
+        public async Task<List<CategoriasObjetosModel>> ListarTodo()
         {
-            var sql = "pkg_categorias_objetos.insert_categoria";
+            try { return await _replica.CategoriasObjetos.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo CategoriasObjetosModel: {ex.Message}"); return new List<CategoriasObjetosModel>(); }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_nombre_categoria", m.NombreCategoria),
-                new OracleParameter("p_descripcion", (object?)m.Descripcion ?? DBNull.Value),
-                new OracleParameter("p_activo", m.Activo)
-            };
+        public async Task<CategoriasObjetosModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.CategoriasObjetos.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId CategoriasObjetosModel: {ex.Message}"); return null; }
+        }
 
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_nombre_categoria, :p_descripcion, :p_activo); END;", parametros);
+        public async Task<bool> Insertar(CategoriasObjetosModel m)
+        {
+            _primary.CategoriasObjetos.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<CategoriasObjetosModel>> ListarTodas()
+        public async Task<bool> Actualizar(int id, CategoriasObjetosModel m)
         {
-            return await _context.CategoriasObjetos
-                .OrderBy(c => c.NombreCategoria)
-                .ToListAsync();
-        }
-
-        public async Task<List<CategoriasObjetosModel>> ListarActivas()
-        {
-            // Útil para poblar los ComboBox/Selects en el frontend
-            return await _context.CategoriasObjetos
-                .Where(c => c.Activo == 1)
-                .OrderBy(c => c.NombreCategoria)
-                .ToListAsync();
-        }
-
-        public async Task<bool> DesactivarCategoria(int id)
-        {
-            // Soft delete: Ideal para no romper la integridad referencial histórica
-            var sql = "pkg_categorias_objetos.desactivar_categoria";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_categoria); END;", new OracleParameter("p_id_categoria", id));
+            _primary.CategoriasObjetos.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_categorias_objetos.delete_categoria";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_categoria); END;", new OracleParameter("p_id_categoria", id));
+            var e = await _primary.CategoriasObjetos.FindAsync(id);
+            if (e == null) return false;
+            _primary.CategoriasObjetos.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

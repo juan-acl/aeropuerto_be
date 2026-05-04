@@ -8,48 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class ProgramasCompensacionAmbientalController : ControllerBase
     {
-        private readonly IProgramasCompensacionAmbientalService _service;
+        private readonly IProgramasCompensacionAmbientalService _svc;
+        public ProgramasCompensacionAmbientalController(IProgramasCompensacionAmbientalService svc) { _svc = svc; }
 
-        public ProgramasCompensacionAmbientalController(IProgramasCompensacionAmbientalService service)
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            _service = service;
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Crear([FromBody] ProgramasCompensacionAmbiental modelo)
+        public async Task<IActionResult> Create([FromBody] ProgramasCompensacionAmbiental m)
         {
-            if (modelo == null) return BadRequest("Datos inválidos");
-            try {
-                await _service.Insertar(modelo);
-                return Ok(new { mensaje = "ProgramasCompensacionAmbiental insertado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Actualizar([FromBody] ProgramasCompensacionAmbiental modelo)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] ProgramasCompensacionAmbiental m)
         {
-            try {
-                await _service.Actualizar(modelo.IdProgramaCompensacion, modelo);
-                return Ok(new { mensaje = "ProgramasCompensacionAmbiental actualizado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            try {
-                await _service.Eliminar(id);
-                return Ok(new { mensaje = "ProgramasCompensacionAmbiental eliminado correctamente." });
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Listar()
-        {
-            try {
-                var lista = await _service.ListarTodo();
-                return Ok(lista);
-            } catch (Exception ex) { return StatusCode(500, ex.Message); }
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }

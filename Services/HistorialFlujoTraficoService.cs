@@ -1,26 +1,49 @@
-﻿using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
+
 namespace Aeropuerto.Backend.Services
 {
     public class HistorialFlujoTraficoService : IHistorialFlujoTraficoService
     {
-        private readonly DBContext _ctx;
-        public HistorialFlujoTraficoService(DBContext ctx) => _ctx = ctx;
-        public async Task<List<HistorialFlujoTrafico>> ListarTodo() => await _ctx.Set<HistorialFlujoTrafico>().ToListAsync();
-        public async Task<HistorialFlujoTrafico?> ObtenerPorId(int id) => await _ctx.Set<HistorialFlujoTrafico>().FindAsync(id);
-        public async Task<bool> Insertar(HistorialFlujoTrafico m) { _ctx.Set<HistorialFlujoTrafico>().Add(m); await _ctx.SaveChangesAsync(); return true; }
-        public async Task<bool> Actualizar(int id, HistorialFlujoTrafico m) {
-            var e = await _ctx.Set<HistorialFlujoTrafico>().FindAsync(id);
-            if (e == null) return false;
-            _ctx.Entry(e).CurrentValues.SetValues(m);
-            await _ctx.SaveChangesAsync(); return true;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public HistorialFlujoTraficoService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
+
+        public async Task<List<HistorialFlujoTrafico>> ListarTodo()
+        {
+            try { return await _replica.HistorialFlujo.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HistorialFlujoTrafico: {ex.Message}"); return new List<HistorialFlujoTrafico>(); }
         }
-        public async Task<bool> Eliminar(int id) {
-            var e = await _ctx.Set<HistorialFlujoTrafico>().FindAsync(id);
+
+        public async Task<HistorialFlujoTrafico ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.HistorialFlujo.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId HistorialFlujoTrafico: {ex.Message}"); return null; }
+        }
+
+        public async Task<bool> Insertar(HistorialFlujoTrafico m)
+        {
+            _primary.HistorialFlujo.Add(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Actualizar(int id, HistorialFlujoTrafico m)
+        {
+            _primary.HistorialFlujo.Update(m);
+            await _primary.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> Eliminar(int id)
+        {
+            var e = await _primary.HistorialFlujo.FindAsync(id);
             if (e == null) return false;
-            _ctx.Set<HistorialFlujoTrafico>().Remove(e); await _ctx.SaveChangesAsync(); return true;
+            _primary.HistorialFlujo.Remove(e);
+            await _primary.SaveChangesAsync();
+            return true;
         }
     }
 }

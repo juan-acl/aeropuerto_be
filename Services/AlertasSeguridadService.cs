@@ -1,64 +1,48 @@
-using Aeropuerto.Backend.Data;
-using Aeropuerto.Backend.Interfaces;
+﻿using Aeropuerto.Backend.Interfaces;
 using Aeropuerto.Backend.Models;
+using Aeropuerto.Backend.Data;
 using Microsoft.EntityFrameworkCore;
-using Oracle.ManagedDataAccess.Client;
 
 namespace Aeropuerto.Backend.Services
 {
     public class AlertasSeguridadService : IAlertasSeguridadService
     {
-        private readonly DBContext _context;
+        private readonly DBContext _primary;
+        private readonly ReplicaDBContext _replica;
+        public AlertasSeguridadService(DBContext primary, ReplicaDBContext replica) { _primary = primary; _replica = replica; }
 
-        public AlertasSeguridadService(DBContext context) => _context = context;
-
-        public async Task<bool> EmitirAlerta(AlertasSeguridadModel m)
+        public async Task<List<AlertasSeguridadModel>> ListarTodo()
         {
-            if (!string.IsNullOrEmpty(m.CodigoAeropuerto))
-            {
-                var sqlDesactivar = "pkg_alertas_seguridad.desactivar_alertas_aeropuerto";
-                await _context.Database.ExecuteSqlRawAsync($"BEGIN {sqlDesactivar}(:p_codigo_aeropuerto); END;", new OracleParameter("p_codigo_aeropuerto", m.CodigoAeropuerto));
-            }
+            try { return await _replica.AlertasSeguridad.ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo AlertasSeguridadModel: {ex.Message}"); return new List<AlertasSeguridadModel>(); }
+        }
 
-            var sql = "pkg_alertas_seguridad.insert_alerta";
+        public async Task<AlertasSeguridadModel ?> ObtenerPorId(int id)
+        {
+            try { return await _replica.AlertasSeguridad.FindAsync(id); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId AlertasSeguridadModel: {ex.Message}"); return null; }
+        }
 
-            var parametros = new[] {
-                new OracleParameter("p_codigo_aeropuerto", (object?)m.CodigoAeropuerto ?? DBNull.Value),
-                new OracleParameter("p_nivel_alerta", m.NivelAlerta),
-                new OracleParameter("p_motivo", (object?)m.Motivo ?? DBNull.Value),
-                new OracleParameter("p_medidas_adicionales", (object?)m.MedidasAdicionales ?? DBNull.Value),
-                new OracleParameter("p_emitida_por", (object?)m.EmitidaPor ?? DBNull.Value)
-            };
-
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_codigo_aeropuerto, :p_nivel_alerta, :p_motivo, :p_medidas_adicionales, :p_emitida_por); END;", parametros);
+        public async Task<bool> Insertar(AlertasSeguridadModel m)
+        {
+            _primary.AlertasSeguridad.Add(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<AlertasSeguridadModel>> ListarHistorial(string codigo)
+        public async Task<bool> Actualizar(int id, AlertasSeguridadModel m)
         {
-            return await _context.AlertasSeguridad
-                .Where(a => a.CodigoAeropuerto == codigo)
-                .OrderByDescending(a => a.FechaInicio)
-                .ToListAsync();
-        }
-
-        public async Task<AlertasSeguridadModel?> ObtenerAlertaActiva(string codigo)
-        {
-            return await _context.AlertasSeguridad
-                .FirstOrDefaultAsync(a => a.CodigoAeropuerto == codigo && a.Activa == 1);
-        }
-
-        public async Task<bool> DesactivarAlerta(int id)
-        {
-            var sql = "pkg_alertas_seguridad.desactivar_alerta";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_alerta); END;", new OracleParameter("p_id_alerta", id));
+            _primary.AlertasSeguridad.Update(m);
+            await _primary.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> EliminarFisico(int id)
+        public async Task<bool> Eliminar(int id)
         {
-            var sql = "pkg_alertas_seguridad.delete_alerta";
-            await _context.Database.ExecuteSqlRawAsync($"BEGIN {sql}(:p_id_alerta); END;", new OracleParameter("p_id_alerta", id));
+            var e = await _primary.AlertasSeguridad.FindAsync(id);
+            if (e == null) return false;
+            _primary.AlertasSeguridad.Remove(e);
+            await _primary.SaveChangesAsync();
             return true;
         }
     }

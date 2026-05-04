@@ -9,6 +9,10 @@ namespace Aeropuerto.Backend.Data
         {
         }
 
+        protected DBContext(DbContextOptions options) : base(options)
+        {
+        }
+
         // ══════════════════════════════════════════════════════════════════════
         // Módulo 1: Infraestructura
         // ══════════════════════════════════════════════════════════════════════
@@ -341,6 +345,14 @@ namespace Aeropuerto.Backend.Data
             // Clave compuesta para EmpleadoCapacitacion (Módulo 15)
             modelBuilder.Entity<EmpleadoCapacitacion>()
                 .HasKey(ec => new { ec.IdEmpleado, ec.IdCapacitacion });
+
+            // Clave compuesta para GruposPasajeros (Módulo 7)
+            modelBuilder.Entity<GruposPasajerosModel>()
+                .HasKey(gp => new { gp.IdGrupo, gp.IdPasajero });
+
+            // Clave compuesta para ReservasPromociones (Módulo 8)
+            modelBuilder.Entity<ReservasPromocionesModel>()
+                .HasKey(rp => new { rp.IdReserva, rp.IdPromocion });
 
             base.OnModelCreating(modelBuilder);
         }

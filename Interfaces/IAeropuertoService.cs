@@ -4,11 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IAeropuertoService
     {
-        Task<bool> Insertar(AeropuertoModel modelo);
-        Task<bool> Actualizar(string codigo, int terminales, int puertas, int activo);
-        Task<bool> Eliminar(string codigo);
-
         Task<List<AeropuertoModel>> ListarTodo();
+        Task<AeropuertoModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(AeropuertoModel m);
+        Task<bool> Actualizar(int id, AeropuertoModel m);
+        Task<bool> Eliminar(int id);
     }
 }
-

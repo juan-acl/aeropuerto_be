@@ -4,9 +4,10 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IPreferenciaIdiomaService
     {
-        Task<bool> Insertar(PreferenciaIdiomaModel modelo);
-        Task<List<PreferenciaIdiomaModel>> ListarPorPasajero(int idPasajero);
-        Task<bool> Actualizar(int id, PreferenciaIdiomaModel modelo);
-        Task<bool> EliminarFisico(int id);
+        Task<List<PreferenciaIdiomaModel>> ListarTodo();
+        Task<PreferenciaIdiomaModel ?> ObtenerPorId(int id);
+        Task<bool> Insertar(PreferenciaIdiomaModel m);
+        Task<bool> Actualizar(int id, PreferenciaIdiomaModel m);
+        Task<bool> Eliminar(int id);
     }
 }

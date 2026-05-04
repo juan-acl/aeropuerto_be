@@ -6,6 +6,7 @@ namespace Aeropuerto.Backend.Models
     [Table("MANTENIMIENTO_AVIONES")]
     public class MantenimientoAvionModel
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key][Column("ID_MANTENIMIENTO")]
         public int IdMantenimiento { get; set; }
         

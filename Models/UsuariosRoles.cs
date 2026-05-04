@@ -1,9 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aeropuerto.Backend.Models
 {
     [Table("USUARIOS_ROLES")]
+    [PrimaryKey(nameof(IdUsuarioSistema), nameof(IdRolSistema))]
     public class UsuariosRoles
     {
         
@@ -22,9 +24,5 @@ namespace Aeropuerto.Backend.Models
         [Column("ACTIVO")]
         public decimal? Activo { get; set; }
         
-        [Key]
-        [Column("ID_USUARIO_ROL")]
-        public int IdUsuarioRol { get; set; }
-  
     }
 }

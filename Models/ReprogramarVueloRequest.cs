@@ -1,4 +1,4 @@
-﻿namespace Aeropuerto.Backend.Models
+namespace Aeropuerto.Backend.Models
 {
     public class ReprogramarVueloRequest
     {

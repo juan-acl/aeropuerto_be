@@ -8,47 +8,38 @@ namespace Aeropuerto.Backend.Controllers
     [Route("api/[controller]")]
     public class IncidentesEvidenciaController : ControllerBase
     {
-        private readonly IIncidentesEvidenciaService _service;
+        private readonly IIncidentesEvidenciaService _svc;
+        public IncidentesEvidenciaController(IIncidentesEvidenciaService svc) { _svc = svc; }
 
-        public IncidentesEvidenciaController(IIncidentesEvidenciaService service) => _service = service;
+        [HttpGet]
+        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
-        [HttpPost("cargar")]
-        public async Task<IActionResult> Post([FromBody] IncidentesEvidenciaModel modelo)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            try
-            {
-                await _service.CargarEvidencia(modelo);
-                return Ok(new { mensaje = "Evidencia registrada correctamente." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error: {ex.Message}");
-            }
+            var item = await _svc.ObtenerPorId(id);
+            return item == null ? NotFound() : Ok(item);
         }
 
-        [HttpGet("incidente/{idIncidente}")]
-        public async Task<IActionResult> GetByIncidente(int idIncidente)
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] IncidentesEvidenciaModel m)
         {
-            var result = await _service.ListarPorIncidente(idIncidente);
-            return Ok(result);
+            await _svc.Insertar(m);
+            return Ok(new { mensaje = "Registro creado correctamente." });
         }
 
-        [HttpGet("{id}/archivo")]
-        public async Task<IActionResult> GetFile(int id)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] IncidentesEvidenciaModel m)
         {
-            var evidencia = await _service.ObtenerPorId(id);
-            if (evidencia == null || evidencia.ArchivoEvidencia == null)
-                return NotFound("Archivo no encontrado.");
-
-            // Retorna el binario (esto permite previsualizar imágenes en el navegador)
-            return File(evidencia.ArchivoEvidencia, "application/octet-stream");
+            await _svc.Actualizar(id, m);
+            return Ok(new { mensaje = "Registro actualizado correctamente." });
         }
 
-        [HttpDelete("fisico/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _service.EliminarFisico(id);
-            return Ok(new { mensaje = "Evidencia eliminada." });
+            await _svc.Eliminar(id);
+            return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
     }
 }
