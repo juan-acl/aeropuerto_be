@@ -23,6 +23,18 @@ namespace Aeropuerto.Backend.Services
             catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ReservasModel: {ex.Message}"); return null; }
         }
 
+        public async Task<List<ReservasModel>> ListarPorPasajero(int idPasajero)
+        {
+            try { return await _replica.Reservas.Where(r => r.IdPasajero == idPasajero).ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarPorPasajero ReservasModel: {ex.Message}"); return new List<ReservasModel>(); }
+        }
+
+        public async Task<List<ReservasModel>> ListarPorVuelo(int idVuelo)
+        {
+            try { return await _replica.Reservas.Where(r => r.IdVuelo == idVuelo && r.EstadoReserva != "CANCELADA").ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarPorVuelo ReservasModel: {ex.Message}"); return new List<ReservasModel>(); }
+        }
+
         public async Task<bool> Insertar(ReservasModel m)
         {
             _primary.Reservas.Add(m);
@@ -31,7 +43,7 @@ namespace Aeropuerto.Backend.Services
         }
 
         public async Task<bool> Actualizar(int id, ReservasModel m)
-        {
+        {   
             _primary.Reservas.Update(m);
             await _primary.SaveChangesAsync();
             return true;

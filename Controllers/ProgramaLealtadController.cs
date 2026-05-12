@@ -21,6 +21,10 @@ namespace Aeropuerto.Backend.Controllers
             return item == null ? NotFound() : Ok(item);
         }
 
+        [HttpGet("pasajero/{idPasajero}")]
+        public async Task<IActionResult> GetByPasajero(int idPasajero)
+            => Ok(await _svc.ObtenerPorPasajero(idPasajero));
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProgramaLealtadModel m)
         {

@@ -14,6 +14,13 @@ namespace Aeropuerto.Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
 
+        [HttpGet("aeropuerto/{codigo}")]
+        public async Task<IActionResult> GetByAeropuerto(string codigo)
+        {
+            var items = await _svc.ListarPorAeropuerto(codigo);
+            return Ok(items);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {

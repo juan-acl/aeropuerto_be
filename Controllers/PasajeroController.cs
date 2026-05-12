@@ -21,11 +21,18 @@ namespace Aeropuerto.Backend.Controllers
             return item == null ? NotFound() : Ok(item);
         }
 
+        [HttpGet("email/{email}")]
+        public async Task<IActionResult> GetByEmail(string email)
+        {
+            var item = await _svc.ObtenerPorEmail(email);
+            return item == null ? NotFound() : Ok(item);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PasajeroModel m)
         {
             await _svc.Insertar(m);
-            return Ok(new { mensaje = "Registro creado correctamente." });
+            return Ok(new { IdGenerado = m.IdPasajero, mensaje = "Registro creado correctamente." });
         }
 
         [HttpPut("{id}")]

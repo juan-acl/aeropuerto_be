@@ -19,6 +19,12 @@ namespace Aeropuerto.Backend.Services
             catch (Exception ex) { Console.WriteLine($"ERROR ListarTodo HotelesCercanosModel: {ex.Message}"); return new List<HotelesCercanosModel>(); }
         }
 
+        public async Task<List<HotelesCercanosModel>> ListarPorAeropuerto(string codigoAeropuerto)
+        {
+            try { return await _replica.HotelesCercanos.Where(h => h.CodigoAeropuerto == codigoAeropuerto.ToUpper()).ToListAsync(); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ListarPorAeropuerto HotelesCercanosModel: {ex.Message}"); return new List<HotelesCercanosModel>(); }
+        }
+
         public async Task<HotelesCercanosModel ?> ObtenerPorId(int id)
         {
             try { return await _replica.HotelesCercanos.FindAsync(id); }

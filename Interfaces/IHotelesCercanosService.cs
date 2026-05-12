@@ -5,6 +5,7 @@ namespace Aeropuerto.Backend.Interfaces
     public interface IHotelesCercanosService
     {
         Task<List<HotelesCercanosModel>> ListarTodo();
+        Task<List<HotelesCercanosModel>> ListarPorAeropuerto(string codigoAeropuerto);
         Task<HotelesCercanosModel ?> ObtenerPorId(int id);
         Task<bool> Insertar(HotelesCercanosModel m);
         Task<bool> Actualizar(int id, HotelesCercanosModel m);

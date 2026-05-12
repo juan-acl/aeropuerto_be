@@ -23,6 +23,12 @@ namespace Aeropuerto.Backend.Services
             catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId PasajeroModel: {ex.Message}"); return null; }
         }
 
+        public async Task<PasajeroModel ?> ObtenerPorEmail(string email)
+        {
+            try { return await _replica.Pasajeros.FirstOrDefaultAsync(p => p.Email != null && p.Email.ToLower() == email.ToLower()); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorEmail PasajeroModel: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(PasajeroModel m)
         {
             _primary.Pasajeros.Add(m);

@@ -6,6 +6,7 @@ namespace Aeropuerto.Backend.Interfaces
     {
         Task<List<ProgramaLealtadModel>> ListarTodo();
         Task<ProgramaLealtadModel ?> ObtenerPorId(int id);
+        Task<ProgramaLealtadModel ?> ObtenerPorPasajero(int idPasajero);
         Task<bool> Insertar(ProgramaLealtadModel m);
         Task<bool> Actualizar(int id, ProgramaLealtadModel m);
         Task<bool> Eliminar(int id);

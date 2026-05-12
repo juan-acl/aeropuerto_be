@@ -25,6 +25,12 @@ namespace Aeropuerto.Backend.Services
             catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorId ProgramaLealtadModel: {ex.Message}"); return null; }
         }
 
+        public async Task<ProgramaLealtadModel ?> ObtenerPorPasajero(int idPasajero)
+        {
+            try { return await _replica.ProgramaLealtad.FirstOrDefaultAsync(p => p.IdPasajero == idPasajero); }
+            catch (Exception ex) { Console.WriteLine($"ERROR ObtenerPorPasajero ProgramaLealtadModel: {ex.Message}"); return null; }
+        }
+
         public async Task<bool> Insertar(ProgramaLealtadModel m)
         {
             try

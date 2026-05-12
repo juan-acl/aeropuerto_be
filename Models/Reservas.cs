@@ -18,7 +18,7 @@ namespace Aeropuerto.Backend.Models
         public int IdPasajero { get; set; }
 
         [Column("CODIGO_RESERVA")]
-        public string CodigoReserva { get; set; } = null!;
+        public string? CodigoReserva { get; set; }
 
         [Column("FECHA_RESERVA")]
         public DateTime? FechaReserva { get; set; }
