@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Aeropuerto.Backend.Models
 {
@@ -7,7 +7,6 @@ namespace Aeropuerto.Backend.Models
     public class ReservasModel
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("ID_RESERVA")]
         public int IdReserva { get; set; }
 
@@ -18,7 +17,7 @@ namespace Aeropuerto.Backend.Models
         public int IdPasajero { get; set; }
 
         [Column("CODIGO_RESERVA")]
-        public string? CodigoReserva { get; set; }
+        public string CodigoReserva { get; set; } = null!;
 
         [Column("FECHA_RESERVA")]
         public DateTime? FechaReserva { get; set; }

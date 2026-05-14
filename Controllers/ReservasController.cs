@@ -12,17 +12,37 @@ namespace Aeropuerto.Backend.Controllers
 
         public ReservasController(IReservasService service) => _service = service;
 
+        // Extrae el mensaje legible del error Oracle (ORA-2XXXX son errores de usuario)
+        private static string ExtraerMensaje(Exception ex)
+        {
+            var msg = ex.InnerException?.Message ?? ex.Message;
+            var match = System.Text.RegularExpressions.Regex.Match(
+                msg, @"ORA-2\d{4}:\s*(.+?)(?:\r?\n|$)");
+            return match.Success
+                ? match.Groups[1].Value.Trim()
+                : msg.Split('\n')[0].Trim();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ReservasModel modelo)
         {
+            if (string.IsNullOrWhiteSpace(modelo.CodigoReserva))
+                modelo.CodigoReserva =
+                    $"RES-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..6].ToUpper()}";
+
             try
             {
                 await _service.Insertar(modelo);
-                return Ok(new { mensaje = "Reserva creada exitosamente." });
+                return Ok(new
+                {
+                    CodigoReserva = modelo.CodigoReserva,
+                    IdGenerado    = modelo.IdReserva,
+                    mensaje       = "Reserva creada exitosamente."
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error: {ex.Message}");
+                return BadRequest(new { mensaje = ExtraerMensaje(ex) });
             }
         }
 
@@ -30,6 +50,13 @@ namespace Aeropuerto.Backend.Controllers
         public async Task<IActionResult> GetByPasajero(int idPasajero)
         {
             var result = await _service.ListarPorPasajero(idPasajero);
+            return Ok(result);
+        }
+
+        [HttpGet("vuelo/{idVuelo}")]
+        public async Task<IActionResult> GetByVuelo(int idVuelo)
+        {
+            var result = await _service.ListarPorVuelo(idVuelo);
             return Ok(result);
         }
 
