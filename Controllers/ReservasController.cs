@@ -23,6 +23,13 @@ namespace Aeropuerto.Backend.Controllers
                 : msg.Split('\n')[0].Trim();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _service.ListarTodo();
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ReservasModel modelo)
         {

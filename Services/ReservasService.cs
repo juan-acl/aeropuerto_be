@@ -12,6 +12,11 @@ namespace Aeropuerto.Backend.Services
 
         public ReservasService(DBContext context) => _context = context;
 
+        public async Task<List<ReservasModel>> ListarTodo()
+        {
+            return await _context.Reservas.ToListAsync();
+        }
+
         public async Task<bool> Insertar(ReservasModel m)
         {
             var sql = "sp_crear_reserva";

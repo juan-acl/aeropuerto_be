@@ -4,6 +4,7 @@ namespace Aeropuerto.Backend.Interfaces
 {
     public interface IReservasService
     {
+        Task<List<ReservasModel>> ListarTodo();
         Task<bool> Insertar(ReservasModel modelo);
         Task<List<ReservasModel>> ListarPorPasajero(int idPasajero);
         Task<List<ReservasModel>> ListarPorVuelo(int idVuelo);

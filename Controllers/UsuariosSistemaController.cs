@@ -12,13 +12,17 @@ namespace Aeropuerto.Backend.Controllers
         public UsuariosSistemaController(IUsuariosSistemaService svc) { _svc = svc; }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() => Ok(await _svc.ListarTodo());
+        public async Task<IActionResult> GetAll()
+        {
+            var items = await _svc.ListarTodo();
+            return Ok(items.Select(ToSafeResponse));
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var item = await _svc.ObtenerPorId(id);
-            return item == null ? NotFound() : Ok(item);
+            return item == null ? NotFound() : Ok(ToSafeResponse(item));
         }
 
         [HttpPost]
@@ -41,5 +45,22 @@ namespace Aeropuerto.Backend.Controllers
             await _svc.Eliminar(id);
             return Ok(new { mensaje = "Registro eliminado correctamente." });
         }
+
+        private static object ToSafeResponse(UsuariosSistema item) => new
+        {
+            item.IdUsuarioSistema,
+            item.IdEmpleado,
+            item.NombreUsuario,
+            item.EmailInstitucional,
+            item.FechaCreacion,
+            item.FechaUltimoAcceso,
+            item.FechaVencimientoPassword,
+            item.IntentosFallidos,
+            item.Bloqueado,
+            item.MotivoBloqueo,
+            item.RequiereCambioPassword,
+            item.Activo,
+            item.CreadoPor
+        };
     }
 }
